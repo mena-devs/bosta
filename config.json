@@ -1,0 +1,18 @@
+{
+    "token": "use your bot token",
+
+    "plugins": {
+        "eval": {
+            "folder": "eval",
+            "timeout": 2,
+            "languages": {
+                "python": { "timeout": 2, "memory": 8, "image": "python:latest", "command": "python" },
+                "perl": { "timeout": 2, "memory": 8, "image": "python:latest", "command": "perl" },
+                "javascript": { "timeout": 2, "memory": 8, "image": "google/nodejs:latest", "command": "node" },
+                "scala": { "timeout": 5, "memory": 64, "image": "williamyeh/scala:latest", "command": "scala" },
+                "ruby": { "timeout": 2, "memory": 8, "image": "ruby:latest", "command": "ruby" },
+                "php": { "timeout": 2, "memory": 8, "image": "php:latest", "command": "php" }
+                }
+            }
+        }
+}
