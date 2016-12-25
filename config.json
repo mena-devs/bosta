@@ -12,7 +12,7 @@
                 "scala": { "timeout": 5, "memory": 64, "image": "williamyeh/scala:latest", "command": "scala" },
                 "ruby": { "timeout": 2, "memory": 8, "image": "ruby:latest", "command": "ruby" },
                 "php": { "timeout": 2, "memory": 8, "image": "php:latest", "command": "php" },
-                "haskell": { "timeout": 4, "memory": 8, "image": "mitchty/alpine-ghc:latest", "command": "runghc" }
+                "haskell": { "timeout": 4, "memory": 8, "image": "mchakravarty/ghc-7.10.2:latest", "command": "runghc" }
                 }
             }
         }
