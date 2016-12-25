@@ -3,17 +3,54 @@
 
     "plugins": {
         "eval": {
-            "folder": "eval",
             "timeout": 2,
+            "memory": 8,
+            "crop": 512,
+            "folder": "eval",
             "languages": {
-                "python": { "timeout": 2, "memory": 8, "image": "python:latest", "command": "python" },
-                "perl": { "timeout": 2, "memory": 8, "image": "python:latest", "command": "perl" },
-                "javascript": { "timeout": 2, "memory": 8, "image": "google/nodejs:latest", "command": "node" },
-                "scala": { "timeout": 5, "memory": 64, "image": "williamyeh/scala:latest", "command": "scala" },
-                "ruby": { "timeout": 2, "memory": 8, "image": "ruby:latest", "command": "ruby" },
-                "php": { "timeout": 2, "memory": 8, "image": "php:latest", "command": "php" },
-                "haskell": { "timeout": 4, "memory": 8, "image": "mchakravarty/ghc-7.10.2:latest", "command": "runghc" }
+                "haskell": {
+                    "command": "runghc",
+                    "image": "mchakravarty/ghc-7.10.2:latest",
+                    "memory": 8,
+                    "timeout": 4
+                },
+                "javascript": {
+                    "command": "node",
+                    "image": "google/nodejs:latest",
+                    "memory": 8,
+                    "timeout": 2
+                },
+                "perl": {
+                    "command": "perl",
+                    "image": "python:latest",
+                    "memory": 8,
+                    "timeout": 2
+                },
+                "php": {
+                    "command": "php",
+                    "image": "php:latest",
+                    "memory": 8,
+                    "timeout": 2
+                },
+                "python": {
+                    "command": "python",
+                    "image": "python:latest",
+                    "memory": 8,
+                    "timeout": 2
+                },
+                "ruby": {
+                    "command": "ruby",
+                    "image": "ruby:latest",
+                    "memory": 8,
+                    "timeout": 2
+                },
+                "scala": {
+                    "command": "scala",
+                    "image": "williamyeh/scala:latest",
+                    "memory": 64,
+                    "timeout": 10
                 }
             }
         }
+    }
 }
