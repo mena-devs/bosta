@@ -3,7 +3,7 @@
 
     "plugins": {
         "eval": {
-            "timeout": 2,
+            "timeout": 4,
             "memory": 8,
             "crop": 512,
             "folder": "eval",
@@ -18,31 +18,31 @@
                     "command": "node",
                     "image": "google/nodejs:latest",
                     "memory": 8,
-                    "timeout": 2
+                    "timeout": 4
                 },
                 "perl": {
                     "command": "perl",
                     "image": "python:latest",
                     "memory": 8,
-                    "timeout": 2
+                    "timeout": 4
                 },
                 "php": {
                     "command": "php",
                     "image": "php:latest",
                     "memory": 8,
-                    "timeout": 2
+                    "timeout": 4
                 },
                 "python": {
                     "command": "python",
                     "image": "python:latest",
                     "memory": 8,
-                    "timeout": 2
+                    "timeout": 4
                 },
                 "ruby": {
                     "command": "ruby",
                     "image": "ruby:latest",
                     "memory": 8,
-                    "timeout": 2
+                    "timeout": 4
                 },
                 "scala": {
                     "command": "scala",
