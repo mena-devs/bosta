@@ -8,6 +8,8 @@ const RtmClient = require('@slack/client').RtmClient;
 const CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
+const figlet = require('figlet');
+
 const winston = require('winston');
 
 const config = require('./config.json');
@@ -27,12 +29,26 @@ client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
 
 
 client.on(RTM_EVENTS.MESSAGE, (message) => {
+    // PING
     if(message.text === 'test') {
         winston.info(
             `${message.user} pinged on channel ${message.channel}`, message);
         client.sendMessage('icle', message.channel);
     }
 
+    // FIGLET
+    if(message.text.startsWith('figlet')){
+        const text = message.text.substring(7);
+        figlet(text, function(err, data) {
+            if (err) {
+                winston.error(err);
+            }else{
+                client.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+            }
+        });
+    }
+
+    // Snippets
     if(message.text
             && message.text.toLocaleLowerCase() === 'snippets support') {
         winston.info(`support request: ${message}`);
@@ -61,6 +77,15 @@ client.on(RTM_EVENTS.MESSAGE, (message) => {
         }
     }
 });
+
+client.on(RTM_EVENTS.REACTION_ADDED, (message) => {
+    if(message.item.type === 'file' && message.reaction == 'repeat'){
+        winston.info(`repeat request: ${message.item.file}`);
+        web.files.info(message.item.file)
+            .then(result => download(result.file));
+    }
+});
+
 
 
 function download(file){
