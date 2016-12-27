@@ -11,8 +11,8 @@
                 "haskell": {
                     "command": "runghc",
                     "image": "mchakravarty/ghc-7.10.2:latest",
-                    "memory": 8,
-                    "timeout": 4
+                    "memory": 16,
+                    "timeout": 8
                 },
                 "javascript": {
                     "command": "node",

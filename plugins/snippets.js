@@ -60,11 +60,11 @@ function execute(name, config, sourceFolder) {
         let output = '';
         let error = '';
         docker.stdout.on('data', (data) => {
-            output = data.toString();
+            output += data.toString();
         });
 
         docker.stderr.on('data', (data) => {
-            error = data.toString();
+            error += data.toString();
         });
 
         docker.on('close', (code) => {
