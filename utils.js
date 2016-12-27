@@ -3,13 +3,13 @@ const https = require('https');
 const spawn = require('child_process').spawn;
 
 
-function download(host, path, token){
+function download(host, path, token) {
     const options = {
         host,
         path,
         headers: {
-            'Authorization': `Bearer ${token}`
-        }
+            Authorization: `Bearer ${token}`,
+        },
     };
 
     return new Promise((resolve, reject) => {
@@ -22,38 +22,38 @@ function download(host, path, token){
 }
 
 
-function save(path, source_stream){
+function save(path, sourceStream) {
     return new Promise((resolve, reject) => {
-        let target_stream = fs.createWriteStream(path)
-        source_stream.pipe(target_stream);
+        const targetStream = fs.createWriteStream(path);
+        sourceStream.pipe(targetStream);
 
-        target_stream.on('finish', () => {
+        targetStream.on('finish', () => {
             resolve(path);
-        }).on('error', (error) =>{
+        }).on('error', (error) => {
             reject(error);
         });
     });
 }
 
 
-function execute(name, config, source_folder){
-    const docker_args = [
+function execute(name, config, sourceFolder) {
+    const dockerArgs = [
         'run',
         '--rm',
         '-m', `${config.memory}M`,
         '-w', '/local',
-        '-v', `${source_folder}:/local`,
+        '-v', `${sourceFolder}:/local`,
         config.image,
         'timeout', config.timeout,
         config.command,
-        name
+        name,
     ];
 
-    return new Promise((resolve, reject) => {
-        let docker = spawn('docker', docker_args);
+    return new Promise((resolve) => {
+        const docker = spawn('docker', dockerArgs);
         let output = '';
         let error = '';
-        docker.stdout.on('data', (data) =>{
+        docker.stdout.on('data', (data) => {
             output = data.toString();
         });
 
@@ -62,10 +62,11 @@ function execute(name, config, source_folder){
         });
 
         docker.on('close', (code) => {
-            let result = [output || error];
+            const result = [output || error];
 
-            if(code > 0)
+            if (code > 0) {
                 result.push(`Your snippet failed with exit code: ${code}`);
+            }
 
             resolve(result.join('\n'));
         });
@@ -73,7 +74,7 @@ function execute(name, config, source_folder){
 }
 
 
-function load_config(config, name) {
+function loadConfig(config, name) {
     const language = config.plugins.eval.languages[name];
     return {
         timeout: language.timeout || config.plugins.eval.timeout,
@@ -81,7 +82,7 @@ function load_config(config, name) {
         memory: language.memory || config.plugins.eval.memory,
         image: language.image,
         command: language.command,
-    }
+    };
 }
 
 
@@ -89,5 +90,5 @@ module.exports = {
     download,
     save,
     execute,
-    load_config
+    loadConfig,
 };
