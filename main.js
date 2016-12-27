@@ -90,11 +90,17 @@ client.on(RTM_EVENTS.MESSAGE, (message) => {
             && message.text.startsWith('snippets config')) {
         const name = message.text.split(' ').pop();
         winston.info(`config request: ${name}`);
-        const { timeout, crop, memory } = utils.loadConfig(config, name);
-        client.sendMessage(`\`\`\`${name}:
-    Timeout  : ${timeout} seconds
-    Memory   : ${memory}MB
-    Crops at : ${crop} characters\`\`\``, message.channel);
+        try{
+            const { timeout, crop, memory } = utils.loadConfig(config, name);
+            client.sendMessage(`\`\`\`${name}:
+        Timeout  : ${timeout} seconds
+        Memory   : ${memory}MB
+        Crops at : ${crop} characters\`\`\``, message.channel);
+        } catch(e) {
+            client.sendMessage(
+                    `\`\`\`${name} is not supported\`\`\``,
+                    message.channel);
+        }
     }
 
     if (message.file
