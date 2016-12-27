@@ -12,6 +12,8 @@
   "dependencies": {
     "@slack/client": "^3.8.1",
     "figlet": "^1.2.0",
+    "glob": "^7.1.1",
+    "node-glob": "^1.2.0",
     "winston": "^2.3.0"
   },
   "devDependencies": {

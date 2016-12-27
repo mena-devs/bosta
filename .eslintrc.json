@@ -5,6 +5,8 @@
         "import"
     ],
     "rules": {
-        "indent": ["error", 4]
+        "indent": ["error", 4],
+        "global-require": "off",
+        "import/no-dynamic-require": "off"
     }
 }
