@@ -1,4 +1,4 @@
-# Bostantine Androidaou is a Slack Greek Emperor
+# Bostantine Androidaou
 
 | Branch | Build Status |
 | ------ | ----- |
@@ -6,7 +6,7 @@
 
 ### Synopsis
 
-MENA-Devs.com Slack Bot
+[MENA-Devs](http://mena-devs.com)'s Slack Greek Emperor
 
 ### Installation & Configuration
 
