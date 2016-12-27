@@ -37,7 +37,8 @@ client.on(RTM_EVENTS.MESSAGE, (message) => {
     }
 
     // FIGLET
-    if(message.text.startsWith('figlet')){
+    if(message.text
+            && message.text.startsWith('figlet')){
         const text = message.text.substring(7);
         figlet(text, function(err, data) {
             if (err) {
@@ -50,14 +51,14 @@ client.on(RTM_EVENTS.MESSAGE, (message) => {
 
     // Snippets
     if(message.text
-            && message.text.toLocaleLowerCase() === 'snippets support') {
+            && message.text === 'snippets support') {
         winston.info(`support request: ${message}`);
         const languages = Object.keys(config.plugins.eval.languages).join(', ');
         client.sendMessage(`I can run: ${languages}`, message.channel);
     }
 
     if(message.text
-            && message.text.toLocaleLowerCase().startsWith('snippets config')){
+            && message.text.startsWith('snippets config')){
         winston.info(`config request: ${message}`);
         const name = message.text.split(' ').pop();
         const language = config.plugins.eval.languages[name];
@@ -85,7 +86,6 @@ client.on(RTM_EVENTS.REACTION_ADDED, (message) => {
             .then(result => download(result.file));
     }
 });
-
 
 
 function download(file){
