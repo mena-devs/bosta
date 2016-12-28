@@ -1,6 +1,4 @@
 {
-    "token": "use your bot token",
-
     "plugins": {
         "eval": {
             "timeout": 4,

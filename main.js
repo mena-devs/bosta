@@ -9,8 +9,8 @@ const glob = require('glob');
 
 const config = require('./config.json');
 
-const client = new RtmClient(config.token);
-const web = new WebClient(config.token);
+const client = new RtmClient(process.env.SLACK_BOT_TOKEN);
+const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 
 client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
