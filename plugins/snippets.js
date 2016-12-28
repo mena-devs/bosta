@@ -81,11 +81,11 @@ function execute(name, config, sourceFolder) {
 
 
 function loadConfig(config, name) {
-    const language = config.plugins.eval.languages[name];
+    const language = config.plugins.snippets.languages[name];
     return {
-        timeout: language.timeout || config.plugins.eval.timeout,
-        crop: language.crop || config.plugins.eval.crop,
-        memory: language.memory || config.plugins.eval.memory,
+        timeout: language.timeout || config.plugins.snippets.timeout,
+        crop: language.crop || config.plugins.snippets.crop,
+        memory: language.memory || config.plugins.snippets.memory,
         image: language.image,
         command: language.command,
     };
@@ -102,7 +102,7 @@ function runSnippet(web, rtm, config, file) {
     const { host, path } = url.parse(file.url_private_download);
     const language = loadConfig(config, file.filetype);
 
-    const sourceFolder = `${__dirname}/${config.plugins.eval.folder}`;
+    const sourceFolder = `${__dirname}/${config.plugins.snippets.folder}`;
     const fileOnDisk = `${sourceFolder}/${fileName}`;
 
     download(host, path, config.token)
@@ -122,7 +122,7 @@ function register(id, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text
                 && message.text === 'snippets support') {
-            const languages = Object.keys(config.plugins.eval.languages).join(', ');
+            const languages = Object.keys(config.plugins.snippets.languages).join(', ');
             rtm.sendMessage(`I can run: ${languages}`, message.channel);
         }
 
@@ -145,7 +145,7 @@ function register(id, rtm, web, config) {
         if (message.file
                 && message.file.mode === 'snippet'
                 && message.subtype === 'file_share'
-                && config.plugins.eval.languages[message.file.filetype]) {
+                && config.plugins.snippets.languages[message.file.filetype]) {
             runSnippet(web, rtm, config, message.file);
         }
     });

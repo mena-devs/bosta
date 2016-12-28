@@ -1,6 +1,6 @@
 {
     "plugins": {
-        "eval": {
+        "snippets": {
             "timeout": 4,
             "memory": 8,
             "crop": 512,
