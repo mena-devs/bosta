@@ -7,10 +7,11 @@ const CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
 const winston = require('winston');
 const glob = require('glob');
 
+const secret = require('./secret.json');
 const config = require('./config.json');
 
-const client = new RtmClient(process.env.SLACK_BOT_TOKEN);
-const web = new WebClient(process.env.SLACK_BOT_TOKEN);
+const client = new RtmClient(secret.token);
+const web = new WebClient(secret.token);
 
 
 client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
