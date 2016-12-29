@@ -46,6 +46,7 @@ function execute(name, config, sourceFolder) {
     const dockerArgs = [
         'run',
         '--rm',
+        '--net', 'none',
         '-m', `${config.memory}M`,
         '-w', '/local',
         '-v', `${sourceFolder}:/local`,
