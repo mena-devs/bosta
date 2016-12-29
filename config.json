@@ -1,5 +1,8 @@
 {
     "plugins": {
+        "sentiment":{
+            "recent": 10
+        }, 
         "snippets": {
             "timeout": 4,
             "memory": 8,
