@@ -49,7 +49,7 @@ function execute(name, config, sourceFolder) {
         '--net', 'none',
         '-m', `${config.memory}M`,
         '-w', '/local',
-        '-v', `${sourceFolder}:/local`,
+        '-v', `${sourceFolder}:/local:ro`,
         config.image,
         'timeout', config.timeout,
         config.command,
