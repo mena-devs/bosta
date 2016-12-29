@@ -19,7 +19,7 @@ client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
     glob.sync('./plugins/*.js').forEach((file) => {
         winston.info(`Found plugin: ${file}`);
         const plugin = require(path.resolve(file));
-        plugin.register(data.self.id, client, web, config);
+        plugin.register(data.self.id, client, web, config, secret);
     });
 });
 

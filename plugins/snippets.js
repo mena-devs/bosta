@@ -91,21 +91,17 @@ function loadConfig(config, name) {
     };
 }
 
-function runSnippet(web, rtm, config, file) {
-    // Provide a random name for files without one (-.x) gives errors
-    let fileName = file.name;
-    if (fileName.startsWith('-.')) {
-        fileName = crypto.randomBytes(4).toString('hex');
-    }
-
+function runSnippet(web, rtm, config, secret, file) {
     const reply = text => web.files.comments.add(file.id, text);
+
+    const fileName = crypto.randomBytes(4).toString('hex');
     const { host, path } = url.parse(file.url_private_download);
     const language = loadConfig(config, file.filetype);
 
     const sourceFolder = `${__dirname}/${config.plugins.snippets.folder}`;
     const fileOnDisk = `${sourceFolder}/${fileName}`;
 
-    download(host, path, config.token)
+    download(host, path, secret.token)
         .then(response => save(fileOnDisk, response))
         .then(() => execute(fileName, language, sourceFolder))
         .then(text => reply(`\`\`\`${text}\`\`\``))
@@ -118,7 +114,7 @@ function runSnippet(web, rtm, config, file) {
         .catch(() => {}); // bot already reacted supposedly
 }
 
-function register(id, rtm, web, config) {
+function register(id, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text
                 && message.text === 'snippets support') {
@@ -146,7 +142,7 @@ function register(id, rtm, web, config) {
                 && message.file.mode === 'snippet'
                 && message.subtype === 'file_share'
                 && config.plugins.snippets.languages[message.file.filetype]) {
-            runSnippet(web, rtm, config, message.file);
+            runSnippet(web, rtm, config, secret, message.file);
         }
     });
 
@@ -156,7 +152,7 @@ function register(id, rtm, web, config) {
                 && message.item.type === 'file'
                 && message.reaction === 'repeat') {
             web.files.info(message.item.file)
-                .then(result => runSnippet(web, rtm, config, result.file));
+                .then(result => runSnippet(web, rtm, config, secret, result.file));
         }
     });
 }
