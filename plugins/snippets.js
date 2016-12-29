@@ -104,7 +104,7 @@ function runSnippet(web, rtm, config, secret, file) {
     download(host, path, secret.token)
         .then(response => save(fileOnDisk, response))
         .then(() => execute(fileName, language, sourceFolder))
-        .then(text => reply(`\`\`\`${text}\`\`\``))
+        .then(text => reply(`\`\`\`${text.slice(0, language.crop)}\`\`\``))
         .catch((error) => {
             reply(error);
             winston.error(error);
