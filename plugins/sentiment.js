@@ -5,31 +5,38 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 const winston = require('winston');
 
 
-function findUser(web, name) {
+function findUser(bot, name) {
     return new Promise((resolve, reject) => {
-        web.users.list((error, response) => {
-            if (error) {
-                reject(error);
-            } else {
-                const members = response.members.filter(m => m.name === name);
+        const members = bot.users.filter(m => m.name === name);
 
-                if (members.length !== 1) {
-                    reject('Invalid user');
-                } else {
-                    resolve(members[0].id);
-                }
-            }
-        });
+        if (members.length !== 1) {
+            reject(`I don't know of a ${name}`);
+        } else {
+            resolve(members[0]);
+        }
     });
 }
 
-function loadRecentMessages(web, config, channel, user) {
+
+function pickTarget(bot, channel){
+    return [...bot.channels, ...bot.groups].filter(c => c.id === channel)[0];
+}
+
+
+function loadRecentMessages(bot, web, config, channel, user) {
     return new Promise((resolve, reject) => {
-        web.channels.history(channel, { count: 1000 }, (error, response) => {
+        const target = pickTarget(bot, channel);
+        let source = web.channels;
+
+        if (target.is_group) {
+            source = web.groups;
+        }
+
+        source.history(channel, { count: 1000 }, (error, response) => {
             if (error) {
                 reject(error);
             } else {
-                let messages = response.messages.filter(m => m.user === user);
+                let messages = response.messages.filter(m => m.user === user.id);
 
                 if (messages.length > config.plugins.sentiment.recent) {
                     messages = messages.slice(1, config.plugins.sentiment.recent);
@@ -69,14 +76,14 @@ function analyseSentiment(secret, messages) {
 }
 
 
-function register(id, rtm, web, config, secret) {
+function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
             const who = message.text.match('how has ([^ ]+) been recently');
 
             if (who) {
-                findUser(web, who[1])
-                    .then(user => loadRecentMessages(web, config, message.channel, user))
+                findUser(bot, who[1])
+                    .then(user => loadRecentMessages(bot, web, config, message.channel, user))
                     .then(messages => analyseSentiment(secret, messages))
                     .then((sentiment) => {
                         rtm.sendMessage(
