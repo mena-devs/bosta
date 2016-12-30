@@ -7,6 +7,7 @@ const winston = require('winston');
 const key = 'wikipedia';
 const API = '/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=';
 
+
 function wikipedia(title) {
     const values = o => Object.keys(o).map(k => o[k]);
     const options = {
@@ -40,7 +41,7 @@ function wikipedia(title) {
 }
 
 
-function register(id, rtm) {
+function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text && message.text.toLocaleLowerCase().startsWith(key)) {
             const text = message.text.substring(key.length + 1);

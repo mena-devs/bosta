@@ -115,7 +115,7 @@ function runSnippet(web, rtm, config, secret, file) {
         .catch(() => {}); // bot already reacted supposedly
 }
 
-function register(id, rtm, web, config, secret) {
+function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text
                 && message.text === 'snippets support') {
@@ -149,7 +149,7 @@ function register(id, rtm, web, config, secret) {
 
 
     rtm.on(RTM_EVENTS.REACTION_ADDED, (message) => {
-        if (message.user !== id
+        if (message.user !== bot.self.id
                 && message.item.type === 'file'
                 && message.reaction === 'repeat') {
             web.files.info(message.item.file)
@@ -157,6 +157,7 @@ function register(id, rtm, web, config, secret) {
         }
     });
 }
+
 
 module.exports = {
     register,

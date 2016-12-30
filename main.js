@@ -10,22 +10,30 @@ const glob = require('glob');
 const secret = require('./secret.json');
 const config = require('./config.json');
 
-const client = new RtmClient(secret.token);
-const web = new WebClient(secret.token);
 
+function main() {
+    const client = new RtmClient(secret.token);
+    const web = new WebClient(secret.token);
 
-client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
-    winston.info(`${data.team.name} > ${data.self.name}`);
-    glob.sync('./plugins/*.js').forEach((file) => {
-        winston.info(`Found plugin: ${file}`);
-        const plugin = require(path.resolve(file));
-        plugin.register(data.self.id, client, web, config, secret);
+    client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
+        winston.info(`${data.team.name} > ${data.self.name}`);
+
+        glob.sync('./plugins/*.js').forEach((file) => {
+            winston.info(`Found plugin: ${file}`);
+            const plugin = require(path.resolve(file));
+            plugin.register(data, client, web, config, secret);
+        });
     });
-});
 
 
-client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-    winston.info('I\'m to receive RTM events.');
-});
+    client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
+        winston.info("I'm can receive RTM events.");
+    });
 
-client.start();
+    client.start();
+}
+
+
+if (require.main === module) {
+    main();
+}

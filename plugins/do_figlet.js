@@ -2,7 +2,8 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const figlet = require('figlet');
 
-function register(id, rtm) {
+
+function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text
                 && message.text.startsWith('figlet')) {
@@ -13,6 +14,7 @@ function register(id, rtm) {
         }
     });
 }
+
 
 module.exports = {
     register,
