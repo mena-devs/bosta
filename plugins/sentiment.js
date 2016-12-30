@@ -18,7 +18,7 @@ function findUser(bot, name) {
 }
 
 
-function pickTarget(bot, channel){
+function pickTarget(bot, channel) {
     return [...bot.channels, ...bot.groups].filter(c => c.id === channel)[0];
 }
 

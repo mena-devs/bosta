@@ -25,9 +25,8 @@ function main() {
         });
     });
 
-
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-        winston.info("I'm can receive RTM events.");
+        winston.info("I'm can now receive RTM events.");
     });
 
     client.start();
