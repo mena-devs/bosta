@@ -12,7 +12,6 @@ const META = {
     ],
 };
 
-const key = 'wikipedia';
 const API = '/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=';
 
 

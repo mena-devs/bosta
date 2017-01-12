@@ -1,5 +1,8 @@
 const config = {
     plugins: {
+        tellmeabout:{
+            path: 'data/storage.txt',
+        },
         sentiment: {
             recent: 10,
         },

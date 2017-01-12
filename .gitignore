@@ -3,3 +3,4 @@ node_modules/
 eval/
 sublime/
 secret.json
+data/
