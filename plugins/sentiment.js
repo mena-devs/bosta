@@ -86,15 +86,15 @@ function analyseSentiment(secret, messages) {
 function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const who = message.text.match('how has ([^ ]+) been recently');
+            const match = message.text.match(/<@([^>]+)>:? how has ([^ ]+) been recently\?/);
 
-            if (who) {
-                findUser(bot, who[1])
+            if (match && match[1] === bot.self.id) {
+                findUser(bot, match[2])
                     .then(user => loadRecentMessages(bot, web, config, message.channel, user))
                     .then(messages => analyseSentiment(secret, messages))
                     .then((sentiment) => {
                         rtm.sendMessage(
-                            `${who[1]} has recently been ${sentiment.output.result}`,
+                            `${match[2]} has recently been ${sentiment.output.result}`,
                             message.channel);
                     })
                     .catch(error => winston.error(error));

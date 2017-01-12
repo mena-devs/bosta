@@ -12,12 +12,14 @@ const META = {
 
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text
-                && message.text.startsWith('figlet')) {
-            const text = message.text.substring(7);
-            figlet(text, (err, data) => {
-                rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
-            });
+        if (message.text) {
+            const match = message.text.match(/<@([^>]+)>:? figlet (.*)/);
+
+            if (match && match[1] === bot.self.id) {
+                figlet(match[2], (err, data) => {
+                    rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+                });
+            }
         }
     });
 }

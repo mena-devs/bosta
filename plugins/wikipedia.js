@@ -51,13 +51,15 @@ function wikipedia(title) {
 
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text && message.text.toLocaleLowerCase().startsWith(key)) {
-            const text = message.text.substring(key.length + 1);
+        if (message.text) {
+            const match = message.text.match(/<@([^>]+)>:? wikipedia (.*)/);
 
-            wikipedia(text)
-                .then((extract) => {
-                    rtm.sendMessage(`> ${extract}`, message.channel);
-                }).catch(error => winston.error(error));
+            if (match && match[1] === bot.self.id) {
+                wikipedia(match[2])
+                    .then((extract) => {
+                        rtm.sendMessage(`> ${extract}`, message.channel);
+                    }).catch(error => winston.error(error));
+            }
         }
     });
 }

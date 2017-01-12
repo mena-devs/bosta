@@ -10,8 +10,12 @@ const META = {
 
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text === 'test') {
-            rtm.sendMessage('icle', message.channel);
+        if (message.text) {
+            const match = message.text.match(/<@([^>]+)>:? ping/);
+
+            if (match && match[1] === bot.self.id) {
+                rtm.sendMessage('pong', message.channel);
+            }
         }
     });
 }
