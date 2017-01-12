@@ -8,7 +8,7 @@ const winston = require('winston');
 const glob = require('glob');
 
 const secret = require('./secret.json');
-const config = require('./config.json');
+const config = require('./config.js');
 
 
 function main() {

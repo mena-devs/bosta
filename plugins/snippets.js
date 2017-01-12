@@ -43,6 +43,12 @@ function save(path, sourceStream) {
 
 
 function execute(name, config, sourceFolder) {
+    let timeout = [config.timeout];
+
+    if (typeof(config.timeout) === 'string') {
+        timeout = config.timeout.split(' ');
+    }
+
     const dockerArgs = [
         'run',
         '--rm',
@@ -51,7 +57,8 @@ function execute(name, config, sourceFolder) {
         '-w', '/local',
         '-v', `${sourceFolder}:/local:ro`,
         config.image,
-        'timeout', config.timeout,
+        'timeout',
+        ...timeout,
         config.command,
         name,
     ];
