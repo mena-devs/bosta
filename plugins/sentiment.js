@@ -8,7 +8,7 @@ const META = {
     name: 'sentiment',
     short: 'provides a sentiment analysis on the last 10 messages of a user',
     examples: [
-        '@bosta how has @omar been recently?',
+        '@bosta how has omar been recently?',
     ],
 };
 

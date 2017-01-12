@@ -31,7 +31,7 @@ function main() {
             plugins[plugin.META.name] = utils.buildHelp(plugin.META);
         });
 
-        plugins[''] = values(plugins).join('\n');
+        plugins[''] = values(plugins).join('\n\n');
     });
 
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {

@@ -4,7 +4,7 @@ const META = {
     name: 'ping',
     short: 'pings the bot',
     examples: [
-        '@bosta test',
+        '@bosta ping',
     ],
 };
 
