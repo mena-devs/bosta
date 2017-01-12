@@ -2,6 +2,13 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const figlet = require('figlet');
 
+const META = {
+    name: 'figlet',
+    short: 'figlet-izes text',
+    examples: [
+        '@bosta figlet dany boy',
+    ],
+};
 
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
@@ -18,4 +25,5 @@ function register(bot, rtm) {
 
 module.exports = {
     register,
+    META,
 };

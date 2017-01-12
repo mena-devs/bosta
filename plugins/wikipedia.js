@@ -4,6 +4,14 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
 
+const META = {
+    name: 'wikipedia',
+    short: 'pulls an extract from wikipedia',
+    examples: [
+        '@bosta wikipedia LOL',
+    ],
+};
+
 const key = 'wikipedia';
 const API = '/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=';
 
@@ -57,4 +65,5 @@ function register(bot, rtm) {
 
 module.exports = {
     register,
+    META,
 };

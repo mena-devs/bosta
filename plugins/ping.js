@@ -1,5 +1,12 @@
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
+const META = {
+    name: 'ping',
+    short: 'pings the bot',
+    examples: [
+        '@bosta test',
+    ],
+};
 
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
@@ -11,4 +18,5 @@ function register(bot, rtm) {
 
 module.exports = {
     register,
+    META,
 };

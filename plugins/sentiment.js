@@ -4,6 +4,13 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
 
+const META = {
+    name: 'sentiment',
+    short: 'provides a sentiment analysis on the last 10 messages of a user',
+    examples: [
+        '@bosta how has @omar been recently?',
+    ],
+};
 
 function findUser(bot, name) {
     return new Promise((resolve, reject) => {
@@ -99,4 +106,5 @@ function register(bot, rtm, web, config, secret) {
 
 module.exports = {
     register,
+    META,
 };

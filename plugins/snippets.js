@@ -8,6 +8,15 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
 
+const META = {
+    name: 'snippets',
+    short: 'runs user submitted code',
+    examples: [
+        'simply create a snippet and set the language that the bot understands, see next for additional.',
+        '@bosta snippets support',
+        '@bosta snippets config python',
+    ],
+};
 
 function download(host, path, token) {
     const options = {
@@ -45,7 +54,7 @@ function save(path, sourceStream) {
 function execute(name, config, sourceFolder) {
     let timeout = [config.timeout];
 
-    if (typeof(config.timeout) === 'string') {
+    if (typeof config.timeout === 'string') {
         timeout = config.timeout.split(' ');
     }
 
@@ -168,4 +177,5 @@ function register(bot, rtm, web, config, secret) {
 
 module.exports = {
     register,
+    META,
 };
