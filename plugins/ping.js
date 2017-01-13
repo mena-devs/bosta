@@ -8,20 +8,25 @@ const META = {
     ],
 };
 
+function handlePing(bot, rtm, message) {
+    if (message.text) {
+        const pattern = /<@([^>]+)>:? ping/;
+        const [, target] = message.text.match(pattern) || [];
+
+        if (target === bot.self.id) {
+            rtm.sendMessage('pong', message.channel);
+        }
+    }
+}
+
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? ping/;
-            const [, target] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                rtm.sendMessage('pong', message.channel);
-            }
-        }
+        handlePing(bot, rtm, message);
     });
 }
 
 module.exports = {
-    register,
     META,
+    register,
+    handlePing,
 };
