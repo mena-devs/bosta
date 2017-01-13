@@ -22,11 +22,11 @@ function register(bot, rtm, web, config) {
 
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? save ([^ ]+) as: (.*)/);
+            const match = message.text.match(/<@([^>]+)>:? save (.+?) as: (.+)/);
 
             if (match && match[1] === bot.self.id) {
                 storage
-                    .setItem(match[1], match[3])
+                    .setItem(match[2], match[3])
                     .then(() => {
                         rtm.sendMessage(`${match[2]} saved.`, message.channel);
                     });
@@ -38,9 +38,17 @@ function register(bot, rtm, web, config) {
 
             if (match && match[1] === bot.self.id) {
                 storage
-                    .getItem(match[1])
+                    .getItem(match[2])
                     .then((value) => {
-                        rtm.sendMessage(`${match[2]}: ${value}`, message.channel);
+                        if (value) {
+                            rtm.sendMessage(
+                                `${match[2]}: ${value}`,
+                                message.channel);
+                        } else {
+                            rtm.sendMessage(
+                                `I do not know anything about ${match[2]}`,
+                                 message.channel);
+                        }
                     });
             }
         }
