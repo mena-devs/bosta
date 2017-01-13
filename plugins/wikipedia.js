@@ -12,7 +12,7 @@ const META = {
     ],
 };
 
-const API = '/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=';
+const API = '/w/api.php?format=json&redirects=1&action=query&prop=extracts&exintro=&explaintext=&titles=';
 
 
 function wikipedia(title) {
