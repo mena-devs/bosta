@@ -51,10 +51,11 @@ function wikipedia(title) {
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? wikipedia (.*)/);
+            const pattern = /<@([^>]+)>:? wikipedia (.*)/;
+            const [, target, text] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
-                wikipedia(match[2])
+            if (target === bot.self.id) {
+                wikipedia(text)
                     .then((extract) => {
                         rtm.sendMessage(`> ${extract}`, message.channel);
                     }).catch(error => winston.error(error));

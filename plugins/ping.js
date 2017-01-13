@@ -11,9 +11,10 @@ const META = {
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? ping/);
+            const pattern = /<@([^>]+)>:? ping/;
+            const [, target] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
+            if (target === bot.self.id) {
                 rtm.sendMessage('pong', message.channel);
             }
         }

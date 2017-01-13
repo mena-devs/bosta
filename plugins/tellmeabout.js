@@ -2,8 +2,6 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const storage = require('node-persist');
 
-const utils = require('../utils.js');
-
 const META = {
     name: 'tellmeabout',
     short: 'records and plays text',
@@ -22,31 +20,33 @@ function register(bot, rtm, web, config) {
 
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? save (.+?) as: (.+)/);
+            const pattern = /<@([^>]+)>:? save (.+?) as: (.+)/;
+            const [, target, key, value] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
+            if (target === bot.self.id) {
                 storage
-                    .setItem(match[2], match[3])
+                    .setItem(key, value)
                     .then(() => {
-                        rtm.sendMessage(`${match[2]} saved.`, message.channel);
+                        rtm.sendMessage(`${key} saved.`, message.channel);
                     });
             }
         }
 
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? about (.*)/);
+            const pattern = /<@([^>]+)>:? about (.*)/;
+            const [, target, key] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
+            if (target === bot.self.id) {
                 storage
-                    .getItem(match[2])
+                    .getItem(key)
                     .then((value) => {
                         if (value) {
                             rtm.sendMessage(
-                                `${match[2]}: ${value}`,
+                                `${key}: ${value}`,
                                 message.channel);
                         } else {
                             rtm.sendMessage(
-                                `I do not know anything about ${match[2]}`,
+                                `I do not know anything about ${key}`,
                                  message.channel);
                         }
                     });

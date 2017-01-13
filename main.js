@@ -40,11 +40,12 @@ function main() {
 
     client.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? help ?(.*)/);
+            const pattern = /<@([^>]+)>:? help ?(.*)/;
+            const [, target, topic] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id && plugins[match[2]]) {
+            if (target === bot.self.id && plugins[topic]) {
                 client.sendMessage(
-                    utils.pre(plugins[match[2]]),
+                    utils.pre(plugins[topic]),
                     message.channel);
             }
         }

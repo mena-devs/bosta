@@ -13,10 +13,11 @@ const META = {
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? figlet (.*)/);
+            const pattern = /<@([^>]+)>:? figlet (.*)/;
+            const [, target, text] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
-                figlet(match[2], (err, data) => {
+            if (target === bot.self.id) {
+                figlet(text, (err, data) => {
                     rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
                 });
             }

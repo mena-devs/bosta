@@ -1,6 +1,6 @@
 const config = {
     plugins: {
-        tellmeabout:{
+        tellmeabout: {
             path: 'data/storage.txt',
         },
         sentiment: {

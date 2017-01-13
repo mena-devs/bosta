@@ -134,27 +134,29 @@ function runSnippet(web, rtm, config, secret, file) {
 function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? snippets support/);
+            const pattern = /<@([^>]+)>:? snippets support/;
+            const [, target] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
+            if (target === bot.self.id) {
                 const languages = Object.keys(config.plugins.snippets.languages).join(', ');
                 rtm.sendMessage(`I can run: ${languages}`, message.channel);
             }
         }
 
         if (message.text) {
-            const match = message.text.match(/<@([^>]+)>:? snippets config (.*)/);
+            const pattern = /<@([^>]+)>:? snippets config (.*)/;
+            const [, target, lang] = message.text.match(pattern) || [];
 
-            if (match && match[1] === bot.self.id) {
+            if (target === bot.self.id) {
                 try {
-                    const { timeout, crop, memory } = loadConfig(config, match[2]);
-                    rtm.sendMessage(`\`\`\`${match[2]}:
-                Timeout  : ${timeout} seconds
-                Memory   : ${memory}MB
-                Crops at : ${crop} characters\`\`\``, message.channel);
+                    const { timeout, crop, memory } = loadConfig(config, lang);
+                    rtm.sendMessage(`\`\`\`${lang}:
+    Timeout  : ${timeout} seconds
+    Memory   : ${memory}MB
+    Crops at : ${crop} characters\`\`\``, message.channel);
                 } catch (e) {
                     rtm.sendMessage(
-                            `\`\`\`${match[2]} is not supported\`\`\``,
+                            `\`\`\`${lang} is not supported\`\`\``,
                             message.channel);
                 }
             }
