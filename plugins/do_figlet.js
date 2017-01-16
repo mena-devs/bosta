@@ -10,17 +10,30 @@ const META = {
     ],
 };
 
+function handleFiglet(bot, rtm, message) {
+    return new Promise((resolve, reject) => {
+        const pattern = /<@([^>]+)>:? figlet (.*)/;
+        const [, target, text] = message.text.match(pattern) || [];
+
+        if (target === bot.self.id && text) {
+            figlet(text, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+                    resolve(data);
+                }
+            });
+        } else {
+            reject('no match');
+        }
+    });
+}
+
 function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const pattern = /<@([^>]+)>:? figlet (.*)/;
-            const [, target, text] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                figlet(text, (err, data) => {
-                    rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
-                });
-            }
+            handleFiglet(bot, rtm, message);
         }
     });
 }
@@ -29,4 +42,5 @@ function register(bot, rtm) {
 module.exports = {
     register,
     META,
+    handleFiglet,
 };
