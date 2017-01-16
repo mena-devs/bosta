@@ -61,6 +61,43 @@ line. You can configure the amount of text displayed in the configuration file.
 
 Displays funky text.
 
+### Sentiment Analysis
+
+Provides sentiment analysis over a user's last N-messages. The plugin uses
+[DatumBox's Sentiment Analysis API](http://www.datumbox.com/api-sandbox/#!/Document-Classification/SentimentAnalysis_post_0)
+ and you must provide the API key in your `secret.json`:
+
+```json
+{
+    ...
+    "datumbox": "api-token-here"
+}
+```
+
+### Spell Checker
+
+This plugin will automatically check the spelling of words that are followed
+by `(sp?)`. Example:
+
+```
+John: This may end up being idiocyncracy(sp?). What did you see?
+Bosta: possible spelling for idiosyncracy: idiosyncrasy, idiosyncratic, ...
+```
+
+### Tell-Me-About
+
+A rudimentary, persistent, user-configured responder. It's purpose is to allow
+users to configure shortcuts to commonly used text. Example:
+
+```
+John: @bosta save sscce as: Short, Self Contained, Correct, Example. Read more
+about it here http://sscce.org/
+bosta: sscce saved.
+John: about sscce
+bosta: sscce: Short, Self Contained, Correct, Example. Read more
+about it here http://sscce.org/
+```
+
 ### Snippets
 
 The snippets plugin is capable of executing user submitted snippets and report
