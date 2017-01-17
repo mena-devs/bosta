@@ -54,7 +54,7 @@ function register(bot, rtm, web, config) {
                             }
                         ]
                     }
-                    web.chat.postMessage('#bot-test', '', attachment, 
+                    web.chat.postMessage('#admins', '', attachment, 
                     function(err, res) {
                         if (err) {
                             winston.error('Error:', err);
