@@ -4,8 +4,6 @@ const request = require('request');
 
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
-const storage = require('node-persist');
-
 const winston = require('winston');
 
 const META = {
