@@ -13,7 +13,7 @@ const META = {
 function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([\<\>a-zA-Z\:\@\|\.]+)?\) \(([a-zA-Z0-9 ]+)?\)/;
+            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([\<\>a-zA-Z\:\@\|\.]+)?\) \((.+[^)])\)?/;
             const [, target, fullname, email, occupation] = message.text.match(pattern) || [];
 
             if (target === bot.self.id) {
