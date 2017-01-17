@@ -4,8 +4,16 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
 
-const key = 'wikipedia';
-const API = '/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=';
+const META = {
+    name: 'wikipedia',
+    short: 'pulls an extract from wikipedia',
+    examples: [
+        '@bosta wikipedia LOL',
+    ],
+};
+
+const API = '/w/api.php?format=json&redirects=1&action=query&prop=extracts&exintro=&explaintext=&titles=';
+
 
 function wikipedia(title) {
     const values = o => Object.keys(o).map(k => o[k]);
@@ -40,15 +48,18 @@ function wikipedia(title) {
 }
 
 
-function register(id, rtm) {
+function register(bot, rtm) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text && message.text.toLocaleLowerCase().startsWith(key)) {
-            const text = message.text.substring(key.length + 1);
+        if (message.text) {
+            const pattern = /<@([^>]+)>:? wikipedia (.*)/;
+            const [, target, text] = message.text.match(pattern) || [];
 
-            wikipedia(text)
-                .then((extract) => {
-                    rtm.sendMessage(`> ${extract}`, message.channel);
-                }).catch(error => winston.error(error));
+            if (target === bot.self.id) {
+                wikipedia(text)
+                    .then((extract) => {
+                        rtm.sendMessage(`> ${extract}`, message.channel);
+                    }).catch(error => winston.error(error));
+            }
         }
     });
 }
@@ -56,4 +67,5 @@ function register(id, rtm) {
 
 module.exports = {
     register,
+    META,
 };
