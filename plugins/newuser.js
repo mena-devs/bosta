@@ -84,7 +84,7 @@ function register(bot, rtm, web, config) {
                                     if (err) {
                                         winston.error('Error:', err);
                                     } else {
-                                        winston.info('Message sent: ', res);
+                                        winston.info('Message sent!');
                                     }
                                 });
                             });
