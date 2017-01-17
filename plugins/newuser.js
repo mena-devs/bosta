@@ -16,7 +16,7 @@ const META = {
     ],
 };
 
-const COCURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/README.md';
+const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md';
 
 /**
  * Retrieves user information from ID
@@ -46,9 +46,16 @@ function findUser(bot, id) {
  */
 function retrieveCoC() {
     return new Promise((resolve, reject) => {
-        https.get(COCURL, (res) => {
+        https.get(cocURL, (res) => {
+            // Combine the chunks that are retrieved
+            var responseParts = [];
+            res.setEncoding('utf8');
             res.on('data', (d) => {
-                resolve(d);
+                responseParts.push(d);
+            });
+            // Combine the chunks and resolve
+            res.on('end', () => {
+                resolve(responseParts.join(''));
             });
         }).on('error', (e) => {
             reject(e);
@@ -70,13 +77,14 @@ function register(bot, rtm, web, config) {
                         retrieveCoC()
                             .then(data => {
                                 // Send a private message to the user with the CoC
-                                web.chat.postMessage(user[1], `\`\`\`${data}\`\`\``, {
+                                // user[1] refers to User ID
+                                web.chat.postMessage(user[1], `Hi ${user[0]}! \n${data}`, {
                                     as_user: true
                                 }, function(err, res) {
                                     if (err) {
-                                        console.log('Error:', err);
+                                        winston.error('Error:', err);
                                     } else {
-                                        console.log('Message sent: ', res);
+                                        winston.info('Message sent: ', res);
                                     }
                                 });
                             });
