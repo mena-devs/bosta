@@ -116,8 +116,7 @@ function register(bot, rtm, web, config) {
                                     "title": `Top ${nStories} Hacker News Stories`,
                                     "fields": response,
                                     "footer": "Automation",
-                                    "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
-                                    "ts": Number(new Date())
+                                    "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png"
                                 }
                             ]
                         }
