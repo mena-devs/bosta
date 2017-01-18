@@ -32,7 +32,7 @@ function findUser(bot, id) {
         if (members.length !== 1) {
             reject(`I don't know of a ${id}`);
         } else {
-            resolve([members[0].name, members[0].id]);
+            resolve(members[0].name);
         }
     });
 }
@@ -61,32 +61,55 @@ function retrieveCoC() {
     });
 }
 
+/**
+ * Send a private message to a user
+ *
+ * @param {[type]} web      [description]
+ * @param {[type]} receiver [description]
+ * @param {[type]} message  [description]
+ *
+ * @return {[type]} [description]
+ */
+function postMessage(web, receiver, message) {
+    return new Promise((resolve, reject) => {
+        // Send a private message to the user with the CoC
+        web.chat.postMessage(receiver.id, `Hi ${receiver.name}! \n${message}`, {
+            as_user: true
+        }, function(err, res) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+/**
+ * Main
+ *
+ * @param {[type]} bot    [description]
+ * @param {[type]} rtm    [description]
+ * @param {[type]} web    [description]
+ * @param {[type]} config [description]
+ *
+ * @return {[type]} [description]
+ */
 function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
             const pattern = /<@([^>]+)>:? greet <@([^>]+)>:?/;
             const [, target, userId] = message.text.match(pattern) || [];
+            var user = {'id': userId, 'name': ''};
 
             if (target === bot.self.id) {
-                findUser(bot, userId)
-                    .then((user) => {
-                        rtm.sendMessage(`Welcome on-board ${user[0]} glad to have you here`, message.channel);
-                        // Send the user the CoC
-                        retrieveCoC()
-                            .then(data => {
-                                // Send a private message to the user with the CoC
-                                // user[1] refers to User ID
-                                web.chat.postMessage(user[1], `Hi ${user[0]}! \n${data}`, {
-                                    as_user: true
-                                }, function(err, res) {
-                                    if (err) {
-                                        winston.error('Error:', err);
-                                    } else {
-                                        winston.info('Message sent!');
-                                    }
-                                });
-                            });
-                    });
+                findUser(bot, user.id)
+                    .then(response => { 
+                        user.name = response;
+                        rtm.sendMessage(`Welcome on-board ${user.name} glad to have you here`, message.channel); 
+                    })
+                    .then(() => retrieveCoC())
+                    .then(data => postMessage(web, user, data));
             }
         }
     });
