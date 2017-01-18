@@ -24,8 +24,6 @@ function handleFiglet(bot, rtm, message) {
                     resolve(data);
                 }
             });
-        } else {
-            reject('no match');
         }
     });
 }
