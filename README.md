@@ -1,9 +1,5 @@
 # Bostantine Androidaou
 
-| Branch | Build Status |
-| ------ | ----- |
-| master |  N/A  |
-
 ## Synopsis
 
 [MENA-Devs](http://mena-devs.com)'s Slack Greek Emperor
@@ -113,6 +109,22 @@ have the corresponding docker images specified in `config.json`:
 ```
 
 Simply install the proper image (in the example above `docker pull python:latest`)
+
+### User Requests
+
+This plugin takes a request from any MENA Devs member and pushes it to assigned admins for action.
+
+#### Supported Requests
+
+- Invitation request
+
+### Hacker News
+
+Retrieves up to (N) top stories from YCombinator's Hacker News
+
+### New User
+
+Manually triggered command to send a greeting to any member and push the MENA Dev's Code of Conduct to them in a private message sent by the Bot.
 
 ## Contributing
 
