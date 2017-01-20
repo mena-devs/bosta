@@ -73,7 +73,10 @@ function retrieveCoC() {
 function postMessage(web, receiver, message) {
     return new Promise((resolve, reject) => {
         // Send a private message to the user with the CoC
-        web.chat.postMessage(receiver.id, `Hi ${receiver.name}! \n${message}`, {
+        web.chat.postMessage(receiver.id, `Hi ${receiver.name}! \n\
+I'm *Bostantine Androidaou* MENA Dev's butler. I'm at your service, all you \
+gotta do is to call \`@bosta help\`. In the meantime, here's a message \
+from the admins: \n\n ${message}`, {
             as_user: true
         }, function(err, res) {
             if (err) {
@@ -109,7 +112,9 @@ function register(bot, rtm, web, config) {
                         rtm.sendMessage(`Welcome on-board ${user.name} glad to have you here`, message.channel); 
                     })
                     .then(() => retrieveCoC())
-                    .then(data => postMessage(web, user, data));
+                    .catch(error => winston.error(error))
+                    .then(data => postMessage(web, user, data))
+                    .catch(error => winston.error(error));
             }
         }
     });
