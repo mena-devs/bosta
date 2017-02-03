@@ -11,6 +11,7 @@ const META = {
     short: 'Execute system calls to manage Bosta',
     examples: [
         '@bosta respawn',
+        '@bosta uptime',
     ],
 };
 
@@ -26,6 +27,7 @@ const META = {
  */
 function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
+        // respawn command
         if (message.text) {
             const pattern = /<@([^>]+)>:? respawn/;
             const [, target, userId] = message.text.match(pattern) || [];
@@ -43,6 +45,28 @@ function register(bot, rtm, web, config) {
                     } else {
                         winston.info(`I'm rebooting now... :face_with_rolling_eyes: `);
                         rtm.sendMessage(response, message.channel);
+                    }
+                });
+            }
+        }
+
+        // uptime command
+        if (message.text) {
+            const pattern = /<@([^>]+)>:? uptime/;
+            const [, target, userId] = message.text.match(pattern) || [];
+
+            if (target === bot.self.id) {
+                // Confirm receipt of the command
+                rtm.sendMessage(`Hold on a sec :thinking_face:`, message.channel);
+
+                // Retrieve the uptime
+                cp.exec('forever list --plain', (error, stdout, stderr) => {
+                    if (error) {
+                        winston.error(`Could not execute your order: ${error}`)
+                    } else {
+                        rtm.sendMessage(
+                            `There you go: \n \`\`\`${stdout}\`\`\``, 
+                            message.channel);
                     }
                 });
             }

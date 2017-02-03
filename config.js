@@ -1,4 +1,8 @@
 const config = {
+    main: {
+        general_chan_id: 'C03B400RU',
+        bot_test_chan_id: 'C1X3769UJ',
+    },
     plugins: {
         tellmeabout: {
             path: 'data/storage.txt',
