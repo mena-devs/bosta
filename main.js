@@ -40,7 +40,7 @@ function main() {
         // C1X3769UJ is the encoded ID for #bot-test
         client.sendMessage(
             'All hail the BOSTA who from the ashes was born again like a Phoenix :trollface:',
-            config.main.bot_test_chan_id);
+            config.main.general_chan_id);
     });
 
     client.on(RTM_EVENTS.MESSAGE, (message) => {
