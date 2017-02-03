@@ -54,12 +54,26 @@ function register(bot, rtm, web, config) {
                             }
                         ]
                     }
-                    web.chat.postMessage('#admins', '', attachment, 
-                    function(err, res) {
-                        if (err) {
-                            winston.error('Error:', err);
+                    console.log(message.user);
+                    // Inform the user that her request is being processed
+                    web.chat.postMessage(message.user, `Hey <@${message.user}>, \
+we have received your invitation request for ${fullname} and the admins are \
+currently processing it. I'll keep you posted on \
+its status! :wink:`, {
+                        as_user: true
+                    }, function(error, res) {
+                        if (error) {
+                            winston.error('Could not respond to invitation requesting user:', error);
                         } else {
-                            winston.info('Message sent!');
+                            winston.info('Invitation confirmation message was sent');
+                        }
+                    });
+                    // Notify the admins
+                    web.chat.postMessage('#admins', '', attachment, function(error, res) {
+                        if (error) {
+                            winston.error('Could not post invitation request to #admins:', error);
+                        } else {
+                            winston.info('Invitation request sent to #admins');
                         }
                     });
                 }
