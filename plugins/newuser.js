@@ -17,27 +17,6 @@ const META = {
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md';
 
 /**
- * Retrieves user information from ID
- * TODO -- Move to utils.js
- *
- * @param {[type]} bot [description]
- * @param {[type]} id  [description]
- *
- * @return {[type]} [description]
- */
-function findUser(bot, id) {
-    return new Promise((resolve, reject) => {
-        const members = bot.users.filter(m => m.id === id);
-
-        if (members.length !== 1) {
-            reject(`I don't know of a ${id}`);
-        } else {
-            resolve(members[0].name);
-        }
-    });
-}
-
-/**
  * Retrieve the CoC from the github URL
  *
  * @return {[type]} [description]
@@ -62,6 +41,28 @@ function retrieveCoC() {
 }
 
 /**
+ * Retrieves user information from ID
+ * TODO: Move it to utils.js
+ * 
+ * @param {[type]} bot [description]
+ * @param {[type]} id  [description]
+ *
+ * @return {String} Username associated the ID provided
+ */
+function findUser(web, id) {
+    return new Promise((resolve, reject) => {
+        // Send a private message to the user with the CoC
+        web.users.info(id, function(err, res) {
+            if (err) {
+                reject(`I don't know of a ${id}`);
+            } else {
+                resolve(res.user.name);
+            }
+        });
+    });
+}
+
+/**
  * Send a private message to a user
  *
  * @param {[type]} web      [description]
@@ -80,7 +81,7 @@ from the admins: \n\n ${message}`, {
             as_user: true
         }, function(err, res) {
             if (err) {
-                reject(err);
+                reject(`Welcome message could not be sent: ${err}`);
             } else {
                 resolve(true);
             }
@@ -106,7 +107,7 @@ function register(bot, rtm, web, config) {
             var user = {'id': userId, 'name': ''};
 
             if (target === bot.self.id) {
-                findUser(bot, user.id)
+                findUser(web, user.id)
                     .then(response => { 
                         user.name = response;
                         rtm.sendMessage(`Welcome on-board ${user.name} glad to have you here`, message.channel); 
