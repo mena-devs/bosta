@@ -15,28 +15,6 @@ const META = {
 };
 
 /**
- * Call forever to reboot the bot main process
- *
- * @param {[type]} web      [description]
- * @param {[type]} receiver [description]
- * @param {[type]} message  [description]
- *
- * @return {[type]} [description]
- */
-function rebootOrder() {
-    return new Promise((resolve, reject) => {
-        // Execute the reboot order with 'forever'
-        cp.exec('forever restart main.js', (error, stdout, stderr) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(`Goodbye cruel world...`);
-            }
-        });
-    });
-}
-
-/**
  * Main
  *
  * @param {[type]} bot    [description]
@@ -55,15 +33,18 @@ function register(bot, rtm, web, config) {
             if (target === bot.self.id) {
                 // Confirm receipt of the command
                 rtm.sendMessage(`Let me see what I can do about that! :thinking_face:`, message.channel);
-                rebootOrder()
-                    .then(response => {
-                        winston.info(`I'm rebooting now... :face_with_rolling_eyes: `);
-                        rtm.sendMessage(response, message.channel);
-                    })
-                    .catch(error => {
+
+                // Execute the reboot order with 'forever'
+                // This cannot be an async call
+                cp.exec('forever restart main.js', (error, stdout, stderr) => {
+                    if (error) {
                         rtm.sendMessage(`Looks like that reboot isn't gonna happen today :grin:`, message.channel);
                         winston.error(`Could not execute reboot: ${error}`)
-                    });
+                    } else {
+                        winston.info(`I'm rebooting now... :face_with_rolling_eyes: `);
+                        rtm.sendMessage(response, message.channel);
+                    }
+                });
             }
         }
     });
