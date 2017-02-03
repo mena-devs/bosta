@@ -20,9 +20,9 @@ const config = {
                 },
                 javascript: {
                     command: 'node',
-                    image: 'mhart/alpine-node:latest',
+                    image: 'bosta/javascript:latest',
                     memory: 8,
-                    timeout: '-t 4',
+                    timeout: 4,
                 },
                 perl: {
                     command: 'perl',
@@ -32,21 +32,21 @@ const config = {
                 },
                 php: {
                     command: 'php',
-                    image: 'matriphe/alpine-php:cli',
+                    image: 'bosta/php:latest',
                     memory: 8,
-                    timeout: '-t 4',
+                    timeout: 4,
                 },
                 python: {
                     command: 'python',
-                    image: 'frolvlad/alpine-python2:latest',
+                    image: 'bosta/python:latest',
                     memory: 8,
-                    timeout: '-t 4',
+                    timeout: 4,
                 },
                 ruby: {
                     command: 'ruby',
-                    image: 'frolvlad/alpine-ruby:latest',
+                    image: 'bosta/ruby:latest',
                     memory: 8,
-                    timeout: '-t 4',
+                    timeout: 4,
                 },
                 scala: {
                     command: 'scala',

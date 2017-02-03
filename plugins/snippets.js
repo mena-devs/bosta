@@ -85,7 +85,8 @@ function execute(name, config, sourceFolder) {
         });
 
         docker.on('close', (code) => {
-            const result = [output || error];
+            const replaced = output.split('\n').join(';');
+            const result = [replaced || error];
 
             if (code > 0) {
                 result.push(`Your snippet failed with exit code: ${code}`);
