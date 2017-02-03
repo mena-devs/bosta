@@ -15,7 +15,7 @@ const META = {
 };
 
 /**
- * Send a private message to a user
+ * Call forever to reboot the bot main process
  *
  * @param {[type]} web      [description]
  * @param {[type]} receiver [description]
