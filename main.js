@@ -35,7 +35,7 @@ function main() {
 
     client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
         bot = data;
-        winston.info(`${data.team.name} > ${data.self.name}`);
+        winston.info(`GROUP: ${data.team.name} > MY NAME: ${data.self.name}`);
 
         glob.sync('./plugins/*.js').forEach((file) => {
             winston.info(`Found plugin: ${file}`);
