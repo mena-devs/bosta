@@ -6,7 +6,7 @@ const CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
-const winston_slack_transport = require('winston-slack-transport');
+const winstonSlackTransport = require('winston-slack-transport');
 const glob = require('glob');
 
 const secret = require('./secret.json');
@@ -24,12 +24,12 @@ function main() {
     // Adding custon transport for Winston
     // in order to post logs into a specific channel
     if (config.winston.enabled) {
-        winston.add(winston_slack_transport, {
+        winston.add(winstonSlackTransport, {
             webhook_url: secret.winston_webhook,
             channel: config.winston.channel,
             username: config.winston.username,
             level: config.winston.level,
-            handleExceptions: config.winston.handleExceptions
+            handleExceptions: config.winston.handleExceptions,
         });
     }
 
@@ -48,7 +48,7 @@ function main() {
     });
 
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-        winston.info("Now I can receive RTM events.");
+        winston.info('Now I can receive RTM events.');
         // Send a message to signal that the script has started / rebooted
         // C1X3769UJ is the encoded ID for #bot-test
         client.sendMessage(

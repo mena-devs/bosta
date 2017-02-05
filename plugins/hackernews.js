@@ -1,7 +1,5 @@
 const https = require('https');
 
-const request = require('request');
-
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
@@ -26,14 +24,14 @@ function retrieveStories(nStories) {
     return new Promise((resolve, reject) => {
         https.get(hnAPIURL, (res) => {
             // Combine the chunks that are retrieved
-            var responseParts = [];
+            const responseParts = [];
             res.setEncoding('utf8');
             res.on('data', (d) => {
                 responseParts.push(d);
             });
             // Combine the chunks and resolve
             res.on('end', () => {
-                var storyIDs = JSON.parse(responseParts.join(''));
+                const storyIDs = JSON.parse(responseParts.join(''));
                 resolve(storyIDs.slice(0, nStories));
             });
         }).on('error', (e) => {
@@ -53,25 +51,25 @@ function retrieveStories(nStories) {
 function retrieveStoryDetails(storyIDs) {
     return new Promise((resolve, reject) => {
         // Array containing story details objects
-        var fields = [];
+        const fields = [];
         // Loop over all the stories in the array and retrieve their details
-        let requests = storyIDs.map((item) => {
+        const requests = storyIDs.map((item) => {
             return new Promise((resolve, reject) => {
-                var customURL = hnStoryURL.replace(/<STORY_ID>/, item);
+                const customURL = hnStoryURL.replace(/<STORY_ID>/, item);
                 https.get(customURL, (res) => {
                     // Combine the chunks that are retrieved
-                    var responseParts = [];
+                    const responseParts = [];
                     res.setEncoding('utf8');
                     res.on('data', (d) => {
                         responseParts.push(d);
                     });
                     // Combine the chunks and resolve
                     res.on('end', () => {
-                        var parsed = JSON.parse(responseParts.join(''));
-                        var storyField = {
-                            "title": `${parsed.score} - ${parsed.title}`,
-                            "value": parsed.url,
-                            "short": false
+                        const parsed = JSON.parse(responseParts.join(''));
+                        const storyField = {
+                            title: `${parsed.score} - ${parsed.title}`,
+                            value: parsed.url,
+                            short: false,
                         };
                         fields.push(storyField);
                         resolve();
@@ -80,7 +78,7 @@ function retrieveStoryDetails(storyIDs) {
                     reject(e);
                 });
             });
-        })
+        });
         // Waint until all requests have been resolved
         Promise.all(requests).then(() => resolve(fields));
     });
@@ -96,7 +94,7 @@ function retrieveStoryDetails(storyIDs) {
  *
  * @return {[type]} [description]
  */
-function register(bot, rtm, web, config) {
+function register(bot, rtm, web) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
             const pattern = /<@([^>]+)>:? hnews \(([0-9]+)\):?/;
@@ -107,22 +105,22 @@ function register(bot, rtm, web, config) {
                     retrieveStories(nStories)
                     .then(response => retrieveStoryDetails(response))
                     .then((response) => {
-                        var attachment = {
-                            "as_user": true,
-                            "attachments": [
+                        const attachment = {
+                            as_user: true,
+                            attachments: [
                                 {
-                                    "color": "#36a64f",
-                                    "author_name": "Bosta",
-                                    "title": `Top ${nStories} Hacker News Stories`,
-                                    "fields": response,
-                                    "footer": "Automation",
-                                    "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png"
-                                }
-                            ]
-                        }
+                                    color: '#36a64f',
+                                    author_name: 'Bosta',
+                                    title: `Top ${nStories} Hacker News Stories`,
+                                    fields: response,
+                                    footer: 'Automation',
+                                    footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
+                                },
+                            ],
+                        };
+
                         // Post the message
-                        web.chat.postMessage(message.channel, '', attachment, 
-                        function(err, res) {
+                        web.chat.postMessage(message.channel, '', attachment, (err) => {
                             if (err) {
                                 winston.error('Error:', err);
                             } else {

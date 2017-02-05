@@ -5,10 +5,10 @@ const config = {
     },
     winston: {
         enabled: false,
-        channel: "#bot-log",
-        username: "Bosta",
+        channel: '#bot-log',
+        username: 'Bosta',
         level: 'info',
-        handleExceptions: true
+        handleExceptions: true,
     },
     plugins: {
         tellmeabout: {
