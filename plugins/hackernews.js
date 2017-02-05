@@ -126,7 +126,7 @@ function register(bot, rtm, web, config) {
                             if (err) {
                                 winston.error('Error:', err);
                             } else {
-                                winston.info('Message sent!');
+                                winston.info('Hackernews articles retrieved and pushed to relevant channel.');
                             }
                         });
                     });
