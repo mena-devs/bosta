@@ -18,7 +18,8 @@
     "node-persist": "^2.0.7",
     "request": "^2.79.0",
     "spellchecker": "^3.3.1",
-    "winston": "^2.3.0"
+    "winston": "^2.3.0",
+    "winston-slack-transport": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^3.12.2",

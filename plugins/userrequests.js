@@ -54,7 +54,6 @@ function register(bot, rtm, web, config) {
                             }
                         ]
                     }
-                    console.log(message.user);
                     // Inform the user that her request is being processed
                     web.chat.postMessage(message.user, `Hey <@${message.user}>, \
 we have received your invitation request for ${fullname} and the admins are \
