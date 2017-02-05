@@ -25,10 +25,11 @@ $ npm install
 
 ### Configure and Run
 
-Retrieve your bot token from slack and create a `secret.json` file as follows:
+Retrieve your bot token and add a custom incoming webhook (if winston is enabled in your configuration file) from slack and create a `secret.json` file as follows:
 
 ```
 {
+    "winston_webhook": "webhook-url-here"
     "token": "your-bot-token-here"
 }
 ```

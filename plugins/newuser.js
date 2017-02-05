@@ -113,7 +113,6 @@ function register(bot, rtm, web, config) {
                         rtm.sendMessage(`Welcome on-board ${user.name} glad to have you here`, message.channel); 
                     })
                     .then(() => retrieveCoC())
-                    .catch(error => winston.error(error))
                     .then(data => postMessage(web, user, data))
                     .catch(error => winston.error(error));
             }

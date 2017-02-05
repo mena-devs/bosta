@@ -6,6 +6,7 @@ const CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
+const winston_slack_transport = require('winston-slack-transport');
 const glob = require('glob');
 
 const secret = require('./secret.json');
@@ -19,6 +20,18 @@ function main() {
     const web = new WebClient(secret.token);
     const plugins = {};
     let bot;
+
+    // Adding custon transport for Winston
+    // in order to post logs into a specific channel
+    if (config.winston.enabled) {
+        winston.add(winston_slack_transport, {
+            webhook_url: secret.winston_webhook,
+            channel: config.winston.channel,
+            username: config.winston.username,
+            level: config.winston.level,
+            handleExceptions: config.winston.handleExceptions
+        });
+    }
 
     client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
         bot = data;
@@ -40,7 +53,8 @@ function main() {
         // C1X3769UJ is the encoded ID for #bot-test
         client.sendMessage(
             'All hail the BOSTA who from the ashes was born again like a Phoenix :trollface:',
-            config.main.default_chan_id);
+            config.main.default_chan_id)
+            .catch(error => winston.error(error));
     });
 
     client.on(RTM_EVENTS.MESSAGE, (message) => {

@@ -1,7 +1,14 @@
 const config = {
     main: {
-        default_chan_id: 'C03B400RU',
-        bot_test_chan_id: 'C1X3769UJ',
+        default_chan_id: 'C1X3769UJ',
+        bot_test_chan_id: 'C03B400RU',
+    },
+    winston: {
+        enabled: false,
+        channel: "#bot-log",
+        username: "Bosta",
+        level: 'info',
+        handleExceptions: true
     },
     plugins: {
         tellmeabout: {
