@@ -8,7 +8,7 @@ const META = {
     name: 'newuser',
     short: 'Greets new users and sends them a copy of the code of conduct',
     examples: [
-        '@bosta greet @Username',
+        'when a user joins #general they will be greeted privately',
     ],
 };
 
@@ -39,28 +39,6 @@ function retrieveCoC() {
 }
 
 /**
- * Retrieves user information from ID
- * TODO: Move it to utils.js
- *
- * @param {[type]} bot [description]
- * @param {[type]} id  [description]
- *
- * @return {String} Username associated the ID provided
- */
-function findUser(web, id) {
-    return new Promise((resolve, reject) => {
-        // Send a private message to the user with the CoC
-        web.users.info(id, (err, res) => {
-            if (err) {
-                reject(`I don't know of a ${id}`);
-            } else {
-                resolve(res.user.name);
-            }
-        });
-    });
-}
-
-/**
  * Send a private message to a user
  *
  * @param {[type]} web      [description]
@@ -72,16 +50,16 @@ function findUser(web, id) {
 function postMessage(web, receiver, message) {
     return new Promise((resolve, reject) => {
         // Send a private message to the user with the CoC
-        const msg = `Hi ${receiver.name}! \n\
+        const msg = `Hi <@${receiver}>! \n\
 I'm *Bostantine Androidaou* MENA Dev's butler. I'm at your service, all you \
 gotta do is to call \`@bosta help\`. In the meantime, here's a message \
 from the admins: \n\n ${message}`;
 
-        web.chat.postMessage(receiver.id, msg, { as_user: true }, (err) => {
+        web.chat.postMessage(receiver, msg, { as_user: true }, (err) => {
             if (err) {
                 reject(`Welcome message could not be sent: ${err}`);
             } else {
-                resolve(true);
+                resolve(receiver);
             }
         });
     });
@@ -97,27 +75,17 @@ from the admins: \n\n ${message}`;
  *
  * @return {[type]} [description]
  */
-function register(bot, rtm, web) {
+function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? greet <@([^>]+)>:?/;
-            const [, target, userId] = message.text.match(pattern) || [];
-            const user = { id: userId, name: '' };
-
-            if (target === bot.self.id) {
-                findUser(web, user.id)
-                    .then((response) => {
-                        user.name = response;
-                        rtm.sendMessage(`Welcome on-board ${user.name} glad to have you here`, message.channel);
-                    })
-                    .then(() => retrieveCoC())
-                    .then(data => postMessage(web, user, data))
-                    .catch(error => winston.error(error));
-            }
+        if (message.subtype === 'channel_join'
+                && message.channel === config.main.default_chan_id) {
+            retrieveCoC()
+                .then(data => postMessage(web, message.user, data))
+                .then(user => winston.info(`sent greeting to: <@${user}>`))
+                .catch(error => winston.error(error));
         }
     });
 }
-
 
 module.exports = {
     register,
