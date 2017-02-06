@@ -41,6 +41,42 @@ function retrieveStories(nStories) {
 }
 
 /**
+ * Retrieve each story's information and push it to the array
+ * of stories (fields)
+ *
+ * @param {[type]} storyID [description]
+ * @param {[type]} fields  [description]
+ *
+ * @return {[type]} [description]
+ */
+function retrieveStoryText(storyID, fields) {
+    return new Promise((resolve, reject) => {
+        const customURL = hnStoryURL.replace(/<STORY_ID>/, storyID);
+        https.get(customURL, (res) => {
+            // Combine the chunks that are retrieved
+            const responseParts = [];
+            res.setEncoding('utf8');
+            res.on('data', (d) => {
+                responseParts.push(d);
+            });
+            // Combine the chunks and resolve
+            res.on('end', () => {
+                const parsed = JSON.parse(responseParts.join(''));
+                const storyField = {
+                    title: `${parsed.score} - ${parsed.title}`,
+                    value: parsed.url,
+                    short: false,
+                };
+                fields.push(storyField);
+                resolve();
+            });
+        }).on('error', (e) => {
+            reject(e);
+        });
+    });
+}
+
+/**
  * Loop over an array of Story IDs and retrieve each story's details
  * Resolve the promise only when each story's details have been retrieved
  *
@@ -49,35 +85,13 @@ function retrieveStories(nStories) {
  * @return {[type]} [description]
  */
 function retrieveStoryDetails(storyIDs) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         // Array containing story details objects
         const fields = [];
+        const requests = [];
         // Loop over all the stories in the array and retrieve their details
-        const requests = storyIDs.map((item) => {
-            return new Promise((resolve, reject) => {
-                const customURL = hnStoryURL.replace(/<STORY_ID>/, item);
-                https.get(customURL, (res) => {
-                    // Combine the chunks that are retrieved
-                    const responseParts = [];
-                    res.setEncoding('utf8');
-                    res.on('data', (d) => {
-                        responseParts.push(d);
-                    });
-                    // Combine the chunks and resolve
-                    res.on('end', () => {
-                        const parsed = JSON.parse(responseParts.join(''));
-                        const storyField = {
-                            title: `${parsed.score} - ${parsed.title}`,
-                            value: parsed.url,
-                            short: false,
-                        };
-                        fields.push(storyField);
-                        resolve();
-                    });
-                }).on('error', (e) => {
-                    reject(e);
-                });
-            });
+        storyIDs.forEach((item) => {
+            requests.push(retrieveStoryText(item, fields));
         });
         // Waint until all requests have been resolved
         Promise.all(requests).then(() => resolve(fields));
