@@ -79,6 +79,10 @@ function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.subtype === 'channel_join'
                 && message.channel === config.main.default_chan_id) {
+            web.reactions.add('wave',
+                { channel: message.channel, timestamp: message.ts })
+                .catch(error => winston.error(error));
+
             retrieveCoC()
                 .then(data => postMessage(web, message.user, data))
                 .then(user => winston.info(`sent greeting to: <@${user}>`))
