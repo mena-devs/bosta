@@ -17,7 +17,7 @@ const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/mast
 /**
  * Retrieves user information from ID
  * TODO: Move it to utils.js
- * 
+ *
  * @param {[type]} bot [description]
  * @param {[type]} id  [description]
  *
@@ -114,14 +114,14 @@ function register(bot, rtm, web, config) {
         if (message.text) {
             const pattern = /<@([^>]+)>:? greet <@([^>]+)>:?/;
             const [, target, userId] = message.text.match(pattern) || [];
-            var user = {'id': userId, 'name': ''};
+            const user = { id: userId, name: '' };
 
             if (target === bot.self.id) {
                 findUser(web, user.id)
-                    .then(response => { user.name = response; })
+                    .then((response) => { user.name = response; })
                     .then(() => retrieveCoC())
                     .then(data => postMessage(web, user.id, data))
-                    .then(user => winston.info(`Sent greeting to: <@${user}>`))
+                    .then(userRId => winston.info(`Sent greeting to: <@${userRId}>`))
                     .catch(error => winston.error(error));
             }
         }
