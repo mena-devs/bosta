@@ -52,7 +52,7 @@ function main() {
         // Send a message to signal that the script has started / rebooted
         // C1X3769UJ is the encoded ID for #bot-test
         client.sendMessage(
-            'All hail the BOSTA who from the ashes was born again like a Phoenix :trollface:',
+            ':trollface:',
             config.main.bot_test_chan_id)
             .catch(error => winston.error(error));
     });

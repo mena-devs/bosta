@@ -15,6 +15,28 @@ const META = {
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md';
 
 /**
+ * Retrieves user information from ID
+ * TODO: Move it to utils.js
+ * 
+ * @param {[type]} bot [description]
+ * @param {[type]} id  [description]
+ *
+ * @return {String} Username associated the ID provided
+ */
+function findUser(web, id) {
+    return new Promise((resolve, reject) => {
+        // Send a private message to the user with the CoC
+        web.users.info(id, (err, res) => {
+            if (err) {
+                reject(`I don't know of a ${id}`);
+            } else {
+                resolve(res.user.name);
+            }
+        });
+    });
+}
+
+/**
  * Retrieve the CoC from the github URL
  *
  * @return {[type]} [description]
@@ -33,7 +55,7 @@ function retrieveCoC() {
                 resolve(responseParts.join(''));
             });
         }).on('error', (e) => {
-            reject(e);
+            reject(`Could not retrieve CoC ${e}`);
         });
     });
 }
@@ -54,7 +76,6 @@ function postMessage(web, receiver, message) {
 I'm *Bostantine Androidaou* MENA Dev's butler. I'm at your service, all you \
 gotta do is to call \`@bosta help\`. In the meantime, here's a message \
 from the admins: \n\n ${message}`;
-
         web.chat.postMessage(receiver, msg, { as_user: true }, (err) => {
             if (err) {
                 reject(`Welcome message could not be sent: ${err}`);
@@ -85,8 +106,24 @@ function register(bot, rtm, web, config) {
 
             retrieveCoC()
                 .then(data => postMessage(web, message.user, data))
-                .then(user => winston.info(`sent greeting to: <@${user}>`))
+                .then(user => winston.info(`Sent greeting to: <@${user}>`))
                 .catch(error => winston.error(error));
+        }
+
+        // Manual greet
+        if (message.text) {
+            const pattern = /<@([^>]+)>:? greet <@([^>]+)>:?/;
+            const [, target, userId] = message.text.match(pattern) || [];
+            var user = {'id': userId, 'name': ''};
+
+            if (target === bot.self.id) {
+                findUser(web, user.id)
+                    .then(response => { user.name = response; })
+                    .then(() => retrieveCoC())
+                    .then(data => postMessage(web, user.id, data))
+                    .then(user => winston.info(`Sent greeting to: <@${user}>`))
+                    .catch(error => winston.error(error));
+            }
         }
     });
 }
