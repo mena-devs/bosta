@@ -99,7 +99,7 @@ from the admins: \n\n ${message}`;
 function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.subtype === 'channel_join'
-                && message.channel === config.main.default_chan_id) {
+                && message.channel === config.main.general_chan_id) {
             web.reactions.add('wave',
                 { channel: message.channel, timestamp: message.ts })
                 .catch(error => winston.error(error));
