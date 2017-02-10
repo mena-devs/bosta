@@ -40,10 +40,6 @@ function register(bot, rtm) {
                     if (error) {
                         rtm.sendMessage('Looks like that reboot isn\'t gonna happen today :grin:', message.channel);
                         winston.error(`Could not execute reboot: ${error}`);
-                    } else {
-                        winston.info('I\'m rebooting now... :face_with_rolling_eyes: ');
-                        // TODO: response is not defined =?=
-                        // rtm.sendMessage(response, message.channel);
                     }
                 });
             }
