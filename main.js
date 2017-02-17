@@ -50,7 +50,6 @@ function main() {
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
         winston.info('Now I can receive RTM events.');
         // Send a message to signal that the script has started / rebooted
-        // C1X3769UJ is the encoded ID for #bot-test
         client.sendMessage(
             ':trollface:',
             config.main.bot_test_chan_id)

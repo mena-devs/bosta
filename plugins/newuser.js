@@ -4,6 +4,8 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
 
+const storage = require('node-persist');
+
 const META = {
     name: 'newuser',
     short: 'Greets new users and sends them a copy of the code of conduct',
@@ -13,6 +15,91 @@ const META = {
 };
 
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md';
+
+/**
+ * Takes the UserList (Semi-Column sepearated String)
+ * prepends a newUser to the list and maintains a maximum number of items
+ * returns the new string for storage
+ *
+ * @param {[type]} userList [description]
+ * @param {[type]} maxItems [description]
+ * @param {[type]} newUser  [description]
+ *
+ * @return {[type]} [description]
+ */
+function prependUser(userList, maxItems, newUser) {
+    if (countMembers(userList) < maxItems) {
+        // This crap is because unshift returns the length of the new array
+        // Go figure..
+        userList = userList.split(';');
+        userList.unshift(newUser);
+        return userList.join(';');
+    } else {
+        userList = userList.split(';').slice(0, maxItems);
+        userList.unshift(newUser);
+        return userList.join(';');
+    }
+}
+
+/**
+ * Takes a ';' separated value list and counts the number of entries in it
+ *
+ * @param {[type]} userList [description]
+ *
+ * @return {[type]} [description]
+ */
+function countMembers(userList) {
+    return userList.split(';').length;
+}
+
+/**
+ * Retrieve the list of all recently joined users in storage
+ * These are stored in 'data/recent_members'
+ *
+ * @param {[type]} config  [description]
+ * @param {[type]} storage [description]
+ *
+ * @return {[type]} [description]
+ */
+function getAllUsers(config, storage) {
+    return new Promise((resolve, reject) => {
+        storage.getItem('recent_users')
+        .then((value) => resolve(value));
+    });
+}
+
+/**
+ * Retrieve the list of all the users in storage
+ * if empty, populate it with the first entry
+ * if not, append to the list the new entry
+ * up to a maximum of 10 entries
+ *
+ * @param {[type]} config    [description]
+ * @param {[type]} newUserID [description]
+ *
+ * @return {[type]} [description]
+ */
+function storeNewMember(config, newUserID) {
+    storage.init({
+        dir: config.plugins.system.recent_members_path,
+    })
+    .then(() => getAllUsers(config, storage))
+    .then((users) => {
+        if (!users) {
+            storage.setItem('recent_users', newUserID)
+            .then(() => winston.info(`Added ${newUserID} to storage!`));
+        } else {
+            // Append new user ID
+            const userList = prependUser(users, 9, newUserID);
+            storage.setItem('recent_users', userList)
+            .then(() => getAllUsers(config, storage))
+            .then((users) => {
+                console.log(users, countMembers(users));
+                winston.info('Recent members list updated!')
+            });
+        }
+    });
+}
 
 /**
  * Retrieves user information from ID
@@ -106,7 +193,10 @@ function register(bot, rtm, web, config) {
 
             retrieveCoC()
                 .then(data => postMessage(web, message.user, data))
-                .then(user => winston.info(`Sent greeting to: <@${user}>`))
+                .then(user => {
+                    storeNewMember(config, user);
+                    winston.info(`Sent greeting to: <@${user}>`)
+                })
                 .catch(error => winston.error(error));
         }
 
@@ -121,7 +211,9 @@ function register(bot, rtm, web, config) {
                     .then((response) => { user.name = response; })
                     .then(() => retrieveCoC())
                     .then(data => postMessage(web, user.id, data))
-                    .then(userRId => winston.info(`Sent greeting to: <@${userRId}>`))
+                    .then((userRId) => {
+                        winston.info(`Sent greeting to: <@${userRId}>`)
+                    })
                     .catch(error => winston.error(error));
             }
         }

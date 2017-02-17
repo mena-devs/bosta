@@ -11,6 +11,9 @@ const config = {
         handleExceptions: true,
     },
     plugins: {
+        system: {
+            recent_members_path: 'data/recent_members.txt',
+        },
         tellmeabout: {
             path: 'data/storage.txt',
         },
