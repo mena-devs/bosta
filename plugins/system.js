@@ -12,6 +12,7 @@ const META = {
     examples: [
         '@bosta respawn',
         '@bosta uptime',
+        '@bosta recents'
     ],
 };
 
