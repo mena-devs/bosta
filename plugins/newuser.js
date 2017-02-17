@@ -14,6 +14,7 @@ const META = {
     ],
 };
 
+// TODO :: Move this URL to the configuration file
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md';
 
 /**

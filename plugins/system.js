@@ -1,3 +1,5 @@
+const https = require('https');
+
 const cp = require('child_process');
 
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
@@ -12,9 +14,13 @@ const META = {
     examples: [
         '@bosta respawn',
         '@bosta uptime',
-        '@bosta recents'
+        '@bosta recents',
+        '@bosta coc'
     ],
 };
+
+// TODO :: Move this URL to the configuration file
+const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/README.md';
 
 /**
  * Retrieve the list of all recently joined users in storage
@@ -29,6 +35,31 @@ function getAllUsers(config, storage) {
     return new Promise((resolve, reject) => {
         storage.getItem('recent_users')
         .then((value) => resolve(value));
+    });
+}
+
+
+/**
+ * Retrieve the CoC from the github URL
+ *
+ * @return {[type]} [description]
+ */
+function retrieveCoC() {
+    return new Promise((resolve, reject) => {
+        https.get(cocURL, (res) => {
+            // Combine the chunks that are retrieved
+            const responseParts = [];
+            res.setEncoding('utf8');
+            res.on('data', (d) => {
+                responseParts.push(d);
+            });
+            // Combine the chunks and resolve
+            res.on('end', () => {
+                resolve(responseParts.join(''));
+            });
+        }).on('error', (e) => {
+            reject(`Could not retrieve CoC ${e}`);
+        });
     });
 }
 
@@ -112,6 +143,20 @@ function register(bot, rtm, web, config) {
                     }
                 })
                 .catch(error => winston.error(`Could not retrieve recent users: ${error}`));
+            }
+        }
+
+        // Retrieve the CoC and post it to channel
+        if (message.text) {
+            const pattern = /<@([^>]+)>:? coc/;
+            const [, target] = message.text.match(pattern) || [];
+
+            if (target === bot.self.id) {
+                retrieveCoC()
+                .then((data) => {
+                    rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+                })
+                .catch(error => winston.error(`Could not post CoC: ${error}`));
             }
         }
     });
