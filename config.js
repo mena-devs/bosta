@@ -11,6 +11,9 @@ const config = {
         handleExceptions: true,
     },
     plugins: {
+        newuser: {
+            max_recent_users: 10,
+        },
         userrequests: {
             invitation_request_channel: '#admins',
         },

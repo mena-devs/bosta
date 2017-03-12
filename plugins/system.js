@@ -133,7 +133,6 @@ function register(bot, rtm, web, config) {
                         let returnMessage = 'There you go: ';
                         // Append users to the message string
                         usersArray.forEach((item) => {
-                            console.log(item);
                             returnMessage += ` <@${item}>`;
                         });
                         rtm.sendMessage(returnMessage, message.channel);

@@ -29,14 +29,15 @@ const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/mast
  * @return {[type]} [description]
  */
 function prependUser(userList, maxItems, newUser) {
-    if (countMembers(userList) < maxItems) {
+    // -1 cause Arrays in JS start from the 0 index
+    if (countMembers(userList) < maxItems-1) {
         // This crap is because unshift returns the length of the new array
         // Go figure..
         userList = userList.split(';');
         userList.unshift(newUser);
         return userList.join(';');
     } else {
-        userList = userList.split(';').slice(0, maxItems);
+        userList = userList.split(';').slice(0, maxItems-1);
         userList.unshift(newUser);
         return userList.join(';');
     }
@@ -81,6 +82,8 @@ function getAllUsers(config, storage) {
  * @return {[type]} [description]
  */
 function storeNewMember(config, newUserID) {
+    // Get the total number of users to store from the configuration
+    const maxRecentUsers = config.plugins.newuser.max_recent_users;
     storage.init({
         dir: config.plugins.system.recent_members_path,
     })
@@ -91,7 +94,7 @@ function storeNewMember(config, newUserID) {
             .then(() => winston.info(`Added ${newUserID} to storage!`));
         } else {
             // Append new user ID
-            const userList = prependUser(users, 9, newUserID);
+            const userList = prependUser(users, maxRecentUsers, newUserID);
             storage.setItem('recent_users', userList)
             .then(() => getAllUsers(config, storage))
             .then((users) => {
@@ -213,6 +216,7 @@ function register(bot, rtm, web, config) {
                     .then(() => retrieveCoC())
                     .then(data => postMessage(web, user.id, data))
                     .then((userRId) => {
+                        storeNewMember(config, userRId);
                         winston.info(`Sent greeting to: <@${userRId}>`)
                     })
                     .catch(error => winston.error(error));
