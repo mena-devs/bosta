@@ -4,7 +4,7 @@ const config = {
         bot_test_chan_id: 'C1X3769UJ',
     },
     winston: {
-        enabled: false,
+        enabled: true,
         channel: '#bot-log',
         username: 'Bosta',
         level: 'info',
