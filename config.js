@@ -11,6 +11,9 @@ const config = {
         handleExceptions: true,
     },
     plugins: {
+        userrequests: {
+            invitation_request_channel: '#admins',
+        },
         system: {
             recent_members_path: 'data/recent_members.txt',
         },
