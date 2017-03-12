@@ -8,7 +8,7 @@ const META = {
     name: 'hackernews',
     short: 'Retrieves top N stories from YC Hacker News',
     examples: [
-        '@bosta hnews (N)',
+        '@bosta hnews 10',
     ],
 };
 
@@ -111,7 +111,7 @@ function retrieveStoryDetails(storyIDs) {
 function register(bot, rtm, web) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const pattern = /<@([^>]+)>:? hnews \(([0-9]+)\):?/;
+            const pattern = /<@([^>]+)>:? hnews ([0-9]+):?/;
             const [, target, nStories] = message.text.match(pattern) || [];
 
             if (target === bot.self.id) {

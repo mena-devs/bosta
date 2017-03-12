@@ -4,7 +4,7 @@ const winston = require('winston');
 
 const META = {
     name: 'userrequests',
-    short: 'Request an invite for a user',
+    short: 'Request an invite for a user -- Do not forget the ( ) they are necessary!',
     examples: [
         '@bosta invite (Full Name) (Email) (Occupation)',
     ],
