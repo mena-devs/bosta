@@ -9,6 +9,7 @@
         "global-require": "off",
         "func-names": "off",
         "prefer-arrow-callback": "off",
-        "import/no-dynamic-require": "off"
+        "import/no-dynamic-require": "off",
+        "no-unused-vars": "off"
     }
 }

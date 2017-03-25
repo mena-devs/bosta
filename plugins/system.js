@@ -15,7 +15,7 @@ const META = {
         '@bosta respawn',
         '@bosta uptime',
         '@bosta recents',
-        '@bosta coc'
+        '@bosta coc',
     ],
 };
 
@@ -27,14 +27,13 @@ const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/mast
  * These are stored in 'data/recent_members'
  *
  * @param {[type]} config  [description]
- * @param {[type]} storage [description]
  *
  * @return {[type]} [description]
  */
-function getAllUsers(config, storage) {
+function getRecentUsers(config) {
     return new Promise((resolve, reject) => {
         storage.getItem('recent_users')
-        .then((value) => resolve(value));
+            .then(value => resolve(value));
     });
 }
 
@@ -123,25 +122,19 @@ function register(bot, rtm, web, config) {
             const [, target] = message.text.match(pattern) || [];
 
             if (target === bot.self.id) {
-                storage.init({
-                    dir: config.plugins.system.recent_members_path,
-                })
-                .then(() => getAllUsers(config, storage))
-                .then((users) => {
-                    if (users) {
-                        let usersArray = users.split(';');
-                        let returnMessage = 'There you go: ';
-                        // Append users to the message string
-                        usersArray.forEach((item) => {
-                            returnMessage += ` <@${item}>`;
-                        });
-                        rtm.sendMessage(returnMessage, message.channel);
-                    } else {
-                        winston.info('Have not been keeping track of new users');
-                        rtm.sendMessage('Sorry, I haven\'t been keeping track...', message.channel);
-                    }
-                })
-                .catch(error => winston.error(`Could not retrieve recent users: ${error}`));
+                storage.init({ dir: config.plugins.system.recent_members_path })
+                    .then(() => getRecentUsers(config))
+                    .then((users) => {
+                        if (users) {
+                            const recentIds = users.split(';');
+                            const formattedIds = recentIds.map(id => `<@${id}>`).join(' ');
+                            rtm.sendMessage(`There you go: ${formattedIds}`, message.channel);
+                        } else {
+                            winston.info('Have not been keeping track of new users');
+                            rtm.sendMessage('Sorry, I haven\'t been keeping track...', message.channel);
+                        }
+                    })
+                    .catch(error => winston.error(`Could not retrieve recent users: ${error}`));
             }
         }
 
@@ -152,10 +145,10 @@ function register(bot, rtm, web, config) {
 
             if (target === bot.self.id) {
                 retrieveCoC()
-                .then((data) => {
-                    rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
-                })
-                .catch(error => winston.error(`Could not post CoC: ${error}`));
+                    .then((data) => {
+                        rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+                    })
+                    .catch(error => winston.error(`Could not post CoC: ${error}`));
             }
         }
     });
