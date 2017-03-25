@@ -22,60 +22,60 @@ function register(bot, rtm, web, config) {
                     const postChannel = config.plugins.userrequests.invitation_request_channel;
                     const attachment = {
                         as_user: true,
-                        "attachments": [
-                        {
-                            "color": "#36a64f",
-                            "author_name": "Bosta",
-                            "title": "Invitation Request",
-                            "text": "Attention Admins",
-                            "fields": [
+                        attachments: [{
+                            color: '#36a64f',
+                            author_name: 'Bosta',
+                            title: 'Invitation Request',
+                            text: 'Attention Admins',
+                            fields: [
                                 {
-                                    "title": "Requester",
-                                    "value": `<@${message.user}>`,
-                                    "short": false
+                                    title: 'Requester',
+                                    value: `<@${message.user}>`,
+                                    short: false,
                                 },
                                 {
-                                    "title": "Full Name",
-                                    "value": `${fullname}`,
-                                    "short": false
+                                    title: 'Full Name',
+                                    value: `${fullname}`,
+                                    short: false,
                                 },
                                 {
-                                    "title": "Email",
-                                    "value": `${email}`,
-                                    "short": false
+                                    title: 'Email',
+                                    value: `${email}`,
+                                    short: false,
                                 },
                                 {
-                                    "title": "Occupation",
-                                    "value": `${occupation}`,
-                                    "short": false
-                                }
+                                    title: 'Occupation',
+                                    value: `${occupation}`,
+                                    short: false,
+                                },
                             ],
-                            "footer": "Automation",
-                            "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
-                            "ts": timestamp,
-                            "actions": [
+                            footer: 'Automation',
+                            footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
+                            ts: timestamp,
+                            actions: [
                                 {
-                                    "name": "approve",
-                                    "text": "Approve",
-                                    "type": "button",
-                                    "value": "approve"
+                                    name: 'approve',
+                                    text: 'Approve',
+                                    type: 'button',
+                                    value: 'approve',
                                 },
                                 {
-                                    "name": "reject",
-                                    "text": "Reject",
-                                    "type": "button",
-                                    "value": "reject",
-                                    "style": "danger",
-                                    "confirm": {
-                                            "title": "Are you sure?",
-                                            "text": "This information is not stored anywhere and the invitation request will be lost!",
-                                            "ok_text": "Yes",
-                                            "dismiss_text": "No"
-                                    }
-                                }
-                            ]
-                        }]
+                                    name: 'reject',
+                                    text: 'Reject',
+                                    type: 'button',
+                                    value: 'reject',
+                                    style: 'danger',
+                                    confirm: {
+                                        title: 'Are you sure?',
+                                        text: 'This information is not stored anywhere and the invitation request will be lost!',
+                                        ok_text: 'Yes',
+                                        dismiss_text: 'No',
+                                    },
+                                },
+                            ],
+                        }],
                     };
+
                     // Inform the user that her request is being processed
                     const msg = `Hey <@${message.user}>, \
 we have received your invitation request for ${fullname} and the admins are \
