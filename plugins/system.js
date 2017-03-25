@@ -23,22 +23,6 @@ const META = {
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/README.md';
 
 /**
- * Retrieve the list of all recently joined users in storage
- * These are stored in 'data/recent_members'
- *
- * @param {[type]} config  [description]
- *
- * @return {[type]} [description]
- */
-function getRecentUsers(config) {
-    return new Promise((resolve, reject) => {
-        storage.getItem('recent_users')
-            .then(value => resolve(value));
-    });
-}
-
-
-/**
  * Retrieve the CoC from the github URL
  *
  * @return {[type]} [description]
@@ -123,7 +107,7 @@ function register(bot, rtm, web, config) {
 
             if (target === bot.self.id) {
                 storage.init({ dir: config.plugins.system.recent_members_path })
-                    .then(() => getRecentUsers(config))
+                    .then(() => storage.getItem(config.plugins.system.recent_members_key))
                     .then((users) => {
                         if (users) {
                             const recentIds = users.split(';');

@@ -3,6 +3,7 @@ const config = {
         general_chan_id: 'C03B400RU',
         bot_test_chan_id: 'C1X3769UJ',
     },
+
     winston: {
         enabled: true,
         channel: '#bot-log',
@@ -10,22 +11,30 @@ const config = {
         level: 'info',
         handleExceptions: true,
     },
+
     plugins: {
+
         newuser: {
             max_recent_users: 10,
         },
+
         userrequests: {
             invitation_request_channel: '#admins',
         },
+
         system: {
             recent_members_path: 'data/recent_members.txt',
+            recent_members_key: 'recent_users',
         },
+
         tellmeabout: {
             path: 'data/storage.txt',
         },
+
         sentiment: {
             recent: 10,
         },
+
         snippets: {
             timeout: 4,
             memory: 8,
