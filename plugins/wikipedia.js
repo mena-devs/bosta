@@ -34,10 +34,12 @@ function wikipedia(title) {
                 const json = JSON.parse(body);
 
                 if (json.query) {
-                    const extract = values(json.query.pages)[0].extract;
+                    const extract = values(json.query.pages)[0].extract,
+                          pageId = values(json.query.pages)[0].pageid,
+                          pageUrl = 'https://en.wikipedia.org/?curid=' + pageId;
 
                     if (extract) {
-                        resolve(extract.split('\n')[0]);
+                        resolve(extract.split('\n')[0] + ' ' + pageUrl);
                     }
                 }
             });
