@@ -29,18 +29,15 @@ const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/mast
  * @return {[type]} [description]
  */
 function prependUser(userList, maxItems, newUser) {
+    let splitMembers = userList.split(';');
+
     // -1 cause Arrays in JS start from the 0 index
-    if (countMembers(userList) < maxItems-1) {
-        // This crap is because unshift returns the length of the new array
-        // Go figure..
-        userList = userList.split(';');
-        userList.unshift(newUser);
-        return userList.join(';');
-    } else {
-        userList = userList.split(';').slice(0, maxItems-1);
-        userList.unshift(newUser);
-        return userList.join(';');
+    if (splitMembers.length < maxItems - 1) {
+        splitMembers = splitMembers.slice(0, maxItems - 1);
     }
+
+    splitMembers.unshift(newUser);
+    return splitMembers.join(';');
 }
 
 /**
@@ -52,22 +49,6 @@ function prependUser(userList, maxItems, newUser) {
  */
 function countMembers(userList) {
     return userList.split(';').length;
-}
-
-/**
- * Retrieve the list of all recently joined users in storage
- * These are stored in 'data/recent_members'
- *
- * @param {[type]} config  [description]
- * @param {[type]} storage [description]
- *
- * @return {[type]} [description]
- */
-function getAllUsers(config, storage) {
-    return new Promise((resolve, reject) => {
-        storage.getItem('recent_users')
-        .then((value) => resolve(value));
-    });
 }
 
 /**
@@ -84,25 +65,19 @@ function getAllUsers(config, storage) {
 function storeNewMember(config, newUserID) {
     // Get the total number of users to store from the configuration
     const maxRecentUsers = config.plugins.newuser.max_recent_users;
-    storage.init({
-        dir: config.plugins.system.recent_members_path,
-    })
-    .then(() => getAllUsers(config, storage))
-    .then((users) => {
-        if (!users) {
-            storage.setItem('recent_users', newUserID)
-            .then(() => winston.info(`Added ${newUserID} to storage!`));
-        } else {
-            // Append new user ID
-            const userList = prependUser(users, maxRecentUsers, newUserID);
-            storage.setItem('recent_users', userList)
-            .then(() => getAllUsers(config, storage))
-            .then((users) => {
-                console.log(users, countMembers(users));
-                winston.info('Recent members list updated!')
-            });
-        }
-    });
+    storage.init({ dir: config.plugins.system.recent_members_path })
+        .then(() => storage.getItem('recent_users'))
+        .then((users) => {
+            if (!users) {
+                storage.setItem('recent_users', newUserID)
+                    .then(() => winston.info(`Added ${newUserID} to storage!`));
+            } else {
+                // Append new user ID
+                const userList = prependUser(users, maxRecentUsers, newUserID);
+                storage.setItem('recent_users', userList)
+                    .then(() => winston.info('Recent members list updated!'));
+            }
+        });
 }
 
 /**
@@ -197,9 +172,9 @@ function register(bot, rtm, web, config) {
 
             retrieveCoC()
                 .then(data => postMessage(web, message.user, data))
-                .then(user => {
+                .then((user) => {
                     storeNewMember(config, user);
-                    winston.info(`Sent greeting to: <@${user}>`)
+                    winston.info(`Sent greeting to: <@${user}>`);
                 })
                 .catch(error => winston.error(error));
         }
@@ -217,7 +192,7 @@ function register(bot, rtm, web, config) {
                     .then(data => postMessage(web, user.id, data))
                     .then((userRId) => {
                         storeNewMember(config, userRId);
-                        winston.info(`Sent greeting to: <@${userRId}>`)
+                        winston.info(`Sent greeting to: <@${userRId}>`);
                     })
                     .catch(error => winston.error(error));
             }
