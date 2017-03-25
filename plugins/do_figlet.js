@@ -2,6 +2,8 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const figlet = require('figlet');
 
+const pre = require('../utils.js').pre;
+
 const META = {
     name: 'figlet',
     short: 'figlet-izes text',
@@ -20,7 +22,7 @@ function handleFiglet(bot, rtm, message) {
                 if (err) {
                     reject(err);
                 } else {
-                    rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+                    rtm.sendMessage(pre(data), message.channel);
                     resolve(data);
                 }
             });

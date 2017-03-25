@@ -5,8 +5,9 @@ const spawn = require('child_process').spawn;
 const url = require('url');
 
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 const winston = require('winston');
+
+const pre = require('../utils.js').pre;
 
 const META = {
     name: 'snippets',
@@ -122,7 +123,7 @@ function runSnippet(web, rtm, config, secret, file) {
     download(host, path, secret.token)
         .then(response => save(fileOnDisk, response))
         .then(() => execute(fileName, language, sourceFolder))
-        .then(text => reply(`\`\`\`${text.slice(0, language.crop)}\`\`\``))
+        .then(text => reply(pre(text.slice(0, language.crop))))
         .catch((error) => {
             reply(error);
             winston.error(error);
@@ -151,13 +152,13 @@ function register(bot, rtm, web, config, secret) {
             if (target === bot.self.id) {
                 try {
                     const { timeout, crop, memory } = loadConfig(config, lang);
-                    rtm.sendMessage(`\`\`\`${lang}:
+                    rtm.sendMessage(pre(`${lang}:
     Timeout  : ${timeout} seconds
     Memory   : ${memory}MB
-    Crops at : ${crop} characters\`\`\``, message.channel);
+    Crops at : ${crop} characters`), message.channel);
                 } catch (e) {
                     rtm.sendMessage(
-                            `\`\`\`${lang} is not supported\`\`\``,
+                            pre(`${lang} is not supported`),
                             message.channel);
                 }
             }

@@ -1,12 +1,11 @@
+const cp = require('child_process');
 const https = require('https');
 
-const cp = require('child_process');
-
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 const winston = require('winston');
-
 const storage = require('node-persist');
+
+const pre = require('../utils.js').pre;
 
 const META = {
     name: 'system',
@@ -93,7 +92,7 @@ function register(bot, rtm, web, config) {
                         winston.error(`Could not execute your order: ${error}`);
                     } else {
                         rtm.sendMessage(
-                            `There you go: \n \`\`\`${stdout}\`\`\``,
+                            `There you go: \n ${pre(stdout)}`,
                             message.channel);
                     }
                 });
@@ -130,7 +129,7 @@ function register(bot, rtm, web, config) {
             if (target === bot.self.id) {
                 retrieveCoC()
                     .then((data) => {
-                        rtm.sendMessage(`\`\`\`${data}\`\`\``, message.channel);
+                        rtm.sendMessage(pre(data), message.channel);
                     })
                     .catch(error => winston.error(`Could not post CoC: ${error}`));
             }
