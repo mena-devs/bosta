@@ -126,7 +126,7 @@ function runSnippet(web, rtm, config, secret, file) {
         .then(text => reply(pre(text.slice(0, language.crop))))
         .catch((error) => {
             reply(error);
-            winston.error(error);
+            winston.error(`${META.name} - Error: ${error}`);
         });
 
     web.reactions.add('repeat', { file: file.id })

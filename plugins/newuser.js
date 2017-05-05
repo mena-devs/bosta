@@ -168,7 +168,9 @@ function register(bot, rtm, web, config) {
                 && message.channel === config.main.general_chan_id) {
             web.reactions.add('wave',
                 { channel: message.channel, timestamp: message.ts })
-                .catch(error => winston.error(error));
+                .catch((error) => {
+                    winston.error(`${META.name} - Channel Join - Error: ${error}`);
+                });
 
             retrieveCoC()
                 .then(data => postMessage(web, message.user, data))
@@ -176,7 +178,9 @@ function register(bot, rtm, web, config) {
                     storeNewMember(config, user);
                     winston.info(`Sent greeting to: <@${user}>`);
                 })
-                .catch(error => winston.error(error));
+                .catch((error) => {
+                    winston.error(`${META.name} - Retrieve CoC - Error: ${error}`);
+                });
         }
 
         // Manual greet
@@ -194,7 +198,9 @@ function register(bot, rtm, web, config) {
                         storeNewMember(config, userRId);
                         winston.info(`Sent greeting to: <@${userRId}>`);
                     })
-                    .catch(error => winston.error(error));
+                    .catch((error) => {
+                        winston.error(`${META.name} - Manual Greet - Error: ${error}`);
+                    });
             }
         }
     });

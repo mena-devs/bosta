@@ -98,7 +98,9 @@ function register(bot, rtm, web, config, secret) {
                             `${who} has recently been ${sentiment.output.result}`,
                             message.channel);
                     })
-                    .catch(error => winston.error(error));
+                    .catch((error) => {
+                        winston.error(`${META.name} - Error: ${error}`);
+                    });
             }
         }
     });

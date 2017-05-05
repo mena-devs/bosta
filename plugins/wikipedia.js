@@ -60,7 +60,9 @@ function register(bot, rtm) {
                 wikipedia(text)
                     .then((extract) => {
                         rtm.sendMessage(`> ${extract}`, message.channel);
-                    }).catch(error => winston.error(error));
+                    }).catch((error) => {
+                        winston.error(`${META.name} Error: ${error}`);
+                    });
             }
         }
     });

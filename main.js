@@ -35,7 +35,7 @@ function main() {
 
     client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
         bot = data;
-        winston.info(`GROUP: ${data.team.name} > MY NAME: ${data.self.name}`);
+        winston.info(`Team: ${data.team.name} > Bot: ${data.self.name}`);
 
         glob.sync('./plugins/*.js').forEach((file) => {
             winston.info(`Found plugin: ${file}`);
@@ -48,12 +48,12 @@ function main() {
     });
 
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-        winston.info('Now I can receive RTM events.');
+        winston.info('Locked and loaded!');
         // Send a message to signal that the script has started / rebooted
         client.sendMessage(
             ':trollface:',
             config.main.bot_test_chan_id)
-            .catch(error => winston.error(error));
+            .catch(error => winston.error(`RTM Re/Connect: ${error}`));
     });
 
     client.on(RTM_EVENTS.MESSAGE, (message) => {

@@ -136,7 +136,7 @@ function register(bot, rtm, web) {
                         // Post the message
                         web.chat.postMessage(message.channel, '', attachment, (err) => {
                             if (err) {
-                                winston.error('Error:', err);
+                                winston.error('HN Plugin Error:', err);
                             } else {
                                 winston.info('Hackernews articles retrieved and pushed to relevant channel.');
                             }
