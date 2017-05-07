@@ -1,6 +1,6 @@
-const https = require('https');
-
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
+
+const rp = require('request-promise');
 
 const winston = require('winston');
 
@@ -17,35 +17,29 @@ const API = '/w/api.php?format=json&redirects=1&action=query&prop=extracts&exint
 
 function wikipedia(title) {
     const values = o => Object.keys(o).map(k => o[k]);
+
     const options = {
-        host: 'en.wikipedia.org',
-        path: API + encodeURIComponent(title),
+        uri: `https://en.wikipedia.org${API}${encodeURIComponent(title)}`,
+        json: true,
     };
 
     return new Promise((resolve, reject) => {
-        https.get(options, (res) => {
-            let body = '';
-
-            res.on('data', (chunk) => {
-                body += chunk;
-            });
-
-            res.on('end', () => {
-                const json = JSON.parse(body);
-
+        rp(options)
+            .then((json) => {
                 if (json.query) {
-                    const extract = values(json.query.pages)[0].extract,
-                          pageId = values(json.query.pages)[0].pageid,
-                          pageUrl = 'https://en.wikipedia.org/?curid=' + pageId;
+                    const extract = values(json.query.pages)[0].extract;
+                    const pageId = values(json.query.pages)[0].pageid;
+                    const pageUrl = `https://en.wikipedia.org/?curid=${pageId}`;
 
                     if (extract) {
-                        resolve(extract.split('\n')[0] + ' ' + pageUrl);
+                        const text = extract.split('\n')[0];
+                        resolve(`${text} ${pageUrl}`);
+                    } else {
+                        resolve(`Sorry, I could not find anything about ${title}`);
                     }
                 }
-            });
-        }).on('error', (error) => {
-            reject(error);
-        });
+            })
+            .catch(error => reject(error));
     });
 }
 
@@ -59,7 +53,7 @@ function register(bot, rtm) {
             if (target === bot.self.id) {
                 wikipedia(text)
                     .then((extract) => {
-                        rtm.sendMessage(`> ${extract}`, message.channel);
+                        rtm.sendMessage(extract, message.channel);
                     }).catch((error) => {
                         winston.error(`${META.name} Error: ${error}`);
                     });

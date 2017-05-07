@@ -1,7 +1,6 @@
-const https = require('https');
-
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
+const rp = require('request-promise');
 const storage = require('node-persist');
 
 const META = {
@@ -16,7 +15,6 @@ const META = {
     ],
 };
 
-const API = '/?format=json&q=';
 
 function cleanup(text) {
     const pattern = /<a.*>(.*)<\/a>\s*(.*)/;
@@ -27,21 +25,13 @@ function cleanup(text) {
 
 function search(term) {
     const options = {
-        host: 'duckduckgo.com',
-        path: API + encodeURIComponent(term),
+        uri: `https://duckduckgo.com/?format=json&q=${encodeURIComponent(term)}`,
+        json: true,
     };
 
     return new Promise((resolve, reject) => {
-        https.get(options, (res) => {
-            let body = '';
-
-            res.on('data', (chunk) => {
-                body += chunk;
-            });
-
-            res.on('end', () => {
-                const json = JSON.parse(body);
-
+        rp(options)
+            .then((json) => {
                 if (json) {
                     const topics = json.RelatedTopics
                         .filter(topic => topic.Result !== undefined)
@@ -56,10 +46,8 @@ function search(term) {
                 } else {
                     resolve('invalid response, sorry!');
                 }
-            });
-        }).on('error', (error) => {
-            reject(error);
-        });
+            })
+            .catch(error => reject(error));
     });
 }
 
@@ -97,7 +85,7 @@ function register(bot, rtm, web, config) {
 
                         return search(key);
                     })
-                    .then(value => rtm.sendMessage(`${value}`, message.channel))
+                    .then(value => rtm.sendMessage(`${value}`, message.channel));
             }
         }
 
