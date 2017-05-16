@@ -1,6 +1,6 @@
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 const checker = require('spellchecker');
+
+const Plugin = require('../utils.js').Plugin;
 
 const META = {
     name: 'spellchecker',
@@ -10,27 +10,24 @@ const META = {
     ],
 };
 
-function register(bot, rtm) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /(\w+)\(sp\?\)/;
-            const [, word] = message.text.match(pattern) || [];
-            if (word) {
-                const wrong = checker.isMisspelled(word);
-                const result = checker.getCorrectionsForMisspelling(word);
 
-                if (!wrong) {
-                    rtm.sendMessage(`${word} is spelled correctly.`, message.channel);
-                } else if (result.length === 0) {
-                    rtm.sendMessage(`I don't know how to fix ${word}`, message.channel);
-                } else {
-                    rtm.sendMessage(
-                        `possible spelling for ${word}: ${result.join(', ')}`,
-                        message.channel);
-                }
-            }
-        }
-    });
+function spell(options, message, word) {
+    const wrong = checker.isMisspelled(word);
+    const result = checker.getCorrectionsForMisspelling(word);
+
+    if (!wrong) {
+        message.reply(`${word} is spelled correctly.`);
+    } else if (result.length === 0) {
+        message.reply(`I don't know how to fix ${word}`);
+    } else {
+        message.reply(`possible spelling for ${word}: ${result.join(', ')}`);
+    }
+}
+
+
+function register(bot, rtm, web, config) {
+    const plugin = new Plugin({ bot, rtm, web, config });
+    plugin.route(/(\w+)\(sp\?\)/, spell, {});
 }
 
 

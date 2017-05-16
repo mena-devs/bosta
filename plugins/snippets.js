@@ -8,6 +8,7 @@ const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 const winston = require('winston');
 
 const pre = require('../utils.js').pre;
+const Plugin = require('../utils.js').Plugin;
 
 const META = {
     name: 'snippets',
@@ -133,37 +134,34 @@ function runSnippet(web, rtm, config, secret, file) {
         .catch(() => {}); // bot already reacted supposedly
 }
 
-function register(bot, rtm, web, config, secret) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? snippets support/;
-            const [, target] = message.text.match(pattern) || [];
+function supported(options, message) {
+    const languages = Object.keys(options.config.plugins.snippets.languages).join(', ');
 
-            if (target === bot.self.id) {
-                const languages = Object.keys(config.plugins.snippets.languages).join(', ');
-                rtm.sendMessage(`I can run: ${languages}`, message.channel);
-            }
-        }
+    message.reply(`I can run: ${languages}`);
+}
 
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? snippets config (.*)/;
-            const [, target, lang] = message.text.match(pattern) || [];
 
-            if (target === bot.self.id) {
-                try {
-                    const { timeout, crop, memory } = loadConfig(config, lang);
-                    rtm.sendMessage(pre(`${lang}:
+function langConfig(options, message, who, lang) {
+    try {
+        const { timeout, crop, memory } = loadConfig(options.config, lang);
+
+        message.reply(pre(`${lang}:
     Timeout  : ${timeout} seconds
     Memory   : ${memory}MB
-    Crops at : ${crop} characters`), message.channel);
-                } catch (e) {
-                    rtm.sendMessage(
-                            pre(`${lang} is not supported`),
-                            message.channel);
-                }
-            }
-        }
+    Crops at : ${crop} characters`));
+    } catch (e) {
+        message.reply(pre(`${lang} is not supported`));
+    }
+}
 
+
+function register(bot, rtm, web, config, secret) {
+    const plugin = new Plugin({ bot, rtm, web, config });
+    plugin.route(/<@([^>]+)>:? snippets support/, supported, { self: true });
+    plugin.route(/<@([^>]+)>:? snippets config (.*)/, langConfig, { self: true });
+
+
+    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.file
                 && message.file.mode === 'snippet'
                 && message.subtype === 'file_share'

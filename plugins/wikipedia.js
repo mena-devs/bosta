@@ -1,4 +1,4 @@
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
+const Plugin = require('../utils.js').Plugin;
 
 const rp = require('request-promise');
 
@@ -44,22 +44,19 @@ function wikipedia(title) {
 }
 
 
-function register(bot, rtm) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? wikipedia (.*)/;
-            const [, target, text] = message.text.match(pattern) || [];
+function handleWikipedia(options, message, who, text) {
+    wikipedia(text)
+        .then((extract) => {
+            message.reply(extract);
+        }).catch((error) => {
+            winston.error(`${META.name} Error: ${error}`);
+        });
+}
 
-            if (target === bot.self.id) {
-                wikipedia(text)
-                    .then((extract) => {
-                        rtm.sendMessage(extract, message.channel);
-                    }).catch((error) => {
-                        winston.error(`${META.name} Error: ${error}`);
-                    });
-            }
-        }
-    });
+
+function register(bot, rtm, web, config) {
+    const plugin = new Plugin({ bot, rtm, web, config });
+    plugin.route(/<@([^>]+)>:? wikipedia (.*)/, handleWikipedia, { self: true });
 }
 
 

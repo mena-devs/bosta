@@ -1,4 +1,4 @@
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
+const Plugin = require('../utils.js').Plugin;
 
 const rp = require('request-promise');
 const storage = require('node-persist');
@@ -52,62 +52,48 @@ function search(term) {
 }
 
 
+function save(options, message, who, key, value) {
+    storage
+        .setItem(key, value)
+        .then(_ => message.reply(`${key} saved.`));
+}
+
+
+function about(options, message, who, key) {
+    storage
+        .getItem(key)
+        .then((value) => {
+            if (value) {
+                return `${key}: ${value}`;
+            }
+
+            return search(key);
+        }).then(value => message.reply(value));
+}
+
+
+function forget(options, message, who, key) {
+    storage
+        .removeItem(key)
+        .then((value) => {
+            if (value) {
+                message.reply(`${key} removed.`);
+            } else {
+                message.reply(`I do not know anything about ${key}`);
+            }
+        });
+}
+
+
 function register(bot, rtm, web, config) {
     storage.init({
         dir: config.plugins.tellmeabout.path,
     });
 
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? save (.+?) as: (.+)/;
-            const [, target, key, value] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                storage
-                    .setItem(key, value)
-                    .then(() => {
-                        rtm.sendMessage(`${key} saved.`, message.channel);
-                    });
-            }
-        }
-
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? about (.*)/;
-            const [, target, key] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                storage
-                    .getItem(key)
-                    .then((value) => {
-                        if (value) {
-                            return `${key}: ${value}`;
-                        }
-
-                        return search(key);
-                    })
-                    .then(value => rtm.sendMessage(`${value}`, message.channel));
-            }
-        }
-
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? forget (.*)/;
-            const [, target, key] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                storage
-                    .removeItem(key)
-                    .then((value) => {
-                        if (value) {
-                            rtm.sendMessage(`${key} removed.`, message.channel);
-                        } else {
-                            rtm.sendMessage(
-                                `I do not know anything about ${key}`,
-                                 message.channel);
-                        }
-                    });
-            }
-        }
-    });
+    const plugin = new Plugin({ bot, rtm, web, config });
+    plugin.route(/<@([^>]+)>:? save (.+?) as: (.+)/, save, { self: true });
+    plugin.route(/<@([^>]+)>:? forget (.+)/, forget, { self: true });
+    plugin.route(/<@([^>]+)>:? about (.+)/, about, { self: true });
 }
 
 

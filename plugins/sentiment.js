@@ -1,14 +1,13 @@
 const request = require('request');
-
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 const winston = require('winston');
+
+const Plugin = require('../utils.js').Plugin;
 
 const META = {
     name: 'sentiment',
     short: 'provides a sentiment analysis on the last 10 messages of a user',
     examples: [
-        '@bosta how has jordan been recently?',
+        '@bosta analyse jordan',
     ],
 };
 
@@ -30,13 +29,13 @@ function pickTarget(bot, channel) {
 }
 
 
-function loadRecentMessages(bot, web, config, channel, user) {
+function loadRecentMessages(options, channel, user) {
     return new Promise((resolve, reject) => {
-        const target = pickTarget(bot, channel);
-        let source = web.channels;
+        const target = pickTarget(options.bot, channel);
+        let source = options.web.channels;
 
         if (target.is_group) {
-            source = web.groups;
+            source = options.web.groups;
         }
 
         source.history(channel, { count: 1000 }, (error, response) => {
@@ -45,8 +44,8 @@ function loadRecentMessages(bot, web, config, channel, user) {
             } else {
                 let messages = response.messages.filter(m => m.user === user.id);
 
-                if (messages.length > config.plugins.sentiment.recent) {
-                    messages = messages.slice(1, config.plugins.sentiment.recent);
+                if (messages.length > options.config.plugins.sentiment.recent) {
+                    messages = messages.slice(1, options.config.plugins.sentiment.recent);
                 }
 
                 if (messages.length === 0) {
@@ -83,27 +82,18 @@ function analyseSentiment(secret, messages) {
 }
 
 
-function register(bot, rtm, web, config, secret) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? how has ([^ ]+) been recently\?/;
-            const [, target, who] = message.text.match(pattern) || [];
+function analyse(options, message, who, target) {
+    findUser(options.bot, target)
+        .then(user => loadRecentMessages(options, message.channel, user))
+        .then(messages => analyseSentiment(options.secret, messages))
+        .then(sentiment => message.reply(`${target} has recently been ${sentiment.output.result}`))
+        .catch(error => winston.error(`${META.name} - Error: ${error}`));
+}
 
-            if (target === bot.self.id) {
-                findUser(bot, who)
-                    .then(user => loadRecentMessages(bot, web, config, message.channel, user))
-                    .then(messages => analyseSentiment(secret, messages))
-                    .then((sentiment) => {
-                        rtm.sendMessage(
-                            `${who} has recently been ${sentiment.output.result}`,
-                            message.channel);
-                    })
-                    .catch((error) => {
-                        winston.error(`${META.name} - Error: ${error}`);
-                    });
-            }
-        }
-    });
+
+function register(bot, rtm, web, config, secret) {
+    const plugin = new Plugin({ bot, rtm, web, config, secret });
+    plugin.route(/<@([^>]+)>:? analyse (.+)/, analyse, { self: true });
 }
 
 
