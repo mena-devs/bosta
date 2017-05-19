@@ -19,6 +19,7 @@ function main() {
     const client = new RtmClient(secret.token);
     const web = new WebClient(secret.token);
     const plugins = {};
+    let initial_connection = true;
     let bot;
 
     // Adding custon transport for Winston
@@ -35,6 +36,12 @@ function main() {
 
     client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
         bot = data;
+
+        // Disable plugin reload on reconnect after connection
+        // failure
+        if (!initial_connection)
+            return;
+
         winston.info(`Team: ${data.team.name} > Bot: ${data.self.name}`);
 
         glob.sync('./plugins/*.js').forEach((file) => {
@@ -48,12 +55,18 @@ function main() {
     });
 
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-        winston.info('Locked and loaded!');
-        // Send a message to signal that the script has started / rebooted
-        client.sendMessage(
-            ':trollface:',
-            config.main.bot_test_chan_id)
-            .catch(error => winston.error(`RTM Re/Connect: ${error}`));
+        if (!initial_connection) {
+            winston.info('Reconnected...');
+        } else {
+            winston.info('Locked and loaded!');
+            // Send a message to signal that the script has started / rebooted
+            client.sendMessage(
+                ':trollface:',
+                config.main.bot_test_chan_id)
+                .catch(error => winston.error(`RTM Re/Connect: ${error}`));
+
+            initial_connection = false;
+        }
     });
 
     client.on(RTM_EVENTS.MESSAGE, (message) => {
