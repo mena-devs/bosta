@@ -1,8 +1,6 @@
-const Plugin = require('../utils.js').Plugin;
-
 const https = require('https');
-
 const winston = require('winston');
+const Plugin = require('../utils.js').Plugin;
 
 const META = {
     name: 'hackernews',
