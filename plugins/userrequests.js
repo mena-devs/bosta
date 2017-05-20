@@ -1,3 +1,5 @@
+const rp = require('request-promise');
+
 const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const winston = require('winston');
@@ -9,6 +11,7 @@ const META = {
         '@bosta invite (Full Name) (Email) (Occupation)',
     ],
 };
+
 
 function register(bot, rtm, web, config) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
@@ -52,7 +55,9 @@ function register(bot, rtm, web, config) {
                             footer: 'Automation',
                             footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
                             ts: timestamp,
-                            actions: [
+                            // TODO: Reactivate message action buttons
+                            // Temporarily Disabled
+                            /* actions: [
                                 {
                                     name: 'approve',
                                     text: 'Approve',
@@ -72,7 +77,7 @@ function register(bot, rtm, web, config) {
                                         dismiss_text: 'No',
                                     },
                                 },
-                            ],
+                            ],*/
                         }],
                     };
 
@@ -101,8 +106,40 @@ its status! :wink:`;
             }
         }
     });
+
+    // Wait for the check mark emoji to be added to the message
+    // before processing the invitation request
+    rtm.on(RTM_EVENTS.REACTION_ADDED, (message) => {
+        if (message.reaction == 'white_check_mark') {
+            web.channels.history(message.item.channel, { latest: message.item.ts, count: 1 })
+            .then((response) => { 
+                if (response.messages.length < 1)
+                    return {};
+
+                const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)?/;
+                const [, target, fullname, email, occupation] = response.messages[0].text.match(pattern) || [];
+                const requestingUser = response.messages[0].user;
+
+                return {
+                    invitee_name: fullname,
+                    invitee_email: email,
+                    invitee_title: occupation,
+                    slack_uid: requestingUser,
+                    invitee_company: "" // Not Implemented
+                }
+            })
+            .then((invitationRequestObj) => processInvitationRequest(invitationRequestObj))
+            .catch((error) => {
+                winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
+            });
+        }
+    });
 }
 
+
+function processInvitationRequest(invitationRequestObj) {
+    console.log(invitationRequestObj);
+}
 
 module.exports = {
     register,

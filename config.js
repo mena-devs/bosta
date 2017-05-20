@@ -19,7 +19,7 @@ const config = {
         },
 
         userrequests: {
-            invitation_request_channel: '#admins',
+            invitation_request_channel: '#bot-test',
         },
 
         system: {
