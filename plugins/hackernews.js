@@ -2,8 +2,6 @@ const Plugin = require('../utils.js').Plugin;
 
 const https = require('https');
 
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 const winston = require('winston');
 
 const META = {
@@ -13,7 +11,6 @@ const META = {
         '@bosta hnews 10',
     ],
 };
-
 
 const hnAPIURL = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty';
 const hnStoryURL = 'https://hacker-news.firebaseio.com/v0/item/<STORY_ID>.json?print=pretty';
@@ -82,7 +79,7 @@ function retrieveStoryDetails(storyIDs) {
 }
 
 
-function hnews(options, message, who, key, nStories) {
+function hnews(options, message, who, nStories) {
     if (nStories) {
         retrieveStories(nStories)
         .then(response => retrieveStoryDetails(response))
@@ -102,7 +99,7 @@ function hnews(options, message, who, key, nStories) {
             };
 
             // Post the message
-            web.chat.postMessage(message.channel, '', attachment, (err) => {
+            options.web.chat.postMessage(message.channel, '', attachment, (err) => {
                 if (err) {
                     winston.error('HN Plugin Error:', err);
                 } else {
