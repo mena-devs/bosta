@@ -21,11 +21,7 @@ const META = {
 // TODO :: Move this URL to the configuration file
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/README.md';
 
-/**
- * Retrieve the CoC from the github URL
- *
- * @return {[type]} [description]
- */
+
 function retrieveCoC() {
     return new Promise((resolve, reject) => {
         https.get(cocURL, (res) => {
