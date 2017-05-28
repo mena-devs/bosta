@@ -151,7 +151,6 @@ function register(bot, rtm, web, config, secret) {
 
 
 function processInvitationRequest(invitationRequestObj, web, config, secret) {
-    console.log(invitationRequestObj);
     const options = {
         method: 'POST',
         uri: `${config.plugins.userrequests.menadevs_api_uri}?auth_token=${secret.menadevs_api_token}`,
@@ -186,7 +185,7 @@ currently processing it. I'll keep you posted on \
 its status! :wink:`;
     web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
         if (error) {
-            winston.error('Could not respond to invitation requesting user:', error);
+            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
         } else {
             winston.info('Invitation confirmation message was sent');
         }
@@ -201,7 +200,7 @@ email with further instructions. \
 Thank you for helping spread the message!`;
     web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
         if (error) {
-            winston.error('Could not respond to invitation requesting user:', error);
+            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
         } else {
             winston.info('Invitation approval message was sent');
         }
@@ -216,7 +215,7 @@ invited already or an admin has rejected the request. If it's the latter an admi
 with you soon to clarify the reason.`;
     web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
         if (error) {
-            winston.error('Could not respond to invitation requesting user:', error);
+            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
         } else {
             winston.info('Invitation rejection message was sent');
         }
