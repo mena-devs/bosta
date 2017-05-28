@@ -8,19 +8,18 @@ const META = {
     name: 'userrequests',
     short: 'Request an invite for a user -- Do not forget the ( ) they are necessary!',
     examples: [
-        '@bosta invite (Full Name) (Email) (Occupation)',
+        '@bosta invite (Full Name) (Email) (Occupation) (Company)',
     ],
 };
 
-
-function register(bot, rtm, web, config) {
+function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)?/;
-            const [, target, fullname, email, occupation] = message.text.match(pattern) || [];
+            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
+            const [, target, fullname, email, occupation, company] = message.text.match(pattern) || [];
 
             if (target === bot.self.id) {
-                if (fullname.length > 0 && email.length > 0 && occupation.length > 0) {
+                if (fullname.length > 0 && email.length > 0 && occupation.length > 0 && company.length > 0) {
                     const timestamp = Math.floor(new Date() / 1000);
                     const postChannel = config.plugins.userrequests.invitation_request_channel;
                     const attachment = {
@@ -49,6 +48,11 @@ function register(bot, rtm, web, config) {
                                 {
                                     title: 'Occupation',
                                     value: `${occupation}`,
+                                    short: false,
+                                },
+                                {
+                                    title: 'Company',
+                                    value: `${company}`,
                                     short: false,
                                 },
                             ],
@@ -81,20 +85,9 @@ function register(bot, rtm, web, config) {
                         }],
                     };
 
-                    // Inform the user that her request is being processed
-                    const msg = `Hey <@${message.user}>, \
-we have received your invitation request for ${fullname} and the admins are \
-currently processing it. I'll keep you posted on \
-its status! :wink:`;
-                    web.chat.postMessage(message.user, msg, { as_user: true }, (error) => {
-                        if (error) {
-                            winston.error('Could not respond to invitation requesting user:', error);
-                        } else {
-                            winston.info('Invitation confirmation message was sent');
-                        }
-                    });
+                    informUserRequestPending(web, fullname, message.user);
+
                     // Notify the admins
-                    // TODO: Replace #admins with the variable from config
                     web.chat.postMessage(postChannel, '', attachment, (error) => {
                         if (error) {
                             winston.error(`Could not post invitation request to ${postChannel}`, error);
@@ -112,23 +105,43 @@ its status! :wink:`;
     rtm.on(RTM_EVENTS.REACTION_ADDED, (message) => {
         if (message.reaction == 'white_check_mark') {
             web.channels.history(message.item.channel, { latest: message.item.ts, count: 1 })
+            .then((response) => {
+                if (response.messages.length < 1)
+                    return {};
+
+                const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
+                const [, target, fullname, email, occupation, company] = response.messages[0].text.match(pattern) || [];
+                const requestingUser = response.messages[0].user;
+
+                // This is an ugly fix, but the email returned in the message above
+                // has the following format: <mailto:email@address.com|email@address.com>
+                // so we need to extract the email only from the above
+                const cleanEmail = email.slice(1,-1).split('|')[1];
+
+                return {
+                    invitee_name: fullname,
+                    invitee_email: cleanEmail,
+                    invitee_title: occupation,
+                    slack_uid: requestingUser,
+                    invitee_company: company
+                }
+            })
+            .then((invitationRequestObj) => processInvitationRequest(invitationRequestObj, web, config, secret))
+            .catch((error) => {
+                winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
+            });
+        } else if (message.reaction == 'negative_squared_cross_mark') {
+            web.channels.history(message.item.channel, { latest: message.item.ts, count: 1 })
             .then((response) => { 
                 if (response.messages.length < 1)
                     return {};
 
-                const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)?/;
-                const [, target, fullname, email, occupation] = response.messages[0].text.match(pattern) || [];
+                const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
+                const [, target, fullname, email, occupation, company] = response.messages[0].text.match(pattern) || [];
                 const requestingUser = response.messages[0].user;
 
-                return {
-                    invitee_name: fullname,
-                    invitee_email: email,
-                    invitee_title: occupation,
-                    slack_uid: requestingUser,
-                    invitee_company: "" // Not Implemented
-                }
+                informUserRequestDenied(web, fullname, requestingUser);
             })
-            .then((invitationRequestObj) => processInvitationRequest(invitationRequestObj))
             .catch((error) => {
                 winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
             });
@@ -137,8 +150,77 @@ its status! :wink:`;
 }
 
 
-function processInvitationRequest(invitationRequestObj) {
+function processInvitationRequest(invitationRequestObj, web, config, secret) {
     console.log(invitationRequestObj);
+    const options = {
+        method: 'POST',
+        uri: `${config.plugins.userrequests.menadevs_api_uri}?auth_token=${secret.menadevs_api_token}`,
+        body: {
+            invitation: invitationRequestObj
+        },
+        json: true,
+        simple: false,
+        resolveWithFullResponse: true
+    };
+
+    rp(options)
+        .then(function (response) {
+            if (response.statusCode == 201) {
+                informUserRequestApproved(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid);
+            } else if (response.statusCode == 422) {
+                // TODO -- Handle duplicate errors in a separate manner than
+                // rejected requests by admins
+                informUserRequestDenied(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid);
+            }
+        })
+        .catch(function(error) {
+            winston.error(`${META.name} Invitation Request -- Failed: `, error);
+        });
+}
+
+
+function informUserRequestPending(web, invitee, user_id) {
+    const msg = `Hey <@${user_id}>, \
+we have received your invitation request for ${invitee} and the admins are \
+currently processing it. I'll keep you posted on \
+its status! :wink:`;
+    web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
+        if (error) {
+            winston.error('Could not respond to invitation requesting user:', error);
+        } else {
+            winston.info('Invitation confirmation message was sent');
+        }
+    });
+}
+
+
+function informUserRequestApproved(web, invitee, user_id) {
+    const msg = `Hello again <@${user_id}>, \
+your invitation request for ${invitee} has been approved. (S)he will receive a confirmation \
+email with further instructions. \
+Thank you for helping spread the message!`;
+    web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
+        if (error) {
+            winston.error('Could not respond to invitation requesting user:', error);
+        } else {
+            winston.info('Invitation approval message was sent');
+        }
+    });
+}
+
+
+function informUserRequestDenied(web, invitee, user_id) {
+    const msg = `Hello again <@${user_id}>, \
+I'm afraid that your invitation request for ${invitee} has been denied. This is either because the user has been \
+invited already or an admin has rejected the request. If it's the latter an admin will be in touch \
+with you soon to clarify the reason.`;
+    web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
+        if (error) {
+            winston.error('Could not respond to invitation requesting user:', error);
+        } else {
+            winston.info('Invitation rejection message was sent');
+        }
+    });
 }
 
 module.exports = {

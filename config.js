@@ -20,6 +20,7 @@ const config = {
 
         userrequests: {
             invitation_request_channel: '#bot-test',
+            menadevs_api_uri: 'http://46.101.47.134/api/v1/invitations'
         },
 
         system: {
