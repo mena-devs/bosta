@@ -135,7 +135,7 @@ function retrieveCoC() {
  *
  * @return {[type]} [description]
  */
-function postMessage(web, receiver, message) {
+function privateMessage(web, receiver, message) {
     return new Promise((resolve, reject) => {
         // Send a private message to the user with the CoC
         const msg = `Hi <@${receiver}>! \n\
@@ -173,7 +173,7 @@ function register(bot, rtm, web, config) {
                 });
 
             retrieveCoC()
-                .then(data => postMessage(web, message.user, data))
+                .then(data => privateMessage(web, message.user, data))
                 .then((user) => {
                     storeNewMember(config, user);
                     winston.info(`Sent greeting to: <@${user}>`);
@@ -193,7 +193,7 @@ function register(bot, rtm, web, config) {
                 findUser(web, user.id)
                     .then((response) => { user.name = response; })
                     .then(() => retrieveCoC())
-                    .then(data => postMessage(web, user.id, data))
+                    .then(data => privateMessage(web, user.id, data))
                     .then((userRId) => {
                         storeNewMember(config, userRId);
                         winston.info(`Sent greeting to: <@${userRId}>`);

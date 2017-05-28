@@ -1,8 +1,6 @@
 const https = require('https');
-
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 const winston = require('winston');
+const Plugin = require('../utils.js').Plugin;
 
 const META = {
     name: 'hackernews',
@@ -15,11 +13,7 @@ const META = {
 const hnAPIURL = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty';
 const hnStoryURL = 'https://hacker-news.firebaseio.com/v0/item/<STORY_ID>.json?print=pretty';
 
-/**
- * Retrieve the CoC from the github URL
- *
- * @return {[type]} [description]
- */
+
 function retrieveStories(nStories) {
     return new Promise((resolve, reject) => {
         https.get(hnAPIURL, (res) => {
@@ -40,15 +34,7 @@ function retrieveStories(nStories) {
     });
 }
 
-/**
- * Retrieve each story's information and push it to the array
- * of stories (fields)
- *
- * @param {[type]} storyID [description]
- * @param {[type]} fields  [description]
- *
- * @return {[type]} [description]
- */
+
 function retrieveStoryText(storyID, fields) {
     return new Promise((resolve, reject) => {
         const customURL = hnStoryURL.replace(/<STORY_ID>/, storyID);
@@ -76,78 +62,57 @@ function retrieveStoryText(storyID, fields) {
     });
 }
 
-/**
- * Loop over an array of Story IDs and retrieve each story's details
- * Resolve the promise only when each story's details have been retrieved
- *
- * @param {[type]} storyIDs [description]
- *
- * @return {[type]} [description]
- */
+
 function retrieveStoryDetails(storyIDs) {
     return new Promise((resolve) => {
-        // Array containing story details objects
         const fields = [];
         const requests = [];
-        // Loop over all the stories in the array and retrieve their details
+        
         storyIDs.forEach((item) => {
             requests.push(retrieveStoryText(item, fields));
         });
-        // Waint until all requests have been resolved
+
         Promise.all(requests).then(() => resolve(fields));
     });
 }
 
-/**
- * Main
- *
- * @param {[type]} bot    [description]
- * @param {[type]} rtm    [description]
- * @param {[type]} web    [description]
- * @param {[type]} config [description]
- *
- * @return {[type]} [description]
- */
-function register(bot, rtm, web) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? hnews ([0-9]+):?/;
-            const [, target, nStories] = message.text.match(pattern) || [];
 
-            if (target === bot.self.id) {
-                if (nStories) {
-                    retrieveStories(nStories)
-                    .then(response => retrieveStoryDetails(response))
-                    .then((response) => {
-                        const attachment = {
-                            as_user: true,
-                            attachments: [
-                                {
-                                    color: '#36a64f',
-                                    author_name: 'Bosta',
-                                    title: `Top ${nStories} Hacker News Stories`,
-                                    fields: response,
-                                    footer: 'Automation',
-                                    footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
-                                },
-                            ],
-                        };
+function hnews(options, message, who, nStories) {
+    if (nStories) {
+        retrieveStories(nStories)
+        .then(response => retrieveStoryDetails(response))
+        .then((response) => {
+            const attachment = {
+                as_user: true,
+                attachments: [
+                    {
+                        color: '#36a64f',
+                        author_name: 'Bosta',
+                        title: `Top ${nStories} Hacker News Stories`,
+                        fields: response,
+                        footer: 'Automation',
+                        footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
+                    },
+                ],
+            };
 
-                        // Post the message
-                        web.chat.postMessage(message.channel, '', attachment, (err) => {
-                            if (err) {
-                                winston.error('HN Plugin Error:', err);
-                            } else {
-                                winston.info('Hackernews articles retrieved and pushed to relevant channel.');
-                            }
-                        });
-                    });
+            // Post the message
+            options.web.chat.postMessage(message.channel, '', attachment, (err) => {
+                if (err) {
+                    winston.error('HN Plugin Error:', err);
+                } else {
+                    winston.info('Hackernews articles retrieved and pushed to relevant channel.');
                 }
-            }
-        }
-    });
+            });
+        });
+    }
 }
 
+
+function register(bot, rtm, web, config) {
+    const plugin = new Plugin({ bot, rtm, web, config });
+    plugin.route(/<@([^>]+)>:? hnews ([0-9]+):?/, hnews, { self: true });
+}
 
 module.exports = {
     register,

@@ -1,9 +1,9 @@
 const cp = require('child_process');
 const https = require('https');
-
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 const winston = require('winston');
 const storage = require('node-persist');
+const Plugin = require('../utils.js').Plugin;
+const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
 const pre = require('../utils.js').pre;
 
@@ -21,11 +21,7 @@ const META = {
 // TODO :: Move this URL to the configuration file
 const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/README.md';
 
-/**
- * Retrieve the CoC from the github URL
- *
- * @return {[type]} [description]
- */
+
 function retrieveCoC() {
     return new Promise((resolve, reject) => {
         https.get(cocURL, (res) => {
@@ -45,97 +41,69 @@ function retrieveCoC() {
     });
 }
 
-/**
- * Main
- *
- * @param {[type]} bot    [description]
- * @param {[type]} rtm    [description]
- * @param {[type]} web    [description]
- * @param {[type]} config [description]
- *
- * @return {[type]} [description]
- */
-function register(bot, rtm, web, config) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        // respawn command
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? respawn/;
-            const [, target] = message.text.match(pattern) || [];
 
-            if (target === bot.self.id) {
-                // Confirm receipt of the command
-                rtm.sendMessage('Let me see what I can do about that! :thinking_face:', message.channel);
+function coc(options, message, who) {
+    retrieveCoC()
+        .then((data) => {
+            message.reply(pre(data));
+        })
+        .catch(error => winston.error(`Could not post CoC: ${error}`));
+}
 
-                // Execute the reboot order with 'forever'
-                // This cannot be an async call
-                cp.exec('forever restart main.js', (error) => {
-                    if (error) {
-                        rtm.sendMessage('Looks like that reboot isn\'t gonna happen today :grin:', message.channel);
-                        winston.error(`Could not execute reboot: ${error}`);
-                    }
-                });
-            }
-        }
 
-        // uptime command
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? uptime/;
-            const [, target] = message.text.match(pattern) || [];
+function recents(options, message, who) {
+    storage.init({ dir: options.config.plugins.system.recent_members_path })
+            .then(() => storage.getItem(options.config.plugins.system.recent_members_key))
+            .then((users) => {
+                if (users) {
+                    const recentIds = users.split(';');
+                    const formattedIds = recentIds.map(id => `<@${id}>`).join(' ');
+                    message.reply(`There you go: ${formattedIds}`);
+                } else {
+                    winston.info('Have not been keeping track of new users');
+                    message.reply('Sorry, I haven\'t been keeping track...');
+                }
+            })
+            .catch(error => winston.error(`Could not retrieve recent users: ${error}`));
+}
 
-            if (target === bot.self.id) {
-                // Confirm receipt of the command
-                rtm.sendMessage('Hold on a sec :thinking_face:', message.channel);
 
-                // Retrieve the uptime
-                cp.exec('forever list --plain', (error, stdout) => {
-                    if (error) {
-                        winston.error(`Could not execute your order: ${error}`);
-                    } else {
-                        rtm.sendMessage(
-                            `There you go: \n ${pre(stdout)}`,
-                            message.channel);
-                    }
-                });
-            }
-        }
+function respawn(options, message, who) {
+    message.reply(`<@${message.user}> ordered a respawn! :thinking_face:`);
 
-        // Get recently joined members list
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? recents/;
-            const [, target] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                storage.init({ dir: config.plugins.system.recent_members_path })
-                    .then(() => storage.getItem(config.plugins.system.recent_members_key))
-                    .then((users) => {
-                        if (users) {
-                            const recentIds = users.split(';');
-                            const formattedIds = recentIds.map(id => `<@${id}>`).join(' ');
-                            rtm.sendMessage(`There you go: ${formattedIds}`, message.channel);
-                        } else {
-                            winston.info('Have not been keeping track of new users');
-                            rtm.sendMessage('Sorry, I haven\'t been keeping track...', message.channel);
-                        }
-                    })
-                    .catch(error => winston.error(`Could not retrieve recent users: ${error}`));
-            }
-        }
-
-        // Retrieve the CoC and post it to channel
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? coc/;
-            const [, target] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id) {
-                retrieveCoC()
-                    .then((data) => {
-                        rtm.sendMessage(pre(data), message.channel);
-                    })
-                    .catch(error => winston.error(`Could not post CoC: ${error}`));
-            }
+    // Execute the reboot order with 'forever'
+    // This cannot be an async call
+    cp.exec('forever restart main.js', (error) => {
+        if (error) {
+            message.reply('Looks like that reboot isn\'t gonna happen today :grin:');
+            winston.error(`Could not execute reboot: ${error}`);
         }
     });
 }
+
+
+function uptime(options, message, who) {
+    message.reply('Hold on a sec :thinking_face:');
+
+    // Retrieve the uptime
+    cp.exec('forever list --plain', (error, stdout) => {
+        if (error) {
+            winston.error(`Could not execute your order: ${error}`);
+        } else {
+            message.reply(`There you go: \n ${pre(stdout)}`);
+        }
+    });
+}
+
+
+function register(bot, rtm, web, config) {
+    const plugin = new Plugin({ bot, rtm, web, config });
+    plugin.route(/<@([^>]+)>:? respawn/, respawn, { self: true });
+    plugin.route(/<@([^>]+)>:? uptime/, uptime, { self: true });
+    plugin.route(/<@([^>]+)>:? recents/, recents, { self: true });
+    plugin.route(/<@([^>]+)>:? coc/, coc, { self: true });
+}
+
 
 module.exports = {
     register,
