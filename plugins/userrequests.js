@@ -58,30 +58,7 @@ function register(bot, rtm, web, config, secret) {
                             ],
                             footer: 'Automation',
                             footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
-                            ts: timestamp,
-                            // TODO: Reactivate message action buttons
-                            // Temporarily Disabled
-                            /* actions: [
-                                {
-                                    name: 'approve',
-                                    text: 'Approve',
-                                    type: 'button',
-                                    value: 'approve',
-                                },
-                                {
-                                    name: 'reject',
-                                    text: 'Reject',
-                                    type: 'button',
-                                    value: 'reject',
-                                    style: 'danger',
-                                    confirm: {
-                                        title: 'Are you sure?',
-                                        text: 'This information is not stored anywhere and the invitation request will be lost!',
-                                        ok_text: 'Yes',
-                                        dismiss_text: 'No',
-                                    },
-                                },
-                            ],*/
+                            ts: timestamp
                         }],
                     };
 
@@ -104,26 +81,26 @@ function register(bot, rtm, web, config, secret) {
     // before processing the invitation request
     rtm.on(RTM_EVENTS.REACTION_ADDED, (message) => {
         if (message.reaction == 'white_check_mark') {
-            web.groups.history(message.item.channel, { latest: message.item.ts, count: 1 })
+            web.groups.history(message.item.channel, { latest: message.item.ts, inclusive: true, count: 1 })
             .then((response) => {
                 if (response.messages.length < 1)
                     return {};
 
-                const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
-                const [, target, fullname, email, occupation, company] = response.messages[0].text.match(pattern) || [];
-                const requestingUser = response.messages[0].user;
+                // TODO: parse the fields in a better way (this is fucking ugly!)
+                const messageFields = response.messages[0].attachments[0].fields;
 
                 // This is an ugly fix, but the email returned in the message above
                 // has the following format: <mailto:email@address.com|email@address.com>
                 // so we need to extract the email only from the above
-                const cleanEmail = email.slice(1,-1).split('|')[1];
+                const cleanEmail = messageFields[2].value.slice(1,-1).split('|')[1];
+                const cleanRequesterId = messageFields[0].value.slice(1,-1).split('@')[1];
 
                 return {
-                    invitee_name: fullname,
+                    invitee_name: messageFields[1].value,
                     invitee_email: cleanEmail,
-                    invitee_title: occupation,
-                    slack_uid: requestingUser,
-                    invitee_company: company
+                    invitee_title: messageFields[3].value,
+                    slack_uid: cleanRequesterId,
+                    invitee_company: messageFields[4].value
                 }
             })
             .then((invitationRequestObj) => processInvitationRequest(invitationRequestObj, web, config, secret))
@@ -131,17 +108,29 @@ function register(bot, rtm, web, config, secret) {
                 winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
             });
         } else if (message.reaction == 'negative_squared_cross_mark') {
-            web.groups.history(message.item.channel, { latest: message.item.ts, count: 1 })
+            web.groups.history(message.item.channel, { latest: message.item.ts, inclusive: true, count: 1 })
             .then((response) => { 
                 if (response.messages.length < 1)
                     return {};
 
-                const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
-                const [, target, fullname, email, occupation, company] = response.messages[0].text.match(pattern) || [];
-                const requestingUser = response.messages[0].user;
+                // TODO: parse the fields in a better way (this is fucking ugly!)
+                const messageFields = response.messages[0].attachments[0].fields;
 
-                informUserRequestDenied(web, fullname, requestingUser);
+                // This is an ugly fix, but the email returned in the message above
+                // has the following format: <mailto:email@address.com|email@address.com>
+                // so we need to extract the email only from the above
+                const cleanEmail = messageFields[2].value.slice(1,-1).split('|')[1];
+                const cleanRequesterId = messageFields[0].value.slice(1,-1).split('@')[1];
+
+                return {
+                    invitee_name: messageFields[1].value,
+                    invitee_email: cleanEmail,
+                    invitee_title: messageFields[3].value,
+                    slack_uid: cleanRequesterId,
+                    invitee_company: messageFields[4].value
+                }
             })
+            .then((invitationRequestObj) => informUserRequestDenied(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid))
             .catch((error) => {
                 winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
             });
