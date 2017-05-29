@@ -104,7 +104,7 @@ function register(bot, rtm, web, config, secret) {
     // before processing the invitation request
     rtm.on(RTM_EVENTS.REACTION_ADDED, (message) => {
         if (message.reaction == 'white_check_mark') {
-            web.channels.history(message.item.channel, { latest: message.item.ts, count: 1 })
+            web.groups.history(message.item.channel, { latest: message.item.ts, count: 1 })
             .then((response) => {
                 if (response.messages.length < 1)
                     return {};
@@ -131,7 +131,7 @@ function register(bot, rtm, web, config, secret) {
                 winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
             });
         } else if (message.reaction == 'negative_squared_cross_mark') {
-            web.channels.history(message.item.channel, { latest: message.item.ts, count: 1 })
+            web.groups.history(message.item.channel, { latest: message.item.ts, count: 1 })
             .then((response) => { 
                 if (response.messages.length < 1)
                     return {};
