@@ -19,7 +19,7 @@ const config = {
         },
 
         userrequests: {
-            invitation_request_channel: '#admins',
+            invitation_request_channel: 'G1H574PK7',
             menadevs_api_uri: 'http://46.101.47.134/api/v1/invitations'
         },
 

@@ -80,6 +80,10 @@ function register(bot, rtm, web, config, secret) {
     // Wait for the check mark emoji to be added to the message
     // before processing the invitation request
     rtm.on(RTM_EVENTS.REACTION_ADDED, (message) => {
+        // Do not process the message if it's not in the admin channel
+        if (message.item.channel != config.plugins.userrequests.invitation_request_channel)
+            return;
+
         if (message.reaction == 'white_check_mark') {
             web.groups.history(message.item.channel, { latest: message.item.ts, inclusive: true, count: 1 })
             .then((response) => {
