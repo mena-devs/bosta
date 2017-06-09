@@ -5,3 +5,4 @@ sublime/
 secret.json
 data/
 *.log
+.vscode/
