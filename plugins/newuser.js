@@ -29,6 +29,11 @@ const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/mast
  * @return {[type]} [description]
  */
 function prependUser(userList, maxItems, newUser) {
+    // Append to list only if newUser is not found
+    if (userList.indexOf(newUser) !== -1) {
+        return userList;
+    }
+
     let splitMembers = userList.split(';');
 
     // -1 cause Arrays in JS start from the 0 index
