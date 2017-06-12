@@ -31,7 +31,8 @@ Retrieve your bot token and add a custom incoming webhook (if winston is enabled
 {
     "winston_webhook": "webhook-url-here",
     "token": "your-bot-token-here",
-    "menadevs_api_token": "this is a token specific to MENA Devs purposes"
+    "menadevs_api_token": "this is a token specific to MENA Devs purposes",
+    "wolframalpha_app_id": "APP_ID"
 }
 ```
 
