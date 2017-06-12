@@ -42,10 +42,9 @@ function main() {
         if (!initial_connection)
             return;
 
-        winston.info(`Team: ${data.team.name} > Bot: ${data.self.name}`);
+        winston.info(`Team: ${data.team.name} > Name: ${data.self.name}`);
 
         glob.sync('./plugins/*.js').forEach((file) => {
-            winston.info(`Found plugin: ${file}`);
             const plugin = require(path.resolve(file));
             plugin.register(data, client, web, config, secret);
             plugins[plugin.META.name] = utils.buildHelp(plugin.META);
@@ -59,12 +58,6 @@ function main() {
             winston.info('Reconnected...');
         } else {
             winston.info('Locked and loaded!');
-            // Send a message to signal that the script has started / rebooted
-            client.sendMessage(
-                ':trollface:',
-                config.main.bot_test_chan_id)
-                .catch(error => winston.error(`RTM Re/Connect: ${error}`));
-
             initial_connection = false;
         }
     });
