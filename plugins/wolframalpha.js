@@ -8,8 +8,8 @@ const META = {
     name: 'wolframalpha',
     short: 'Execute a computation using WolframAlpha\'s API',
     examples: [
-        '@bosta wa: `integrate 2x`',
-        '@bosta wa: `pi to 100 digits`'
+        '@bosta wa `integrate 2x`',
+        '@bosta wa `pi to 100 digits`'
     ],
 };
 
@@ -78,7 +78,7 @@ function waQuery(options, message, who, query) {
 function register(bot, rtm, web, config, secret) {
     const plugin = new Plugin({ bot, rtm, web, config });
     wolfram = wolfram.createClient(secret.wolframalpha_app_id);
-    plugin.route(/<@([^>]+)>:? wa: \`?(.+[^)])\`/, waQuery, { self: true });
+    plugin.route(/<@([^>]+)>:? wa \`?(.+[^)])\`/, waQuery, { self: true });
 }
 
 
