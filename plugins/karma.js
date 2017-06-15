@@ -7,7 +7,7 @@ const META = {
     short: 'Give someone karma points.',
     examples: [
         'phr34ck +5 @bassem',
-        '@bosta karma @phr34ck',
+        '@bosta karma @bassem',
     ],
 };
 
