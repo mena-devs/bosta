@@ -32,7 +32,12 @@ function addKarma(options, message, points, userID) {
 function getKarma(options, message, who, userID) {
     return storage.init({ dir: options.config.plugins.system.karma_log_path })
         .then(() => storage.getItem(userID))
-        .then((currentKarma) => message.reply(`<@${userID}>'s Karma-o-meter: ${currentKarma}`))
+        .then((currentKarma) => {
+            if (!currentKarma) {
+                currentKarma = 0;
+            }
+            message.reply(`<@${userID}>'s Karma-o-meter: ${currentKarma}`);
+        })
         .catch(error => winston.error(`${META.name} - Error: ${error}`));
 }
 
