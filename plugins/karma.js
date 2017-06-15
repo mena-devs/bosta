@@ -12,6 +12,10 @@ const META = {
 };
 
 function addKarma(options, message, points, userID) {
+    // Deny user from adding Karma to himself
+    if (message.user == userID)
+        return;
+
     storage.init({ dir: options.config.plugins.system.karma_log_path })
         .then(() => storage.getItem(userID))
         .then((currentKarma) => {
