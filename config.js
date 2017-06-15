@@ -26,6 +26,7 @@ const config = {
         system: {
             recent_members_path: 'data/recent_members.txt',
             recent_members_key: 'recent_users',
+            karma_log_path: 'data/karma_log.txt',
         },
 
         tellmeabout: {
