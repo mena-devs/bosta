@@ -38,8 +38,15 @@ class Plugin {
                         const groups = match.slice(1);
                         const [who, _] = groups;
 
-                        if (!routeOptions.self
-                            || (routeOptions.self && who === this.options.bot.self.id)) {
+                        if (!routeOptions.freeCommand) {
+                            if (!routeOptions.self 
+                                || (routeOptions.self && who === this.options.bot.self.id)) {
+                                handler(this.options, message, ...match.slice(1));
+                            }
+                        }
+                        else if (routeOptions.freeCommand) {
+                            // This option has been added for command that do not
+                            // start with the bot's name
                             handler(this.options, message, ...match.slice(1));
                         }
                     }
