@@ -40,7 +40,7 @@ class Plugin {
 
                         if (!routeOptions.self 
                             || (routeOptions.self && who === this.options.bot.self.id)) {
-                            handler(this.options, message, ...match.slice(1));
+                            handler(this.options, message, ...match.slice(1), routeOptions);
                         }
                     }
                 });
