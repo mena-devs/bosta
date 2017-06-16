@@ -43,7 +43,7 @@ function getKarma(options, message, who, userID) {
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/\+([1-5])? <@([^>]+)>:?/, addKarma, { self: true, freeCommand: true });
+    plugin.route(/\+([1-5])? <@([^>]+)>:?/, addKarma, { });
     plugin.route(/<@([^>]+)>:? karma <@([^>]+)>:?/, getKarma, { self: true });
 }
 
