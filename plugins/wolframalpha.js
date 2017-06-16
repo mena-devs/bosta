@@ -8,8 +8,12 @@ const META = {
     name: 'wolframalpha',
     short: 'Execute a computation using WolframAlpha\'s API',
     examples: [
+        '## Shortened Output (Default)',
         '@bosta wa `integrate 2x`',
         '@bosta wa `pi to 100 digits`'
+        '@bosta wa `length of the Eiffel tower`'
+        '## Verbose Output'
+        '@bosta wav `integrate 2x`'
     ],
 };
 
