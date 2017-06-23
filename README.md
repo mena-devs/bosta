@@ -15,7 +15,7 @@ NodeJS v6.9.2
 The code uses ECMAScript 2015 (ES6) *shipping* features. If you're
 building/submitting plugins please avoid using staged/in progress features.
 
-### Installatian
+### Installation
 
 You can install and run the bot using the following:
 
@@ -116,7 +116,7 @@ re-evaluation of the snippet.
 
 #### What are the concerns?
 
-- Is it safe? Yes, it's very safe; The bot uses containers to execute the
+- Is it safe? Yes, it's very safe; the bot uses containers to execute the
 snippets and as such your system is protected (hopefully, for the most part).
 - What about memory? The plugin allows you to control how much memory is
 allocated for every container/language.
