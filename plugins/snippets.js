@@ -15,8 +15,8 @@ const META = {
     short: 'runs user submitted code',
     examples: [
         'simply create a snippet and set the language that the bot understands, see next for additional.',
-        '@bosta snippets support',
-        '@bosta snippets config python',
+        'snippets support',
+        'snippets config python',
     ],
 };
 
@@ -141,7 +141,7 @@ function supported(options, message) {
 }
 
 
-function langConfig(options, message, who, lang) {
+function langConfig(options, message, lang) {
     try {
         const { timeout, crop, memory } = loadConfig(options.config, lang);
 
@@ -157,8 +157,8 @@ function langConfig(options, message, who, lang) {
 
 function register(bot, rtm, web, config, secret) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/<@([^>]+)>:? snippets support/, supported, { self: true });
-    plugin.route(/<@([^>]+)>:? snippets config (.*)/, langConfig, { self: true });
+    plugin.route(/^snippets support/, supported, {});
+    plugin.route(/^snippets config (.*)/, langConfig, {});
 
 
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {

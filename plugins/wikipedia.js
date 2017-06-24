@@ -8,7 +8,7 @@ const META = {
     name: 'wikipedia',
     short: 'pulls an extract from wikipedia',
     examples: [
-        '@bosta wikipedia LOL',
+        'wikipedia foobar',
     ],
 };
 
@@ -44,7 +44,7 @@ function wikipedia(title) {
 }
 
 
-function handleWikipedia(options, message, who, text) {
+function handleWikipedia(options, message, text) {
     wikipedia(text)
         .then((extract) => {
             message.reply(extract);
@@ -56,7 +56,7 @@ function handleWikipedia(options, message, who, text) {
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/<@([^>]+)>:? wikipedia (.*)/, handleWikipedia, { self: true });
+    plugin.route(/^wikipedia (.*)/, handleWikipedia, {});
 }
 
 

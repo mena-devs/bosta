@@ -6,7 +6,7 @@ const META = {
     name: 'hackernews',
     short: 'Retrieves top N stories from YC Hacker News',
     examples: [
-        '@bosta hnews 10',
+        'hnews 10',
     ],
 };
 
@@ -77,7 +77,7 @@ function retrieveStoryDetails(storyIDs) {
 }
 
 
-function hnews(options, message, who, nStories) {
+function hnews(options, message, nStories) {
     if (nStories) {
         retrieveStories(nStories)
         .then(response => retrieveStoryDetails(response))
@@ -111,7 +111,7 @@ function hnews(options, message, who, nStories) {
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/<@([^>]+)>:? hnews ([0-9]+):?/, hnews, { self: true });
+    plugin.route(/^hnews ([0-9]+):?/, hnews, {});
 }
 
 module.exports = {
