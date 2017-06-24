@@ -67,7 +67,7 @@ function retrieveStoryDetails(storyIDs) {
     return new Promise((resolve) => {
         const fields = [];
         const requests = [];
-        
+
         storyIDs.forEach((item) => {
             requests.push(retrieveStoryText(item, fields));
         });

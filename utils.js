@@ -38,7 +38,7 @@ class Plugin {
                         const groups = match.slice(1);
                         const [who, _] = groups;
 
-                        if (!routeOptions.self 
+                        if (!routeOptions.self
                             || (routeOptions.self && who === this.options.bot.self.id)) {
                             handler(this.options, message, ...match.slice(1), routeOptions);
                         }
