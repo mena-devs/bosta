@@ -31,6 +31,8 @@ const config = {
 
         tellmeabout: {
             path: 'data/storage.txt',
+            max_key_length: 128,
+            max_value_length: 512,
         },
 
         sentiment: {

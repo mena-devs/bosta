@@ -7,11 +7,11 @@ const META = {
     name: 'tellmeabout',
     short: 'records, plays or searchs the interwebs',
     examples: [
-        '@bosta save snippet-security-risks as: the snippets are run in a container, they are perfectly sandboxed.',
-        '@bosta about snippet-security-risks',
-        '@bosta save stop-writing-classes as: https://www.youtube.com/watch?v=o9pEzgHorH0',
-        '@bosta about stop-writing-classes',
-        '@bosta forget key-to-delete',
+        'save snippet-security-risks as: the snippets are run in a container, they are perfectly sandboxed.',
+        'about snippet-security-risks',
+        'save stop-writing-classes as: https://www.youtube.com/watch?v=o9pEzgHorH0',
+        'about stop-writing-classes',
+        'forget key-to-delete',
     ],
 };
 
@@ -52,14 +52,19 @@ function search(term) {
 }
 
 
-function save(options, message, who, key, value) {
-    storage
-        .setItem(key, value)
-        .then(_ => message.reply(`${key} saved.`));
+function save(options, message, key, value) {
+    if (key.length > options.config.plugins.tellmeabout.max_key_length ||
+        value.length > options.config.plugins.tellmeabout.max_value_length) {
+        message.reply('input too large, please reduce.');
+    } else {
+        storage
+            .setItem(key, value)
+            .then(_ => message.reply(`${key} saved.`));
+    }
 }
 
 
-function about(options, message, who, key) {
+function about(options, message, key) {
     storage
         .getItem(key)
         .then((value) => {
@@ -72,7 +77,7 @@ function about(options, message, who, key) {
 }
 
 
-function forget(options, message, who, key) {
+function forget(options, message, key) {
     storage
         .removeItem(key)
         .then((value) => {
@@ -91,9 +96,9 @@ function register(bot, rtm, web, config) {
     });
 
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/<@([^>]+)>:? save (.+?) as: (.+)/, save, { self: true });
-    plugin.route(/<@([^>]+)>:? forget (.+)/, forget, { self: true });
-    plugin.route(/<@([^>]+)>:? about (.+)/, about, { self: true });
+    plugin.route(/^save (.+?) as: (.+)/, save, {});
+    plugin.route(/^forget (.+)/, forget, {});
+    plugin.route(/^about (.+)/, about, {});
 }
 
 
