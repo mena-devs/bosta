@@ -15,15 +15,13 @@ NodeJS v6.9.2
 The code uses ECMAScript 2015 (ES6) *shipping* features. If you're
 building/submitting plugins please avoid using staged/in progress features.
 
-### Installation
+### Configure and Run
 
-You can install and run the bot using the following:
+Install the dependencies using:
 
 ```
 $ npm install
 ```
-
-### Configure and Run
 
 Retrieve your bot token and add a custom incoming webhook (if winston is enabled in your configuration file) from slack and create a `secret.json` file as follows:
 
@@ -44,6 +42,13 @@ $ npm start
 
 Plugins may have their own installation requirements that are covered as part
 of the plugin's own documentation.
+
+Alternatively, you can build and run bosta through docker. Simply make sure your `secret.json` is available and run the following commands:
+
+```
+$ docker build -t bosta:latest .
+$ docker run --rm -ti bosta:latest
+```
 
 ## Available Plugins
 
