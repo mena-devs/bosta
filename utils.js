@@ -29,6 +29,13 @@ class Plugin {
     initialize() {
         this.rtm.on(RTM_EVENTS.MESSAGE, (message) => {
             message.reply = text => this.rtm.sendMessage(text, message.channel);
+            message.reply_thread = (text) => {
+                this.web.chat.postMessage(
+                    message.channel,
+                    text,
+                    { as_user: true, thread_ts: message.ts });
+            };
+
             if (message.text != null) {
                 this.routes.forEach((route) => {
                     const [pattern, handler, routeOptions] = route;

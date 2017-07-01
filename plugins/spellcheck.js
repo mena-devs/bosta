@@ -16,11 +16,11 @@ function spell(options, message, word) {
     const result = checker.getCorrectionsForMisspelling(word);
 
     if (!wrong) {
-        message.reply(`${word} is spelled correctly.`);
+        message.reply_thread(`${word} is spelled correctly.`);
     } else if (result.length === 0) {
-        message.reply(`I don't know how to fix ${word}`);
+        message.reply_thread(`I don't know how to fix ${word}`);
     } else {
-        message.reply(`possible spelling for ${word}: ${result.join(', ')}`);
+        message.reply_thread(`possible spelling for ${word}: ${result.join(', ')}`);
     }
 }
 

@@ -84,6 +84,7 @@ function hnews(options, message, nStories) {
         .then((response) => {
             const attachment = {
                 as_user: true,
+                thread_ts: message.ts,
                 attachments: [
                     {
                         color: '#36a64f',

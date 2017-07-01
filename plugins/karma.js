@@ -52,13 +52,8 @@ function getKarma(options, message, userID) {
             if (!currentKarma) {
                 currentKarma = 0;
             }
-            options.web.chat.postMessage(
-                message.channel,
-                `<@${userID}>'s karma: ${currentKarma}`,
-                { as_user: true, thread_ts: message.ts }
-            );
-        })
-        .catch(error => winston.error(`${META.name} - Error: ${error}`));
+            message.reply_thread(`<@${userID}>'s karma: ${currentKarma}`);
+        }).catch(error => winston.error(`${META.name} - Error: ${error}`));
 }
 
 function register(bot, rtm, web, config) {

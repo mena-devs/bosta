@@ -10,7 +10,7 @@ const META = {
 };
 
 function ping(options, message) {
-    message.reply('pong');
+    message.reply_thread('pong');
 }
 
 function pingThem(options, message, target) {

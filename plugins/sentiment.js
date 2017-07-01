@@ -86,7 +86,7 @@ function analyse(options, message, target) {
     findUser(options.bot, target)
         .then(user => loadRecentMessages(options, message.channel, user))
         .then(messages => analyseSentiment(options.secret, messages))
-        .then(sentiment => message.reply(`${target} has recently been ${sentiment.output.result}`))
+        .then(sentiment => message.reply_thread(`${target} has recently been ${sentiment.output.result}`))
         .catch(error => winston.error(`${META.name} - Error: ${error}`));
 }
 

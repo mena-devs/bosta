@@ -16,7 +16,7 @@ const META = {
 function handleFiglet(options, message, text) {
     figlet(text, (err, data) => {
         if (!err) {
-            message.reply(pre(data));
+            message.reply_thread(pre(data));
         }
     });
 }

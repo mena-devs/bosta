@@ -55,11 +55,11 @@ function search(term) {
 function save(options, message, key, value) {
     if (key.length > options.config.plugins.tellmeabout.max_key_length ||
         value.length > options.config.plugins.tellmeabout.max_value_length) {
-        message.reply('input too large, please reduce.');
+        message.reply_thread('input too large, please reduce.');
     } else {
         storage
             .setItem(key, value)
-            .then(_ => message.reply(`${key} saved.`));
+            .then(_ => message.reply_thread(`${key} saved.`));
     }
 }
 
@@ -73,7 +73,7 @@ function about(options, message, key) {
             }
 
             return search(key);
-        }).then(value => message.reply(value));
+        }).then(value => message.reply_thread(value));
 }
 
 
@@ -82,9 +82,9 @@ function forget(options, message, key) {
         .removeItem(key)
         .then((value) => {
             if (value) {
-                message.reply(`${key} removed.`);
+                message.reply_thread(`${key} removed.`);
             } else {
-                message.reply(`I do not know anything about ${key}`);
+                message.reply_thread(`I do not know anything about ${key}`);
             }
         });
 }

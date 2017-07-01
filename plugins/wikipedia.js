@@ -47,7 +47,7 @@ function wikipedia(title) {
 function handleWikipedia(options, message, text) {
     wikipedia(text)
         .then((extract) => {
-            message.reply(extract);
+            message.reply_thread(extract);
         }).catch((error) => {
             winston.error(`${META.name} Error: ${error}`);
         });
