@@ -12,10 +12,79 @@ const META = {
     ],
 };
 
+function informUserRequestPending(web, invitee, userID) {
+    const msg = `Hey <@${userID}>, \
+we have received your invitation request for ${invitee} and the admins are \
+currently processing it. I'll keep you posted on \
+its status! :wink:`;
+    web.chat.postMessage(userID, msg, { as_user: true }, (error) => {
+        if (error) {
+            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
+        } else {
+            winston.info('Invitation confirmation message was sent');
+        }
+    });
+}
+
+function informUserRequestApproved(web, invitee, userID) {
+    const msg = `Hello again <@${userID}>, \
+your invitation request for ${invitee} has been approved. (S)he will receive a confirmation \
+email with further instructions. \
+Thank you for helping spread the message!`;
+    web.chat.postMessage(userID, msg, { as_user: true }, (error) => {
+        if (error) {
+            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
+        } else {
+            winston.info('Invitation approval message was sent');
+        }
+    });
+}
+
+function informUserRequestDenied(web, invitee, userID) {
+    const msg = `Hello again <@${userID}>, \
+I'm afraid that your invitation request for ${invitee} has been denied. This is either because the user has been \
+invited already or an admin has rejected the request. If it's the latter an admin will be in touch \
+with you soon to clarify the reason.`;
+    web.chat.postMessage(userID, msg, { as_user: true }, (error) => {
+        if (error) {
+            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
+        } else {
+            winston.info('Invitation rejection message was sent');
+        }
+    });
+}
+
+function processInvitationRequest(invitationRequestObj, web, config, secret) {
+    const options = {
+        method: 'POST',
+        uri: `${config.plugins.userrequests.menadevs_api_uri}?auth_token=${secret.menadevs_api_token}`,
+        body: {
+            invitation: invitationRequestObj,
+        },
+        json: true,
+        simple: false,
+        resolveWithFullResponse: true
+    };
+
+    rp(options)
+        .then(function (response) {
+            if (response.statusCode == 201) {
+                informUserRequestApproved(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid);
+            } else if (response.statusCode == 422) {
+                // TODO -- Handle duplicate errors in a separate manner than
+                // rejected requests by admins
+                informUserRequestDenied(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid);
+            }
+        })
+        .catch(function(error) {
+            winston.error(`${META.name} Invitation Request -- Failed: `, error);
+        });
+}
+
 function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9 ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
+            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9- ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
             const [, target, fullname, email, occupation, company] = message.text.match(pattern) || [];
 
             if (target === bot.self.id) {
@@ -58,7 +127,7 @@ function register(bot, rtm, web, config, secret) {
                             ],
                             footer: 'Automation',
                             footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
-                            ts: timestamp
+                            ts: timestamp,
                         }],
                     };
 
@@ -138,79 +207,6 @@ function register(bot, rtm, web, config, secret) {
             .catch((error) => {
                 winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
             });
-        }
-    });
-}
-
-
-function processInvitationRequest(invitationRequestObj, web, config, secret) {
-    const options = {
-        method: 'POST',
-        uri: `${config.plugins.userrequests.menadevs_api_uri}?auth_token=${secret.menadevs_api_token}`,
-        body: {
-            invitation: invitationRequestObj
-        },
-        json: true,
-        simple: false,
-        resolveWithFullResponse: true
-    };
-
-    rp(options)
-        .then(function (response) {
-            if (response.statusCode == 201) {
-                informUserRequestApproved(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid);
-            } else if (response.statusCode == 422) {
-                // TODO -- Handle duplicate errors in a separate manner than
-                // rejected requests by admins
-                informUserRequestDenied(web, invitationRequestObj.invitee_name, invitationRequestObj.slack_uid);
-            }
-        })
-        .catch(function(error) {
-            winston.error(`${META.name} Invitation Request -- Failed: `, error);
-        });
-}
-
-
-function informUserRequestPending(web, invitee, user_id) {
-    const msg = `Hey <@${user_id}>, \
-we have received your invitation request for ${invitee} and the admins are \
-currently processing it. I'll keep you posted on \
-its status! :wink:`;
-    web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
-        if (error) {
-            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
-        } else {
-            winston.info('Invitation confirmation message was sent');
-        }
-    });
-}
-
-
-function informUserRequestApproved(web, invitee, user_id) {
-    const msg = `Hello again <@${user_id}>, \
-your invitation request for ${invitee} has been approved. (S)he will receive a confirmation \
-email with further instructions. \
-Thank you for helping spread the message!`;
-    web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
-        if (error) {
-            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
-        } else {
-            winston.info('Invitation approval message was sent');
-        }
-    });
-}
-
-
-function informUserRequestDenied(web, invitee, user_id) {
-    const msg = `Hello again <@${user_id}>, \
-I'm afraid that your invitation request for ${invitee} has been denied. This is either because the user has been \
-invited already or an admin has rejected the request. If it's the latter an admin will be in touch \
-with you soon to clarify the reason.`;
-    web.chat.postMessage(user_id, msg, { as_user: true }, (error) => {
-        if (error) {
-            winston.error(`${META.name} Could not respond to invitation requesting user:`, error);
-        } else {
-            winston.info('Invitation rejection message was sent');
         }
     });
 }
