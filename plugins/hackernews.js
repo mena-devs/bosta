@@ -6,7 +6,7 @@ const META = {
     name: 'hackernews',
     short: 'Retrieves top N stories from YC Hacker News',
     examples: [
-        '@bosta hnews 10',
+        'hnews 10',
     ],
 };
 
@@ -67,7 +67,7 @@ function retrieveStoryDetails(storyIDs) {
     return new Promise((resolve) => {
         const fields = [];
         const requests = [];
-        
+
         storyIDs.forEach((item) => {
             requests.push(retrieveStoryText(item, fields));
         });
@@ -77,13 +77,14 @@ function retrieveStoryDetails(storyIDs) {
 }
 
 
-function hnews(options, message, who, nStories) {
+function hnews(options, message, nStories) {
     if (nStories) {
         retrieveStories(nStories)
         .then(response => retrieveStoryDetails(response))
         .then((response) => {
             const attachment = {
                 as_user: true,
+                thread_ts: message.ts,
                 attachments: [
                     {
                         color: '#36a64f',
@@ -111,7 +112,7 @@ function hnews(options, message, who, nStories) {
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/<@([^>]+)>:? hnews ([0-9]+):?/, hnews, { self: true });
+    plugin.route(/^hnews ([0-9]+):?/, hnews, {});
 }
 
 module.exports = {

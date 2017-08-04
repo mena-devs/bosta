@@ -19,7 +19,7 @@ function main() {
     const client = new RtmClient(secret.token);
     const web = new WebClient(secret.token);
     const plugins = {};
-    let initial_connection = true;
+    let initialConnection = true;
     let bot;
 
     // Adding custon transport for Winston
@@ -37,10 +37,10 @@ function main() {
     client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
         bot = data;
 
-        // Disable plugin reload on reconnect after connection
-        // failure
-        if (!initial_connection)
+        // Disable plugin reload on reconnect after connection failure
+        if (!initialConnection) {
             return;
+        }
 
         winston.info(`Team: ${data.team.name} > Name: ${data.self.name}`);
 
@@ -54,11 +54,11 @@ function main() {
     });
 
     client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-        if (!initial_connection) {
+        if (!initialConnection) {
             winston.info('Reconnected...');
         } else {
             winston.info('Locked and loaded!');
-            initial_connection = false;
+            initialConnection = false;
         }
     });
 

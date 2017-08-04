@@ -7,7 +7,7 @@ const META = {
     short: 'Give someone karma points.',
     examples: [
         '+5 @jason',
-        '@bosta karma @jason',
+        'karma @jason',
     ],
 };
 
@@ -45,22 +45,21 @@ function addKarma(options, message, points, userID) {
         });
 }
 
-function getKarma(options, message, who, userID) {
+function getKarma(options, message, userID) {
     return storage.init({ dir: options.config.plugins.system.karma_log_path })
         .then(() => storage.getItem(userID))
         .then((currentKarma) => {
             if (!currentKarma) {
                 currentKarma = 0;
             }
-            message.reply(`<@${userID}>'s Karma-o-meter: ${currentKarma}`);
-        })
-        .catch(error => winston.error(`${META.name} - Error: ${error}`));
+            message.reply_thread(`<@${userID}>'s karma: ${currentKarma}`);
+        }).catch(error => winston.error(`${META.name} - Error: ${error}`));
 }
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
     plugin.route(/\+([1-5])? <@([^>]+)>:?/, addKarma, { });
-    plugin.route(/<@([^>]+)>:? karma <@([^>]+)>:?/, getKarma, { self: true });
+    plugin.route(/^karma <@([^>]+)>:?/, getKarma, {});
 }
 
 module.exports = {

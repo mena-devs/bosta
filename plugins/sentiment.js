@@ -7,7 +7,7 @@ const META = {
     name: 'sentiment',
     short: 'provides a sentiment analysis on the last 10 messages of a user',
     examples: [
-        '@bosta analyse jordan',
+        'analyse jordan',
     ],
 };
 
@@ -82,18 +82,18 @@ function analyseSentiment(secret, messages) {
 }
 
 
-function analyse(options, message, who, target) {
+function analyse(options, message, target) {
     findUser(options.bot, target)
         .then(user => loadRecentMessages(options, message.channel, user))
         .then(messages => analyseSentiment(options.secret, messages))
-        .then(sentiment => message.reply(`${target} has recently been ${sentiment.output.result}`))
+        .then(sentiment => message.reply_thread(`${target} has recently been ${sentiment.output.result}`))
         .catch(error => winston.error(`${META.name} - Error: ${error}`));
 }
 
 
 function register(bot, rtm, web, config, secret) {
     const plugin = new Plugin({ bot, rtm, web, config, secret });
-    plugin.route(/<@([^>]+)>:? analyse (.+)/, analyse, { self: true });
+    plugin.route(/^analyse (.+)/, analyse, {});
 }
 
 

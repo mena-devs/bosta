@@ -8,15 +8,15 @@ const META = {
     name: 'figlet',
     short: 'figlet-izes text',
     examples: [
-        '@bosta figlet dany boy',
+        'figlet dany boy',
     ],
 };
 
 
-function handleFiglet(options, message, who, text) {
+function handleFiglet(options, message, text) {
     figlet(text, (err, data) => {
         if (!err) {
-            message.reply(pre(data));
+            message.reply_thread(pre(data));
         }
     });
 }
@@ -24,7 +24,7 @@ function handleFiglet(options, message, who, text) {
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/<@([^>]+)>:? figlet (.*)/, handleFiglet, { self: true });
+    plugin.route(/^figlet (.*)/, handleFiglet, {});
 }
 
 
