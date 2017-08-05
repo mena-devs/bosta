@@ -7,11 +7,11 @@ const META = {
     name: 'tellmeabout',
     short: 'records, plays or searchs the interwebs',
     examples: [
-        'save snippet-security-risks as: the snippets are run in a container, they are perfectly sandboxed.',
-        'about snippet-security-risks',
-        'save stop-writing-classes as: https://www.youtube.com/watch?v=o9pEzgHorH0',
-        'about stop-writing-classes',
-        'forget key-to-delete',
+        'save: snippet-security-risks as: the snippets are run in a container, they are perfectly sandboxed.',
+        'about: snippet-security-risks',
+        'save: stop-writing-classes as: https://www.youtube.com/watch?v=o9pEzgHorH0',
+        'about: stop-writing-classes',
+        'forget: key-to-delete',
     ],
 };
 
@@ -96,9 +96,9 @@ function register(bot, rtm, web, config) {
     });
 
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/^save (.+?) as: (.+)/, save, {});
-    plugin.route(/^forget (.+)/, forget, {});
-    plugin.route(/^about (.+)/, about, {});
+    plugin.route(/^save: (.+?) as: (.+)/, save, {});
+    plugin.route(/^forget: (.+)/, forget, {});
+    plugin.route(/^about: (.+)/, about, {});
 }
 
 
