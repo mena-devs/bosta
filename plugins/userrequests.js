@@ -167,7 +167,7 @@ function register(bot, rtm, web, config, secret) {
                 // so we need to extract the email only from the above
                 const cleanEmail = messageFields[2].value.slice(1,-1).split('|')[1];
                 const cleanRequesterId = messageFields[0].value.slice(1,-1).split('@')[1];
-
+                
                 return {
                     invitee_name: messageFields[1].value,
                     invitee_email: cleanEmail,
@@ -176,7 +176,9 @@ function register(bot, rtm, web, config, secret) {
                     invitee_company: messageFields[4].value
                 }
             })
-            .then((invitationRequestObj) => processInvitationRequest(invitationRequestObj, web, config, secret))
+            .then((invitationRequestObj) => {
+                processInvitationRequest(invitationRequestObj, web, config, secret);
+            })
             .catch((error) => {
                 winston.error(`${META.name} - Processing Invitation Error - : ${error}`);
             });

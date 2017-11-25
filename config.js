@@ -20,7 +20,7 @@ const config = {
 
         userrequests: {
             invitation_request_channel: 'G1H574PK7',
-            menadevs_api_uri: 'http://menadevs.com/api/v1/invitations',
+            menadevs_api_uri: 'https://menadevs.com/api/v1/invitations',
         },
 
         system: {
