@@ -1,22 +1,22 @@
 version: v1.0
-name: Pipeline 2
+name: Deployment Pipeline
 blocks:
   - name: Deploy
     task:
       jobs:
-        - name: 'Job #1'
+        - name: Checkout Repo
           commands:
             - checkout
+        - name: Add private key and set permissions
+          commands:
             - ssh-keyscan -H -p 22 $REMOTE_IP_ADDRESS >> ~/.ssh/known_hosts
             - chmod 0600 ~/.ssh/menadevs_bosta_do
             - printf "Host $REMOTE_IP_ADDRESS\n  HostName $REMOTE_IP_ADDRESS\n  User git\n  IdentityFile ~/.ssh/menadevs_bosta_do\n" >> ~/.ssh/config
+        - name: Push changes
+          commands:
             - 'git remote add prod root@$REMOTE_IP_ADDRESS:/root/repos/bosta-remote'
             - git push --force prod master
-      env_vars:
-        - name: REMOTE_IP_ADDRESS
-          value: 178.62.31.50
-        - name: REMOTE_URL
-          value: root@178.62.31.50/root/repos/bosta-remote
+      env_vars: []
       secrets:
         - name: Bosta
 agent:
