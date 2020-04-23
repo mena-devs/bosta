@@ -1,6 +1,6 @@
 # Bostantine Androidaou
 
-[![Build Status](https://semaphoreci.com/api/v1/mena-devs/bosta/branches/master/shields_badge.svg)](https://semaphoreci.com/mena-devs/bosta)
+[![Build Status](https://menadevs.semaphoreci.com/badges/bosta.svg?style=shields)](https://menadevs.semaphoreci.com/projects/bosta)
 
 ## Synopsis
 
