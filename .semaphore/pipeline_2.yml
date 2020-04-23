@@ -8,6 +8,7 @@ blocks:
           commands:
             - checkout
             - ssh-keyscan -H -p 22 $REMOTE_IP_ADDRESS >> ~/.ssh/known_hosts
+            - chmod 0600 ~/.ssh/menadevs_bosta_do
             - printf "Host $REMOTE_IP_ADDRESS\n  HostName $REMOTE_IP_ADDRESS\n  User git\n  IdentityFile ~/.ssh/menadevs_bosta_do\n" >> ~/.ssh/config
             - 'git remote add prod root@$REMOTE_IP_ADDRESS:/root/repos/bosta-remote'
             - git push --force prod master
