@@ -8,7 +8,7 @@ const META = {
     name: 'userrequests',
     short: 'Request an invite for a user -- Do not forget the ( ) they are necessary!',
     examples: [
-        'invite (Full Name) (Email) (Occupation) (Company)',
+        '@bosta invite (Full Name) (Email) (Occupation) (Company)',
     ],
 };
 
@@ -84,12 +84,10 @@ function processInvitationRequest(invitationRequestObj, web, config, secret) {
 function register(bot, rtm, web, config, secret) {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
         if (message.text) {
-            const pattern = /invite \(([a-zA-Z0-9- ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
-            const match = message.text.match(pattern) || [];
+            const pattern = /<@([^>]+)>:? invite \(([a-zA-Z0-9- ]+)?\) \(([<>a-zA-Z0-9_\-:@|.]+)?\) \((.+[^)])\)? \((.+[^)])\)?/;
+            const [, target, fullname, email, occupation, company] = message.text.match(pattern) || [];
 
-            if (match.length > 4) {
-                const [fullname, email, occupation, company] = match;
-
+            if (target === bot.self.id) {
                 if (fullname.length > 0 && email.length > 0 && occupation.length > 0 && company.length > 0) {
                     const timestamp = Math.floor(new Date() / 1000);
                     const postChannel = config.plugins.userrequests.invitation_request_channel;
