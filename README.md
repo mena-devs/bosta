@@ -174,3 +174,5 @@ Manually triggered command to send a greeting to any member and push the MENA De
 ## Contributing
 
 We would very much appreciate any and all contributions for this project. Nevertheless, in order for us to manage this repository efficiently, please review and abide by the contribution guidelines detailed in this document: [CONTRIBUTING.md](https://github.com/mena-devs/slack_data_collector/blob/master/CONTRIBUTING.md) before pushing your changes.
+
+This project does not require a Contributor License Agreement.
