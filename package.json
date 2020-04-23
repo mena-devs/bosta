@@ -24,7 +24,7 @@
     "wolfram-alpha": "^0.6.0"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
+    "eslint": "^4.18.2",
     "eslint-config-airbnb-base": "^11.0.0",
     "eslint-plugin-import": "^2.2.0",
     "mocha": "^3.2.0"
