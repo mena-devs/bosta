@@ -10,7 +10,7 @@ blocks:
             - ssh-keyscan -H -p 22 $REMOTE_IP_ADDRESS >> ~/.ssh/known_hosts
             - printf "Host $REMOTE_IP_ADDRESS\n  HostName REMOTE_IP_ADDRESS\n  User git\n  IdentityFile ~/.ssh/menadevs_bosta_do\n" >> ~/.ssh/config
             - 'git remote add prod root@$REMOTE_IP_ADDRESS:/root/repos/bosta-remote'
-            - git push origin prod master
+            - git push prod master
       env_vars:
         - name: REMOTE_IP_ADDRESS
           value: 178.62.31.50
