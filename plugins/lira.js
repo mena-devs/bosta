@@ -24,20 +24,34 @@ function fetchLatestRateFromSheet(sheetId, range, apiKey) {
     json: true
   };
 
+  const columnMap = {
+    'lastUpdateDay': 0,
+    'lastUpdateTime': 1,
+    'officialBuy': 2,
+    'officialSell': 3,
+    'parallelBuy': 4,
+    'parallelSell': 5,
+    'blackBuy': 6,
+    'blackSell': 7,
+    'analysis': 17
+  };
+
   return new Promise((resolve, reject) => {
     rp(requestOptions)
       .then((data) => {
-        if (typeof(data.values) != 'undefined' && data.values[0].length >= 8) {
+        if (typeof(data.values) != 'undefined' && data.values[0].length > 0) {
           const values = data.values[0];
-          const fields = {
-            'lastUpdate': `${values[0]} ${values[1]}`,
-            'officialBuy': values[2],
-            'officialSell': values[3],
-            'parallelBuy': values[4],
-            'parallelSell': values[5],
-            'blackBuy': values[6],
-            'blackSell': values[7],
-          };
+          let fields = {};
+
+          Object.keys(columnMap).forEach((fieldName) => {
+            let columnValue = values[columnMap[fieldName]];
+
+            if(typeof columnValue != undefined && columnValue != null) {
+              fields[fieldName] = columnValue;
+            } else {
+              fields[fieldName] = '';
+            }
+          });
 
           resolve(fields);
         } else {
@@ -61,14 +75,15 @@ function fetchLatestRateFromSheet(sheetId, range, apiKey) {
  */
 function liraRate(options, message) {
   const sheetId = '17MC8Gt5AwwAFzr7Awq3c85tV5baZJ--9U2drwnen8W8';
-  const range = 'USD!A7:H7';
+  const range = 'USD!A7:R7';
 
   fetchLatestRateFromSheet(sheetId, range, options.secret.sheets_api_key).then((data) => {
     const lines = [
       `:bank: Official: *BUY:* ${data['officialBuy']} *SELL:* ${data['officialSell']}`,
       `:dollar: Parallel market: *BUY:* ${data['parallelBuy']} *SELL:* ${data['parallelSell']}`,
       `:money_with_wings: Black market: *BUY:* ${data['blackBuy']} *SELL:* ${data['blackSell']}`,
-      `_Last updated: ${data['lastUpdate']} via http://tiny.cc/pkmlnz _`,
+      `>${ data['analysis'].replace(/[\r\n]+/gm, '\n>')}`,
+      `_Last updated: ${data['lastUpdateDay']} ${data['lastUpdateTime']} via http://tiny.cc/pkmlnz _`,
     ];
 
     message.reply(lines.join('\n'));
