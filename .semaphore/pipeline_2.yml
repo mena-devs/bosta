@@ -4,16 +4,12 @@ blocks:
   - name: Deploy
     task:
       jobs:
-        - name: Checkout Repo
+        - name: Checkout Repo & Push Changes
           commands:
             - checkout
-        - name: Add private key and set permissions
-          commands:
             - ssh-keyscan -H -p 22 $REMOTE_IP_ADDRESS >> ~/.ssh/known_hosts
             - chmod 0600 ~/.ssh/menadevs_bosta_do
             - printf "Host $REMOTE_IP_ADDRESS\n  HostName $REMOTE_IP_ADDRESS\n  User git\n  IdentityFile ~/.ssh/menadevs_bosta_do\n" >> ~/.ssh/config
-        - name: Push changes
-          commands:
             - 'git remote add prod root@$REMOTE_IP_ADDRESS:/root/repos/bosta-remote'
             - git push --force prod master
       env_vars: []
