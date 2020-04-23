@@ -1,5 +1,7 @@
 # Bostantine Androidaou
 
+[![Build Status](https://semaphoreci.com/api/v1/mena-devs/bosta/branches/master/shields_badge.svg)](https://semaphoreci.com/mena-devs/bosta)
+
 ## Synopsis
 
 [MENA-Devs](http://mena-devs.com)'s Slack Greek Emperor
