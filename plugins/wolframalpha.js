@@ -9,11 +9,11 @@ const META = {
     short: 'Execute a computation using WolframAlpha\'s API',
     examples: [
         '## Shortened Output (Default)',
-        'wa `integrate 2x`',
-        'wa `pi to 100 digits`',
-        'wa `length of the Eiffel tower`',
+        'wa integrate 2x',
+        'wa pi to 100 digits',
+        'wa length of the Eiffel tower',
         '## Verbose Output',
-        'wav `integrate 2x`'
+        'wav integrate 2x'
     ],
 };
 
