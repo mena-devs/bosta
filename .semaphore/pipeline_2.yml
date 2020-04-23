@@ -6,14 +6,14 @@ blocks:
       jobs:
         - name: 'Job #1'
           commands:
-            - ssh-keyscan -H -p 22 $REMOTE_IP_ADDRESS >> ~/.ssh/known_hosts
-            - git remote add production "$REMOTE_URL" || true
-            - git push --force production master
+            - cat ~/.ssh/menadevs_bosta_do
       env_vars:
         - name: REMOTE_IP_ADDRESS
           value: 178.62.31.50
         - name: REMOTE_URL
           value: root@178.62.31.50/root/repos/bosta-remote
+      secrets:
+        - name: Bosta
 agent:
   machine:
     type: e1-standard-2
