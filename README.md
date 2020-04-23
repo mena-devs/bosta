@@ -1,17 +1,17 @@
 # Bostantine Androidaou
 
-[![Build Status](https://semaphoreci.com/api/v1/mena-devs/bosta/branches/master/shields_badge.svg)](https://semaphoreci.com/mena-devs/bosta)
+[![Build Status](https://menadevs.semaphoreci.com/badges/bosta.svg?style=shields)](https://menadevs.semaphoreci.com/projects/bosta)
 
 ## Synopsis
 
-[MENA-Devs](http://mena-devs.com)'s Slack Greek Emperor
+[MENA-Devs](https://menadevs.com/)'s Slack Greek Emperor
 
 ## Installation & Configuration
 
 ### Minimum Requirements
 
 ```
-NodeJS v6.9.2
+NodeJS v10.15.x
 ```
 
 The code uses ECMAScript 2015 (ES6) *shipping* features. If you're
@@ -159,7 +159,7 @@ Simply install the proper image (in the example above `docker pull python:latest
 
 ### User Requests
 
-This plugin takes a request from any MENA Devs member and pushes it to assigned admins for action.
+This plugin takes a invite request from any MENA Devs member and pushes it to assigned admins for action.
 
 #### Supported Requests
 
@@ -172,6 +172,28 @@ Retrieves up to (N) top stories from YCombinator's Hacker News
 ### New User
 
 Manually triggered command to send a greeting to any member and push the MENA Dev's Code of Conduct to them in a private message sent by the Bot.
+
+### Lira
+
+TBD @aymanfarhat
+
+### WolframAlpha
+
+Integration with the computational knowledge engine. Used to answer a variety of calculable questions.
+
+#### Configuration
+
+The `secrets.json` file should contain a WolframAlpha app id as follows:
+
+```
+    "wolframalpha_app_id": "APP_ID"
+```
+
+### Karma
+
+Manages virtual points that can be given to a user as symbolic appreciation for a contribution in the community.
+
+---
 
 ## Contributing
 
