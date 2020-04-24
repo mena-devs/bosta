@@ -7,6 +7,7 @@ const META = {
   short: 'Gets the latest lira rate',
   examples: [
     'lira rate',
+    'lira rate yesterday',
     'lira inflation',
   ],
 };
@@ -46,7 +47,7 @@ function fetchLatestRateFromSheet(sheetId, range, apiKey) {
           Object.keys(columnMap).forEach((fieldName) => {
             let columnValue = values[columnMap[fieldName]];
 
-            if(typeof columnValue != undefined && columnValue != null) {
+            if(typeof(columnValue) != 'undefined' && columnValue != null) {
               fields[fieldName] = columnValue;
             } else {
               fields[fieldName] = '';
@@ -73,15 +74,21 @@ function fetchLatestRateFromSheet(sheetId, range, apiKey) {
  * @param {object} options
  * @param {string} message
  */
-function liraRate(options, message) {
+function liraRate(options, message, day) {
   const sheetId = '17MC8Gt5AwwAFzr7Awq3c85tV5baZJ--9U2drwnen8W8';
-  const range = 'USD!A7:R7';
+  let range = 'USD!A7:R7';
+
+  // We can assume if there is a day parameter it would be yesterday
+  // as it's hard coded in the router pattern for now
+  if (typeof(day) != 'undefined') {
+    range = 'USD!A8:R8';
+  }
 
   fetchLatestRateFromSheet(sheetId, range, options.secret.sheets_api_key).then((data) => {
     const lines = [
-      `:bank: Official: *BUY:* ${data['officialBuy']} *SELL:* ${data['officialSell']}`,
-      `:dollar: Parallel market: *BUY:* ${data['parallelBuy']} *SELL:* ${data['parallelSell']}`,
       `:money_with_wings: Black market: *BUY:* ${data['blackBuy']} *SELL:* ${data['blackSell']}`,
+      `:dollar: Parallel market: *BUY:* ${data['parallelBuy']} *SELL:* ${data['parallelSell']}`,
+      `:bank: Official: *BUY:* ${data['officialBuy']} *SELL:* ${data['officialSell']}`,
       `>${ data['analysis'].replace(/[\r\n]+/gm, '\n>')}`,
       `_Last updated: ${data['lastUpdateDay']} ${data['lastUpdateTime']} via http://tiny.cc/pkmlnz _`,
     ];
@@ -105,8 +112,8 @@ function liraInflation(options, message) {
 
 function register(bot, rtm, web, config, secret) {
   const plugin = new Plugin({ bot, rtm, web, config, secret });
-  plugin.route(/^lira rate$/, liraRate, {});
-  plugin.route(/^lira inflation$/, liraInflation, {});
+  plugin.route(/^lira rate(?<day> yesterday)?$/i, liraRate, {});
+  plugin.route(/^lira inflation$/i, liraInflation, {});
 }
 
 module.exports = {
