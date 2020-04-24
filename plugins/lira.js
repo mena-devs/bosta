@@ -112,7 +112,7 @@ function liraInflation(options, message) {
 
 function register(bot, rtm, web, config, secret) {
   const plugin = new Plugin({ bot, rtm, web, config, secret });
-  plugin.route(/^lira rate(?<day> yesterday)?$/i, liraRate, {});
+  plugin.route(/^lira rate( yesterday)?$/i, liraRate, {});
   plugin.route(/^lira inflation$/i, liraInflation, {});
 }
 
