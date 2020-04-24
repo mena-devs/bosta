@@ -85,8 +85,8 @@ function getKarma(options, message, userID) {
 
 function register(bot, rtm, web, config) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/\+([1-5])? <@([^>]+)>:?/, updateKarma, { proceedure: 'Increment' });
-    plugin.route(/-([1-5])? <@([^>]+)>:?/, updateKarma, { proceedure: 'Decrement' });
+    plugin.route(/\+([1-5]) <@([^>]+)>:?/, updateKarma, { proceedure: 'Increment' });
+    plugin.route(/-([1-5]) <@([^>]+)>:?/, updateKarma, { proceedure: 'Decrement' });
     plugin.route(/^karma <@([^>]+)>:?/, getKarma, {});
 }
 

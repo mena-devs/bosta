@@ -111,9 +111,7 @@ function loadConfig(config, name) {
     };
 }
 
-function runSnippet(web, rtm, config, secret, file) {
-    const reply = text => web.files.comments.add(file.id, text);
-
+function runSnippet(web, rtm, config, secret, message, file) {
     const fileName = crypto.randomBytes(4).toString('hex');
     const { host, path } = url.parse(file.url_private_download);
     const language = loadConfig(config, file.filetype);
@@ -124,9 +122,9 @@ function runSnippet(web, rtm, config, secret, file) {
     download(host, path, secret.token)
         .then(response => save(fileOnDisk, response))
         .then(() => execute(fileName, language, sourceFolder))
-        .then(text => reply(pre(text.slice(0, language.crop))))
+        .then(text => message.reply(pre(text.slice(0, language.crop))))
         .catch((error) => {
-            reply(error);
+            message.reply(error);
             winston.error(`${META.name} - Error: ${error}`);
         });
 
@@ -162,11 +160,13 @@ function register(bot, rtm, web, config, secret) {
 
 
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.file
-                && message.file.mode === 'snippet'
-                && message.subtype === 'file_share'
-                && config.plugins.snippets.languages[message.file.filetype]) {
-            runSnippet(web, rtm, config, secret, message.file);
+        if (message.files !== undefined
+                && message.files.length > 0
+                && message.files[0].mode === 'snippet'
+                // This is gone?
+                // && message.subtype === 'file_share'
+                && config.plugins.snippets.languages[message.files[0].filetype]) {
+            runSnippet(web, rtm, config, secret, message, message.files[0]);
         }
     });
 

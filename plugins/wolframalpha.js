@@ -9,11 +9,11 @@ const META = {
     short: 'Execute a computation using WolframAlpha\'s API',
     examples: [
         '## Shortened Output (Default)',
-        '@bosta wa `integrate 2x`',
-        '@bosta wa `pi to 100 digits`',
-        '@bosta wa `length of the Eiffel tower`',
+        'wa integrate 2x',
+        'wa pi to 100 digits',
+        'wa length of the Eiffel tower',
         '## Verbose Output',
-        '@bosta wav `integrate 2x`'
+        'wav integrate 2x'
     ],
 };
 
@@ -66,7 +66,7 @@ function buildAttachement(results, verboseOutput) {
 }
 
 
-function waQuery(options, message, who, query, routeOptions) {
+function waQuery(options, message, query, routeOptions) {
     if (!query) {
         message.reply('I got nothing to compute');
         return;
@@ -81,8 +81,8 @@ function waQuery(options, message, who, query, routeOptions) {
 function register(bot, rtm, web, config, secret) {
     const plugin = new Plugin({ bot, rtm, web, config });
     wolfram = wolfram.createClient(secret.wolframalpha_app_id);
-    plugin.route(/<@([^>]+)>:? wa \`?(.+[^)])\`/, waQuery, { self: true, verboseOutput: false });
-    plugin.route(/<@([^>]+)>:? wav \`?(.+[^)])\`/, waQuery, { self: true, verboseOutput: true });
+    plugin.route(/^wa (.+[^)])$/, waQuery, { verboseOutput: false });
+    plugin.route(/^wav (.+[^)])$/, waQuery, { verboseOutput: true });
 }
 
 
