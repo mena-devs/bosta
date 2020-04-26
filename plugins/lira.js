@@ -34,7 +34,7 @@ function fetchLatestRateFromSheet(sheetId, range, apiKey) {
     'parallelSell': 5,
     'blackBuy': 6,
     'blackSell': 7,
-    'analysis': 17
+    'analysis': 8
   };
 
   return new Promise((resolve, reject) => {
@@ -75,13 +75,13 @@ function fetchLatestRateFromSheet(sheetId, range, apiKey) {
  * @param {string} message
  */
 function liraRate(options, message, day) {
-  const sheetId = '17MC8Gt5AwwAFzr7Awq3c85tV5baZJ--9U2drwnen8W8';
-  let range = 'USD!A7:R7';
+  const sheetId = '1_z0gtOy-Q8Pv4mOWkURpzjWkAlyc-ftI0JYHRHegoCw';
+  let range = 'USD!A2:R2';
 
   // We can assume if there is a day parameter it would be yesterday
   // as it's hard coded in the router pattern for now
   if (typeof(day) != 'undefined') {
-    range = 'USD!A8:R8';
+    range = 'USD!A3:R3';
   }
 
   fetchLatestRateFromSheet(sheetId, range, options.secret.sheets_api_key).then((data) => {
@@ -90,7 +90,7 @@ function liraRate(options, message, day) {
       `:dollar: Parallel market: *BUY:* ${data['parallelBuy']} *SELL:* ${data['parallelSell']}`,
       `:bank: Official: *BUY:* ${data['officialBuy']} *SELL:* ${data['officialSell']}`,
       `>${ data['analysis'].replace(/[\r\n]+/gm, '\n>')}`,
-      `_Last updated: ${data['lastUpdateDay']} ${data['lastUpdateTime']} via http://tiny.cc/pkmlnz _`,
+      `_Last updated: ${data['lastUpdateDay']} ${data['lastUpdateTime']} via shorturl.at/eKTV7 _`,
     ];
 
     message.reply(lines.join('\n'));
