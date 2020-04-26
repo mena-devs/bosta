@@ -193,6 +193,10 @@ The `secrets.json` file should contain a WolframAlpha app id as follows:
 
 Manages virtual points that can be given to a user as symbolic appreciation for a contribution in the community.
 
+### Corona
+
+Fetches the latest statistics around the spread of COVID-19. Source: https://covid19api.com/
+
 ---
 
 ## Contributing
