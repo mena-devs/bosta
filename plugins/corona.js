@@ -34,9 +34,7 @@ function world(options, message, query) {
 
     rp(request)
         .then((json) => {
-            return options.web.chat.postMessage(message.channel, 
-                `Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`
-            );
+            message.reply(`Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`);
         })
         .catch(error => winston.error(`${META.name} Error: ${error}`));
 }
@@ -57,10 +55,7 @@ function yesterday(options, message, query) {
     rp(request)
         .then((json) => {
             json = json.slice(-2)[0];
-
-            return options.web.chat.postMessage(message.channel, 
-                `Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${json.Active}, Date: ${json.Date}`
-            );
+            message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${json.Active}, Date: ${json.Date}`);
         })
         .catch(error => winston.error(`${META.name} Error: ${error}`));
 }
@@ -81,19 +76,16 @@ function live(options, message, query) {
     rp(request)
         .then((json) => {
             json = json.slice(-1)[0];
-
-            return options.web.chat.postMessage(message.channel, 
-                `Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${json.Active}, Date: ${json.Date}`
-            );
+            message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${json.Active}, Date: ${json.Date}`);
         })
         .catch(error => winston.error(`${META.name} Error: ${error}`));
 }
 
 function register(bot, rtm, web, config, secret) {
     const plugin = new Plugin({ bot, rtm, web, config });
-    plugin.route(/^corona ([a-zA-Z]{2})$/, live, {});
-    plugin.route(/^corona ([a-zA-Z]{2}) yesterday$/, yesterday, {});
-    plugin.route(/^corona world$/, world, {});
+    plugin.route(/^[c|C]orona ([a-zA-Z]{2})$/, live, {});
+    plugin.route(/^[c|C]orona ([a-zA-Z]{2}) [y|Y]esterday$/, yesterday, {});
+    plugin.route(/^[c|C]orona [w|W]orld$/, world, {});
 }
 
 
