@@ -8,16 +8,11 @@
 
 ## Installation & Configuration
 
-### Minimum Requirements
+Bosta has been tested with the following node version:
 
 ```
-NodeJS v10.15.x
+NodeJS v12.16.x LTS
 ```
-
-The code uses ECMAScript 2015 (ES6) *shipping* features. If you're
-building/submitting plugins please avoid using staged/in progress features.
-
-### Configure and Run
 
 Install the dependencies using:
 

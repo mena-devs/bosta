@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const { RTMClient } = require('@slack/rtm-api');
 const { WebClient } = require('@slack/web-api');
@@ -7,16 +8,12 @@ const winston = require('winston');
 
 const secret = require('./secret.json');
 const config = require('./config.js');
-const utils = require('./utils.js');
 
 const values = (o) => Object.keys(o).map((k) => o[k]);
 
 function main() {
     const rtm = new RTMClient(secret.token);
     const web = new WebClient(secret.token);
-    const plugins = {};
-    let initialConnection = true;
-    let bot;
 
     const logger = winston.createLogger({
         level: 'info',
@@ -31,52 +28,52 @@ function main() {
         ],
     });
 
-    rtm.on('authenticated', (data) => {
-        bot = data;
+    const loadPlugin = (plugin_path) => {
+        const filename = path.resolve(plugin_path)
 
-        // Disable plugin reload on reconnect after connection failure
-        if (!initialConnection) {
-            return;
-        }
+        // Needed, otherwise it'll load from cache
+        delete require.cache[filename];
 
-        logger.info(`
-            > Team: ${data.team.name}
-            > Name: ${data.self.name}
-            > Prefix: ${config.main.prefix}
-        `);
+        const module = require(filename);
+        const plugin_events = module.events;
+        const listeners = {};
 
-        config.plugins.forEach((file) => {
-            const plugin = require(path.resolve(file));
-            plugin.register(data, rtm, web, config, secret);
-            plugins[plugin.META.name] = utils.buildHelp(plugin.META);
+        Object.entries(plugin_events).forEach(([name, func]) => {
+            const listener =  (payload) => {
+                func({logger, rtm, web}, payload);
+            }
+            rtm.on(name, listener);
+            listeners[name] = listener;
         });
 
-        plugins[''] = values(plugins).join('\n\n');
+        module.listeners = listeners;
+
+        if('init' in module)
+            module.init({logger, rtm, web});
+
+        return module;
+    }
+
+    config.plugins.forEach(plugin_path => {
+        let module = loadPlugin(plugin_path);
+
+        // Hot reloads plugins.
+        fs.watchFile(plugin_path, (curr, prev) => {
+            logger.info(`${plugin_path} changed, reloading.`);
+            Object.entries(module.listeners).forEach(([name, listener]) => {
+                rtm.removeListener(name, listener);
+            });
+
+            if('destroy' in module)
+                module.destroy({logger, rtm, web});
+            module = loadPlugin(plugin_path);
+        });
     });
 
-    rtm.on('connected', () => {
-        if (!initialConnection) {
-            logger.info('Reconnected...');
-        } else {
-            logger.info('Locked and loaded!');
-            initialConnection = false;
-        }
-    });
-
-    rtm.on('message', (message) => {
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? help ?(.*)/;
-            const [, target, topic] = message.text.match(pattern) || [];
-
-            if (target === bot.self.id && plugins[topic]) {
-                rtm.sendMessage(utils.pre(plugins[topic]), message.channel);
-            }
-        }
-    });
-
-    rtm.start();
+    (async () => {
+        await rtm.start();
+    })();
 }
-
 
 if (require.main === module) {
     main();

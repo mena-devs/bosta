@@ -18,6 +18,7 @@ const config = {
 
 
     plugins: [
+        path.join('plugins', 'auth.js'),
         path.join('plugins', 'ping.js'),
     ],
 
