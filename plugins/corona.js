@@ -35,6 +35,7 @@ function world(options, message, query) {
     rp(request)
         .then((json) => {
             message.reply(`Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`);
+            message.reply(`Source: https://covid19api.com/`);
         })
         .catch(error => winston.error(`${META.name} Error: ${error}`));
 }
@@ -55,7 +56,14 @@ function yesterday(options, message, query) {
     rp(request)
         .then((json) => {
             json = json.slice(-2)[0];
-            message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${json.Active}, Date: ${json.Date}`);
+
+            let active = json.Active;
+
+            if (active == 0)
+                active = json.Confirmed - (json.Deaths + json.Recovered)
+
+            message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`);
+            message.reply(`Source: https://covid19api.com/`);
         })
         .catch(error => winston.error(`${META.name} Error: ${error}`));
 }
@@ -76,7 +84,13 @@ function live(options, message, query) {
     rp(request)
         .then((json) => {
             json = json.slice(-1)[0];
-            message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${json.Active}, Date: ${json.Date}`);
+            let active = json.Active;
+
+            if (active == 0)
+                active = json.Confirmed - (json.Deaths + json.Recovered)
+
+            message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`);
+            message.reply(`Source: https://covid19api.com/`);
         })
         .catch(error => winston.error(`${META.name} Error: ${error}`));
 }
