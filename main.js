@@ -2,14 +2,14 @@ const path = require('path');
 
 const { RTMClient } = require('@slack/rtm-api');
 const { WebClient } = require('@slack/web-api');
-const SlackHook = require("winston-slack-webhook-transport");
+const SlackHook = require('winston-slack-webhook-transport');
 const winston = require('winston');
 
 const secret = require('./secret.json');
 const config = require('./config.js');
 const utils = require('./utils.js');
 
-const values = o => Object.keys(o).map(k => o[k]);
+const values = (o) => Object.keys(o).map((k) => o[k]);
 
 function main() {
     const rtm = new RTMClient(secret.token);
@@ -19,7 +19,7 @@ function main() {
     let bot;
 
     const logger = winston.createLogger({
-        level: "info",
+        level: 'info',
         transports: [
             new SlackHook({
                 webhookUrl: secret.winston_webhook,
@@ -27,8 +27,8 @@ function main() {
                 username: config.main.logging.username,
                 level: config.main.logging.level,
                 handleExceptions: config.main.logging.handleExceptions,
-            })
-        ]
+            }),
+        ],
     });
 
     rtm.on('authenticated', (data) => {
@@ -69,7 +69,7 @@ function main() {
             const [, target, topic] = message.text.match(pattern) || [];
 
             if (target === bot.self.id && plugins[topic]) {
-                rtm.sendMessage( utils.pre(plugins[topic]), message.channel);
+                rtm.sendMessage(utils.pre(plugins[topic]), message.channel);
             }
         }
     });

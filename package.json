@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "build": "eslint ."
   },
   "author": "",
   "license": "Apache 2.0",
@@ -13,5 +14,10 @@
     "@slack/web-api": "^5.8.0",
     "winston": "^3.2.1",
     "winston-slack-webhook-transport": "^1.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2"
   }
 }

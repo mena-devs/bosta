@@ -1,5 +1,5 @@
 function buildHelp(meta) {
-    const examples = meta.examples.map(e => `    example: ${e}`).join('\n');
+    const examples = meta.examples.map((e) => `    example: ${e}`).join('\n');
     return `${meta.name} - ${meta.short}\n${examples}`;
 }
 
@@ -26,12 +26,15 @@ class Plugin {
 
     initialize() {
         this.rtm.on('message', (message) => {
-            message.reply = text => this.rtm.sendMessage(text, message.channel);
+            message.reply = (text) => {
+                this.rtm.sendMessage(text, message.channel);
+            };
             message.reply_thread = (text) => {
                 this.web.chat.postMessage(
                     message.channel,
                     text,
-                    { as_user: true, thread_ts: message.ts });
+                    { as_user: true, thread_ts: message.ts },
+                );
             };
 
             if (message.text != null) {

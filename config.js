@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 const config = {
 
@@ -18,8 +18,8 @@ const config = {
 
 
     plugins: [
-        path.join('plugins', 'ping.js')
-    ]
+        path.join('plugins', 'ping.js'),
+    ],
 
 };
 
