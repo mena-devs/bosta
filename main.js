@@ -1,13 +1,9 @@
 const path = require('path');
 
-const WebClient = require('@slack/client').WebClient;
-const RtmClient = require('@slack/client').RtmClient;
-const CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
+const { RTMClient } = require('@slack/rtm-api');
+const { WebClient } = require('@slack/web-api');
+const SlackHook = require("winston-slack-webhook-transport");
 const winston = require('winston');
-const winstonSlackTransport = require('winston-slack-transport');
-const glob = require('glob');
 
 const secret = require('./secret.json');
 const config = require('./config.js');
@@ -16,25 +12,26 @@ const utils = require('./utils.js');
 const values = o => Object.keys(o).map(k => o[k]);
 
 function main() {
-    const client = new RtmClient(secret.token);
+    const rtm = new RTMClient(secret.token);
     const web = new WebClient(secret.token);
     const plugins = {};
     let initialConnection = true;
     let bot;
 
-    // Adding custon transport for Winston
-    // in order to post logs into a specific channel
-    if (config.winston.enabled) {
-        winston.add(winstonSlackTransport, {
-            webhook_url: secret.winston_webhook,
-            channel: config.winston.channel,
-            username: config.winston.username,
-            level: config.winston.level,
-            handleExceptions: config.winston.handleExceptions,
-        });
-    }
+    const logger = winston.createLogger({
+        level: "info",
+        transports: [
+            new SlackHook({
+                webhookUrl: secret.winston_webhook,
+                channel: config.main.logging.channel,
+                username: config.main.logging.username,
+                level: config.main.logging.level,
+                handleExceptions: config.main.logging.handleExceptions,
+            })
+        ]
+    });
 
-    client.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (data) => {
+    rtm.on('authenticated', (data) => {
         bot = data;
 
         // Disable plugin reload on reconnect after connection failure
@@ -42,40 +39,42 @@ function main() {
             return;
         }
 
-        winston.info(`Team: ${data.team.name} > Name: ${data.self.name}`);
+        logger.info(`
+            > Team: ${data.team.name}
+            > Name: ${data.self.name}
+            > Prefix: ${config.main.prefix}
+        `);
 
-        glob.sync('./plugins/*.js').forEach((file) => {
+        config.plugins.forEach((file) => {
             const plugin = require(path.resolve(file));
-            plugin.register(data, client, web, config, secret);
+            plugin.register(data, rtm, web, config, secret);
             plugins[plugin.META.name] = utils.buildHelp(plugin.META);
         });
 
         plugins[''] = values(plugins).join('\n\n');
     });
 
-    client.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
+    rtm.on('connected', () => {
         if (!initialConnection) {
-            winston.info('Reconnected...');
+            logger.info('Reconnected...');
         } else {
-            winston.info('Locked and loaded!');
+            logger.info('Locked and loaded!');
             initialConnection = false;
         }
     });
 
-    client.on(RTM_EVENTS.MESSAGE, (message) => {
+    rtm.on('message', (message) => {
         if (message.text) {
             const pattern = /<@([^>]+)>:? help ?(.*)/;
             const [, target, topic] = message.text.match(pattern) || [];
 
             if (target === bot.self.id && plugins[topic]) {
-                client.sendMessage(
-                    utils.pre(plugins[topic]),
-                    message.channel);
+                rtm.sendMessage( utils.pre(plugins[topic]), message.channel);
             }
         }
     });
 
-    client.start();
+    rtm.start();
 }
 
 

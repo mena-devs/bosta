@@ -1,32 +1,17 @@
 {
   "name": "bosta",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js",
-    "test": "./node_modules/mocha/bin/mocha tests",
-    "lint": "./node_modules/eslint/bin/eslint.js ."
+    "start": "node main.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache 2.0",
   "dependencies": {
-    "@slack/client": "^3.8.1",
-    "figlet": "^1.2.0",
-    "glob": "^7.1.1",
-    "node-glob": "^1.2.0",
-    "node-persist": "^2.0.7",
-    "request": "^2.79.0",
-    "request-promise": "^4.2.0",
-    "spellchecker": "^3.3.1",
-    "winston": "^2.3.0",
-    "winston-slack-transport": "^2.0.0",
-    "wolfram-alpha": "^0.6.0"
-  },
-  "devDependencies": {
-    "eslint": "^4.18.2",
-    "eslint-config-airbnb-base": "^11.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "mocha": "^3.2.0"
+    "@slack/rtm-api": "^5.0.3",
+    "@slack/web-api": "^5.8.0",
+    "winston": "^3.2.1",
+    "winston-slack-webhook-transport": "^1.2.1"
   }
 }

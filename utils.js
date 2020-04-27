@@ -1,5 +1,3 @@
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-
 function buildHelp(meta) {
     const examples = meta.examples.map(e => `    example: ${e}`).join('\n');
     return `${meta.name} - ${meta.short}\n${examples}`;
@@ -27,7 +25,7 @@ class Plugin {
     }
 
     initialize() {
-        this.rtm.on(RTM_EVENTS.MESSAGE, (message) => {
+        this.rtm.on('message', (message) => {
             message.reply = text => this.rtm.sendMessage(text, message.channel);
             message.reply_thread = (text) => {
                 this.web.chat.postMessage(
