@@ -28,45 +28,49 @@ function main() {
         ],
     });
 
-    const loadPlugin = (plugin_path) => {
-        const filename = path.resolve(plugin_path)
+    const loadPlugin = (pluginPath) => {
+        const filename = path.resolve(pluginPath);
 
         // Needed, otherwise it'll load from cache
         delete require.cache[filename];
 
         const module = require(filename);
-        const plugin_events = module.events;
+        const pluginEvents = module.events;
         const listeners = {};
 
-        Object.entries(plugin_events).forEach(([name, func]) => {
-            const listener =  (payload) => {
-                func({logger, rtm, web}, payload);
-            }
+        Object.entries(pluginEvents).forEach(([name, func]) => {
+            const listener = (payload) => {
+                func({ logger, rtm, web }, payload);
+            };
+
             rtm.on(name, listener);
             listeners[name] = listener;
         });
 
         module.listeners = listeners;
 
-        if('init' in module)
-            module.init({logger, rtm, web});
+        if ('init' in module) {
+            module.init({ logger, rtm, web });
+        }
 
         return module;
-    }
+    };
 
-    config.plugins.forEach(plugin_path => {
-        let module = loadPlugin(plugin_path);
+    config.plugins.forEach((pluginPath) => {
+        let module = loadPlugin(pluginPath);
 
         // Hot reloads plugins.
-        fs.watchFile(plugin_path, (curr, prev) => {
-            logger.info(`${plugin_path} changed, reloading.`);
+        fs.watchFile(pluginPath, (curr, prev) => {
+            logger.info(`${pluginPath} changed, reloading.`);
             Object.entries(module.listeners).forEach(([name, listener]) => {
                 rtm.removeListener(name, listener);
             });
 
-            if('destroy' in module)
-                module.destroy({logger, rtm, web});
-            module = loadPlugin(plugin_path);
+            if ('destroy' in module) {
+                module.destroy({ logger, rtm, web });
+            }
+
+            module = loadPlugin(pluginPath);
         });
     });
 

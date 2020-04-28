@@ -11,6 +11,6 @@ module.exports = {
                 | Name: ${payload.self.name}
                 | Prefix: ${config.main.prefix}
             `);
-        }
-    }
-}
+        },
+    },
+};

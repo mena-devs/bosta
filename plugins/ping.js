@@ -1,3 +1,13 @@
+const { Router } = require('../utils.js');
+
+function ping(options, message) {
+    message.reply('pong');
+}
+
+function pingThem(options, message, target) {
+    message.reply(`${target} wake up!`);
+}
+
 module.exports = {
     name: 'ping',
     help: `
@@ -9,13 +19,14 @@ module.exports = {
     `,
 
     events: {
-        message: (options, payload) => {
-            const match = payload.text.match('^ping$') || [];
+        message: (options, message) => {
+            const router = new Router(options);
 
-            if (match.length > 0) {
-                options.rtm.sendMessage('new pong', payload.channel);
-            }
-        }
+            router.add(/^ping$/, ping);
+            router.add(/^ping (.+)/, pingThem);
+
+            router.dispatch(message);
+        },
     },
 
     init: (options) => {
@@ -24,5 +35,5 @@ module.exports = {
 
     destroy: (options) => {
         options.logger.info('destroying ping');
-    }
-}
+    },
+};
