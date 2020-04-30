@@ -8,6 +8,7 @@ const winston = require('winston');
 
 const secret = require('./secret.json');
 const config = require('./config.js');
+const utils = require('./utils.js');
 
 const values = (o) => Object.keys(o).map((k) => o[k]);
 
@@ -40,7 +41,7 @@ function main() {
 
         Object.entries(pluginEvents).forEach(([name, func]) => {
             const listener = (payload) => {
-                func({ logger, rtm, web }, payload);
+                func({ logger, rtm, web }, utils.patch(rtm, web, payload));
             };
 
             rtm.on(name, listener);

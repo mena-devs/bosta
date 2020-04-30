@@ -1,39 +1,27 @@
-const { Router } = require('../utils.js');
+const { match } = require('../objectron.js');
 
-function ping(options, message) {
-    message.reply('pong');
-}
+const help = `
+    Pings the bot, or well, people.
 
-function pingThem(options, message, target) {
-    message.reply(`${target} wake up!`);
-}
+    Examples:
+        ping
+        ping john
+`;
 
 module.exports = {
     name: 'ping',
-    help: `
-        Plugin: Help
-        Description: Pings the bot, or well, people.
-        Examples:
-            ping
-            ping john
-    `,
-
+    help,
     events: {
         message: (options, message) => {
-            const router = new Router(options);
+            match(message, {
+                type: 'message',
+                text: /^ping$/,
+            }, result => message.reply('pong'));
 
-            router.add(/^ping$/, ping);
-            router.add(/^ping (.+)/, pingThem);
-
-            router.dispatch(message);
+            match(message, {
+                type: 'message',
+                text: /^ping (?<who>.*)/,
+            }, result => message.reply(`${result.groups.who} wake up!`));
         },
-    },
-
-    init: (options) => {
-        options.logger.info('initializing ping');
-    },
-
-    destroy: (options) => {
-        options.logger.info('destroying ping');
     },
 };
