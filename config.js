@@ -3,7 +3,7 @@ const path = require('path');
 const config = {
 
     main: {
-        prefix: 'omar',
+        prefix: 'Remote',
         general_channel_id: 'C03B400RU',
         bot_test_channel_id: 'C1X3769UJ',
 
@@ -20,6 +20,7 @@ const config = {
     plugins: [
         path.join('plugins', 'auth.js'),
         path.join('plugins', 'ping.js'),
+        path.join('plugins', 'juju.js'),
     ],
 
 };
