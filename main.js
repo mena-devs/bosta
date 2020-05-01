@@ -61,7 +61,7 @@ function main() {
         let module = loadPlugin(pluginPath);
 
         // Hot reloads plugins.
-        fs.watchFile(pluginPath, (curr, prev) => {
+        fs.watchFile(pluginPath, {interval: 1000}, (curr, prev) => {
             logger.info(`${pluginPath} changed, reloading.`);
             Object.entries(module.listeners).forEach(([name, listener]) => {
                 rtm.removeListener(name, listener);
