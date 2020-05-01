@@ -1,4 +1,4 @@
-const { match } = require('../objectron.js');
+const match = require('@menadevs/objectron');
 
 const help = `
     Pings the bot, or well, people.
