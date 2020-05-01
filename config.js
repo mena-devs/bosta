@@ -18,7 +18,11 @@ const config = {
 
 
     plugins: [
+        // Core
         path.join('plugins', 'auth.js'),
+        path.join('plugins', 'help.js'),
+
+        // Other
         path.join('plugins', 'ping.js'),
         path.join('plugins', 'juju.js'),
     ],
