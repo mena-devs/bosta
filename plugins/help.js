@@ -1,8 +1,14 @@
 const path = require('path')
-const config = require('../config.js')
 const match = require('@menadevs/objectron')
 
-const help = 'Bot help plugin'
+const config = require('../config.js')
+const {
+  Blocks,
+  Section,
+  Markdown
+} = require('../blocks.js')
+
+const help = 'help plugin allows you, get help!'
 
 const plugins = config.plugins.filter(p => !p.includes('help.js')).map(p => {
   const plugin = require(path.resolve(p))
@@ -14,25 +20,13 @@ var buildBlocks = (plugin) => {
     // Fugly! => if a plugin was passed, filter, otherwise return all.
     return plugin ? plugin === p[0] : true
   }).map(([name, helpText]) => {
-    return {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `*${name}*\n${helpText}`
-      }
-    }
+    return `*${name}:* ${helpText}`
   })
 
   if (helps.length === 0) {
-    return [{
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `No such plugin: *${plugin}*`
-      }
-    }]
+    return Blocks(Section(Markdown(`No such plugin: *${plugin}*`)))
   } else {
-    return helps
+    return Blocks(Section(Markdown(helps.join('\n'))))
   }
 }
 

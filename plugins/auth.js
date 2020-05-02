@@ -33,7 +33,7 @@ var buildBlocks = (team, name, prefix, host) => {
 
 module.exports = {
   name: 'auth',
-  help: 'Plugin: Bot Auth',
+  help: 'authentication plugin, logs auth sequence to channel',
 
   events: {
     authenticated: (options, payload) => {

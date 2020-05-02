@@ -1,10 +1,8 @@
 const match = require('@menadevs/objectron')
 
-const help = 'Juju!'
-
 module.exports = {
   name: 'juju',
-  help,
+  help: 'what is bad juju?',
   events: {
     message: (options, message) => {
       match(message, {

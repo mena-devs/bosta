@@ -1,16 +1,8 @@
 const match = require('@menadevs/objectron')
 
-const help = `
-    Pings the bot, or well, people.
-
-    Examples:
-        ping
-        ping john
-`
-
 module.exports = {
   name: 'ping',
-  help,
+  help: 'see if the bot is alive, or ask it to ping others',
   events: {
     message: (options, message) => {
       match(message, {
