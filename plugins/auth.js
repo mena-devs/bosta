@@ -1,42 +1,34 @@
 const os = require('os');
 const config = require('../config.js');
+const {
+    Blocks,
+    Section,
+    Fields,
+    Context,
+    Divider,
+    PlainText,
+    Markdown,
+} = require('../blocks.js');
 
 var buildBlocks = (team, name, prefix, host) => {
     const plugins = config.plugins.map((plugin) => {
-        return { "type": "plain_text", "text": plugin };
+        return PlainText(plugin);
     });
 
-    return (
-        [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": `*Team:* ${team}\n*Name*: ${name}\n*Prefix*: ${prefix}\n*Host*: ${host}`
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Installed Plugins:*"
-                },
-                "fields": plugins,
-            },
-            {
-                "type": "divider"
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "mrkdwn",
-                        "text": "Locked and Loaded!"
-                    }
-                ]
-            }
-        ]
-    )
+    return Blocks(
+        Section(
+            Markdown(`*Team:* ${team}\n*Name*: ${name}\n*Prefix*: ${prefix}\n*Host*: ${host}`)
+        ),
+        Divider(),
+        Section(
+            Markdown("*Installed Plugins*"),
+            Fields(...plugins)
+        ),
+        Divider(),
+        Context(
+            Markdown("Locked and Loaded")
+        ),
+    );
 };
 
 module.exports = {
@@ -48,7 +40,7 @@ module.exports = {
 
             options.web.chat.postMessage({
                 channel: config.main.logging.channel,
-                blocks: buildBlocks(
+                'blocks': buildBlocks(
                     payload.team.name,
                     payload.self.name,
                     config.main.prefix,
