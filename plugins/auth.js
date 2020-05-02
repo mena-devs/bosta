@@ -17,16 +17,20 @@ var buildBlocks = (team, name, prefix, host) => {
 
   return Blocks(
     Section(
-      Markdown(`*Team:* ${team}\n*Name*: ${name}\n*Prefix*: ${prefix}\n*Host*: ${host}`)
+      Fields(
+        Markdown(`*Team:* ${team}`),
+        Markdown(`*Prefix*: ${prefix}`),
+        Markdown(`*Name*: ${name}`),
+        Markdown(`*Host*: ${host}`)
+      )
     ),
     Divider(),
     Section(
-      Markdown('*Installed Plugins*'),
       Fields(...plugins)
     ),
     Divider(),
     Context(
-      Markdown('Locked and Loaded')
+      Markdown(`Booted on: ${new Date()}`)
     )
   )
 }
