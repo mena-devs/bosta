@@ -1,6 +1,5 @@
-const rp = require('request-promise');
-const Plugin = require('../utils.js').Plugin;
-
+const rp = require('request-promise')
+const Plugin = require('../utils.js').Plugin
 
 const META = {
   name: 'lira',
@@ -8,9 +7,9 @@ const META = {
   examples: [
     'lira rate',
     'lira rate yesterday',
-    'lira inflation',
-  ],
-};
+    'lira inflation'
+  ]
+}
 
 /**
  * Gets the latest lira rate from http://tiny.cc/pkmlnz via Google Sheets API.
@@ -19,104 +18,104 @@ const META = {
  * @param {string} range
  * @param {string} apiKey
  */
-function fetchLatestRateFromSheet(sheetId, range, apiKey) {
+function fetchLatestRateFromSheet (sheetId, range, apiKey) {
   const requestOptions = {
     uri: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`,
     json: true
-  };
+  }
 
   const columnMap = {
-    'lastUpdateDay': 0,
-    'lastUpdateTime': 1,
-    'officialBuy': 2,
-    'officialSell': 3,
-    'parallelBuy': 4,
-    'parallelSell': 5,
-    'blackBuy': 6,
-    'blackSell': 7,
-    'analysis': 8
-  };
+    lastUpdateDay: 0,
+    lastUpdateTime: 1,
+    officialBuy: 2,
+    officialSell: 3,
+    parallelBuy: 4,
+    parallelSell: 5,
+    blackBuy: 6,
+    blackSell: 7,
+    analysis: 8
+  }
 
   return new Promise((resolve, reject) => {
     rp(requestOptions)
       .then((data) => {
-        if (typeof(data.values) != 'undefined' && data.values[0].length > 0) {
-          const values = data.values[0];
-          let fields = {};
+        if (typeof (data.values) !== 'undefined' && data.values[0].length > 0) {
+          const values = data.values[0]
+          const fields = {}
 
           Object.keys(columnMap).forEach((fieldName) => {
-            let columnValue = values[columnMap[fieldName]];
+            const columnValue = values[columnMap[fieldName]]
 
-            if(typeof(columnValue) != 'undefined' && columnValue != null) {
-              fields[fieldName] = columnValue;
+            if (typeof (columnValue) !== 'undefined' && columnValue != null) {
+              fields[fieldName] = columnValue
             } else {
-              fields[fieldName] = '';
+              fields[fieldName] = ''
             }
-          });
+          })
 
-          resolve(fields);
+          resolve(fields)
         } else {
           reject(
             new Error('Sheet structure not compatible with selected range')
-          );
+          )
         }
       })
       .catch((error) => {
         reject(
           new Error(`[${error.error.code}] ${error.error.message}`)
-        );
-      });
-  });
+        )
+      })
+  })
 }
 
 /**
- * Runs the lira rate command for fetching the latest lira rate 
+ * Runs the lira rate command for fetching the latest lira rate
  * @param {object} options
  * @param {string} message
  */
-function liraRate(options, message, day) {
-  const sheetId = '1_z0gtOy-Q8Pv4mOWkURpzjWkAlyc-ftI0JYHRHegoCw';
-  let range = 'USD!A2:R2';
+function liraRate (options, message, day) {
+  const sheetId = '1_z0gtOy-Q8Pv4mOWkURpzjWkAlyc-ftI0JYHRHegoCw'
+  let range = 'USD!A2:R2'
 
   // We can assume if there is a day parameter it would be yesterday
   // as it's hard coded in the router pattern for now
-  if (typeof(day) != 'undefined') {
-    range = 'USD!A3:R3';
+  if (typeof (day) !== 'undefined') {
+    range = 'USD!A3:R3'
   }
 
   fetchLatestRateFromSheet(sheetId, range, options.secret.sheets_api_key).then((data) => {
     const lines = [
-      `:money_with_wings: Black market: *BUY:* ${data['blackBuy']} *SELL:* ${data['blackSell']}`,
-      `:dollar: Parallel market: *BUY:* ${data['parallelBuy']} *SELL:* ${data['parallelSell']}`,
-      `:bank: Official: *BUY:* ${data['officialBuy']} *SELL:* ${data['officialSell']}`,
-      `>${ data['analysis'].replace(/[\r\n]+/gm, '\n>')}`,
-      `_Last updated: ${data['lastUpdateDay']} ${data['lastUpdateTime']} via shorturl.at/eKTV7 _`,
-    ];
+      `:money_with_wings: Black market: *BUY:* ${data.blackBuy} *SELL:* ${data.blackSell}`,
+      `:dollar: Parallel market: *BUY:* ${data.parallelBuy} *SELL:* ${data.parallelSell}`,
+      `:bank: Official: *BUY:* ${data.officialBuy} *SELL:* ${data.officialSell}`,
+      `>${data.analysis.replace(/[\r\n]+/gm, '\n>')}`,
+      `_Last updated: ${data.lastUpdateDay} ${data.lastUpdateTime} via shorturl.at/eKTV7 _`
+    ]
 
-    message.reply(lines.join('\n'));
+    message.reply(lines.join('\n'))
   }).catch((err) => {
-    message.reply(`:boom: Something is wrong with lira sheets API call: \n *${err.message}*`);
-  });
+    message.reply(`:boom: Something is wrong with lira sheets API call: \n *${err.message}*`)
+  })
 }
 
 /**
- * Try to check inflation rate. Or does it? :D 
+ * Try to check inflation rate. Or does it? :D
  * @param {object} options
  * @param {string} message
  */
-function liraInflation(options, message) {
-  const liras = new Array(20).fill('lira wara lira');
+function liraInflation (options, message) {
+  const liras = new Array(20).fill('lira wara lira')
 
-  message.reply(`${liras.join(', ')} Bosta wins! :muscle:`);
+  message.reply(`${liras.join(', ')} Bosta wins! :muscle:`)
 }
 
-function register(bot, rtm, web, config, secret) {
-  const plugin = new Plugin({ bot, rtm, web, config, secret });
-  plugin.route(/^lira rate( yesterday)?$/i, liraRate, {});
-  plugin.route(/^lira inflation$/i, liraInflation, {});
+function register (bot, rtm, web, config, secret) {
+  const plugin = new Plugin({ bot, rtm, web, config, secret })
+  plugin.route(/^lira rate( yesterday)?$/i, liraRate, {})
+  plugin.route(/^lira inflation$/i, liraInflation, {})
 }
 
 module.exports = {
-    META,
-    register,
-};
+  META,
+  register
+}

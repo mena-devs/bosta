@@ -1,21 +1,21 @@
-const https = require('https');
+const https = require('https')
 
-const RTM_EVENTS = require('@slack/client').RTM_EVENTS;
+const RTM_EVENTS = require('@slack/client').RTM_EVENTS
 
-const winston = require('winston');
+const winston = require('winston')
 
-const storage = require('node-persist');
+const storage = require('node-persist')
 
 const META = {
-    name: 'newuser',
-    short: 'Greets new users and sends them a copy of the code of conduct',
-    examples: [
-        'when a user joins #general they will be greeted privately',
-    ],
-};
+  name: 'newuser',
+  short: 'Greets new users and sends them a copy of the code of conduct',
+  examples: [
+    'when a user joins #general they will be greeted privately'
+  ]
+}
 
 // TODO :: Move this URL to the configuration file
-const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md';
+const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md'
 
 /**
  * Takes the UserList (Semi-Column sepearated String)
@@ -28,21 +28,21 @@ const cocURL = 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/mast
  *
  * @return {[type]} [description]
  */
-function prependUser(userList, maxItems, newUser) {
-    // Append to list only if newUser is not found
-    if (userList.indexOf(newUser) !== -1) {
-        return userList;
-    }
+function prependUser (userList, maxItems, newUser) {
+  // Append to list only if newUser is not found
+  if (userList.indexOf(newUser) !== -1) {
+    return userList
+  }
 
-    let splitMembers = userList.split(';');
+  let splitMembers = userList.split(';')
 
-    // -1 cause Arrays in JS start from the 0 index
-    if (splitMembers.length < maxItems - 1) {
-        splitMembers = splitMembers.slice(0, maxItems - 1);
-    }
+  // -1 cause Arrays in JS start from the 0 index
+  if (splitMembers.length < maxItems - 1) {
+    splitMembers = splitMembers.slice(0, maxItems - 1)
+  }
 
-    splitMembers.unshift(newUser);
-    return splitMembers.join(';');
+  splitMembers.unshift(newUser)
+  return splitMembers.join(';')
 }
 
 /**
@@ -52,8 +52,8 @@ function prependUser(userList, maxItems, newUser) {
  *
  * @return {[type]} [description]
  */
-function countMembers(userList) {
-    return userList.split(';').length;
+function countMembers (userList) {
+  return userList.split(';').length
 }
 
 /**
@@ -67,22 +67,22 @@ function countMembers(userList) {
  *
  * @return {[type]} [description]
  */
-function storeNewMember(config, newUserID) {
-    // Get the total number of users to store from the configuration
-    const maxRecentUsers = config.plugins.newuser.max_recent_users;
-    storage.init({ dir: config.plugins.system.recent_members_path })
-        .then(() => storage.getItem('recent_users'))
-        .then((users) => {
-            if (!users) {
-                storage.setItem('recent_users', newUserID)
-                    .then(() => winston.info(`Added ${newUserID} to storage!`));
-            } else {
-                // Append new user ID
-                const userList = prependUser(users, maxRecentUsers, newUserID);
-                storage.setItem('recent_users', userList)
-                    .then(() => winston.info('Recent members list updated!'));
-            }
-        });
+function storeNewMember (config, newUserID) {
+  // Get the total number of users to store from the configuration
+  const maxRecentUsers = config.plugins.newuser.max_recent_users
+  storage.init({ dir: config.plugins.system.recent_members_path })
+    .then(() => storage.getItem('recent_users'))
+    .then((users) => {
+      if (!users) {
+        storage.setItem('recent_users', newUserID)
+          .then(() => winston.info(`Added ${newUserID} to storage!`))
+      } else {
+        // Append new user ID
+        const userList = prependUser(users, maxRecentUsers, newUserID)
+        storage.setItem('recent_users', userList)
+          .then(() => winston.info('Recent members list updated!'))
+      }
+    })
 }
 
 /**
@@ -94,17 +94,17 @@ function storeNewMember(config, newUserID) {
  *
  * @return {String} Username associated the ID provided
  */
-function findUser(web, id) {
-    return new Promise((resolve, reject) => {
-        // Send a private message to the user with the CoC
-        web.users.info(id, (err, res) => {
-            if (err) {
-                reject(`I don't know of a ${id}`);
-            } else {
-                resolve(res.user.name);
-            }
-        });
-    });
+function findUser (web, id) {
+  return new Promise((resolve, reject) => {
+    // Send a private message to the user with the CoC
+    web.users.info(id, (err, res) => {
+      if (err) {
+        reject(`I don't know of a ${id}`)
+      } else {
+        resolve(res.user.name)
+      }
+    })
+  })
 }
 
 /**
@@ -112,23 +112,23 @@ function findUser(web, id) {
  *
  * @return {[type]} [description]
  */
-function retrieveCoC() {
-    return new Promise((resolve, reject) => {
-        https.get(cocURL, (res) => {
-            // Combine the chunks that are retrieved
-            const responseParts = [];
-            res.setEncoding('utf8');
-            res.on('data', (d) => {
-                responseParts.push(d);
-            });
-            // Combine the chunks and resolve
-            res.on('end', () => {
-                resolve(responseParts.join(''));
-            });
-        }).on('error', (e) => {
-            reject(`Could not retrieve CoC ${e}`);
-        });
-    });
+function retrieveCoC () {
+  return new Promise((resolve, reject) => {
+    https.get(cocURL, (res) => {
+      // Combine the chunks that are retrieved
+      const responseParts = []
+      res.setEncoding('utf8')
+      res.on('data', (d) => {
+        responseParts.push(d)
+      })
+      // Combine the chunks and resolve
+      res.on('end', () => {
+        resolve(responseParts.join(''))
+      })
+    }).on('error', (e) => {
+      reject(`Could not retrieve CoC ${e}`)
+    })
+  })
 }
 
 /**
@@ -140,21 +140,21 @@ function retrieveCoC() {
  *
  * @return {[type]} [description]
  */
-function privateMessage(web, receiver, message) {
-    return new Promise((resolve, reject) => {
-        // Send a private message to the user with the CoC
-        const msg = `Hi <@${receiver}>! \n\
+function privateMessage (web, receiver, message) {
+  return new Promise((resolve, reject) => {
+    // Send a private message to the user with the CoC
+    const msg = `Hi <@${receiver}>! \n\
 I'm *Bostantine Androidaou* MENA Dev's butler. I'm at your service, all you \
 gotta do is to call \`@bosta help\`. In the meantime, here's a message \
-from the admins: \n\n ${message}`;
-        web.chat.postMessage(receiver, msg, { as_user: true }, (err) => {
-            if (err) {
-                reject(`Welcome message could not be sent: ${err}`);
-            } else {
-                resolve(receiver);
-            }
-        });
-    });
+from the admins: \n\n ${message}`
+    web.chat.postMessage(receiver, msg, { as_user: true }, (err) => {
+      if (err) {
+        reject(`Welcome message could not be sent: ${err}`)
+      } else {
+        resolve(receiver)
+      }
+    })
+  })
 }
 
 /**
@@ -167,51 +167,51 @@ from the admins: \n\n ${message}`;
  *
  * @return {[type]} [description]
  */
-function register(bot, rtm, web, config) {
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-        if (message.subtype === 'channel_join'
-                && message.channel === config.main.general_channel_id) {
-            web.reactions.add('wave',
-                { channel: message.channel, timestamp: message.ts })
-                .catch((error) => {
-                    winston.error(`${META.name} - Channel Join - Error: ${error}`);
-                });
+function register (bot, rtm, web, config) {
+  rtm.on(RTM_EVENTS.MESSAGE, (message) => {
+    if (message.subtype === 'channel_join' &&
+                message.channel === config.main.general_channel_id) {
+      web.reactions.add('wave',
+        { channel: message.channel, timestamp: message.ts })
+        .catch((error) => {
+          winston.error(`${META.name} - Channel Join - Error: ${error}`)
+        })
 
-            retrieveCoC()
-                .then(data => privateMessage(web, message.user, data))
-                .then((user) => {
-                    storeNewMember(config, user);
-                    winston.info(`Sent greeting to: <@${user}>`);
-                })
-                .catch((error) => {
-                    winston.error(`${META.name} - Retrieve CoC - Error: ${error}`);
-                });
-        }
+      retrieveCoC()
+        .then(data => privateMessage(web, message.user, data))
+        .then((user) => {
+          storeNewMember(config, user)
+          winston.info(`Sent greeting to: <@${user}>`)
+        })
+        .catch((error) => {
+          winston.error(`${META.name} - Retrieve CoC - Error: ${error}`)
+        })
+    }
 
-        // Manual greet
-        if (message.text) {
-            const pattern = /<@([^>]+)>:? greet <@([^>]+)>:?/;
-            const [, target, userId] = message.text.match(pattern) || [];
-            const user = { id: userId, name: '' };
+    // Manual greet
+    if (message.text) {
+      const pattern = /<@([^>]+)>:? greet <@([^>]+)>:?/
+      const [, target, userId] = message.text.match(pattern) || []
+      const user = { id: userId, name: '' }
 
-            if (target === bot.self.id) {
-                findUser(web, user.id)
-                    .then((response) => { user.name = response; })
-                    .then(() => retrieveCoC())
-                    .then(data => privateMessage(web, user.id, data))
-                    .then((userRId) => {
-                        storeNewMember(config, userRId);
-                        winston.info(`Sent greeting to: <@${userRId}>`);
-                    })
-                    .catch((error) => {
-                        winston.error(`${META.name} - Manual Greet - Error: ${error}`);
-                    });
-            }
-        }
-    });
+      if (target === bot.self.id) {
+        findUser(web, user.id)
+          .then((response) => { user.name = response })
+          .then(() => retrieveCoC())
+          .then(data => privateMessage(web, user.id, data))
+          .then((userRId) => {
+            storeNewMember(config, userRId)
+            winston.info(`Sent greeting to: <@${userRId}>`)
+          })
+          .catch((error) => {
+            winston.error(`${META.name} - Manual Greet - Error: ${error}`)
+          })
+      }
+    }
+  })
 }
 
 module.exports = {
-    register,
-    META,
-};
+  register,
+  META
+}
