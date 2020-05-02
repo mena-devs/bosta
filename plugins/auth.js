@@ -31,9 +31,16 @@ var buildBlocks = (team, name, prefix, host) => {
   )
 }
 
+const verbose = `
+How to use this plugin:
+
+    You don't ;-)
+`
+
 module.exports = {
   name: 'auth',
   help: 'authentication plugin, logs auth sequence to channel',
+  verbose,
 
   events: {
     authenticated: (options, payload) => {
