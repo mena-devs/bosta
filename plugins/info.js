@@ -1,3 +1,4 @@
+const match = require('@menadevs/objectron')
 const os = require('os')
 const config = require('../config.js')
 const {
@@ -38,25 +39,33 @@ var buildBlocks = (team, name, prefix, host) => {
 const verbose = `
 How to use this plugin:
 
-    You don't ;-)
+    bot info
 `
 
 module.exports = {
-  name: 'auth',
-  help: 'authentication plugin, logs auth sequence to channel',
+  name: 'info',
+  help: 'bot information plugin',
   verbose,
 
   events: {
-    authenticated: (options, payload) => {
-      options.web.chat.postMessage({
-        channel: config.main.logging.channel,
-        blocks: buildBlocks(
-          payload.team.name,
-          payload.self.name,
-          config.main.prefix,
-          os.hostname()
-        )
-      })
+    message: (options, message) => {
+      match(message, {
+        type: 'message',
+        text: /^bot info$/
+      }, result => (async () => {
+        const teamPayload = await options.web.team.info()
+
+        options.web.chat.postMessage({
+          as_user: true,
+          channel: message.channel,
+          blocks: buildBlocks(
+            teamPayload.team.name,
+            'Bosta', // Where the hell do we get this from?
+            config.main.prefix,
+            os.hostname()
+          )
+        })
+      })())
     }
   }
 }

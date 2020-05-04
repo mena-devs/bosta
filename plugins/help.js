@@ -8,12 +8,10 @@ const {
   Markdown
 } = require('../blocks.js')
 
-const help = 'help plugin allows you, get help!'
+const help = 'get help!'
 const verbose = `
 How use this plugin:
     help
-    help ping
-    help wikipedia
 `
 
 const plugins = config.plugins.filter(p => !p.includes('help.js')).map(p => {
@@ -21,16 +19,9 @@ const plugins = config.plugins.filter(p => !p.includes('help.js')).map(p => {
   return [plugin.name, plugin.help, plugin.verbose]
 }).concat([['help', help, verbose]])
 
-var buildBlocks = (plugin) => {
-  const helps = plugins.filter(p => {
-    // Fugly! => if a plugin was passed, filter, otherwise return all.
-    return plugin ? plugin === p[0] : true
-  }).map(([name, helpText, verboseText]) => {
-    if (plugin) {
-      return `*${name}:* ${helpText}\n${verboseText}`
-    } else {
-      return `*${name}:* ${helpText}`
-    }
+const buildBlocks = (plugin) => {
+  const helps = plugins.map(([name, helpText, verboseText]) => {
+    return `*${name}:* ${helpText}`
   })
 
   if (helps.length === 0) {

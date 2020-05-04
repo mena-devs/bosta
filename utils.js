@@ -2,8 +2,8 @@ function pre (text) {
   return `\`\`\`${text}\`\`\``
 }
 
-function patch (rtm, web, message) {
-  message.reply = (text) => rtm.sendMessage(text, message.channel)
+function patch (web, message) {
+  message.reply = (text) => web.chat.postMessage({ channel: message.channel, text, as_user: true })
   message.reply_thread = (text) => {
     web.chat.postMessage(
       message.channel,
