@@ -5,6 +5,17 @@ module.exports = {
   Divider: () => { return { type: 'divider' } },
   Context: (...children) => { return { type: 'context', elements: children } },
   Fields: (...children) => { return { type: 'fields', fields: children } },
+  Button: (text, value) => {
+    return {
+      type: 'button',
+      text: {
+        type: 'plain_text',
+        text: text,
+        emoji: true
+      },
+      value
+    }
+  },
 
   Section: (...children) => {
     return {

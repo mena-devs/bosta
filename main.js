@@ -5,13 +5,15 @@ const express = require('express')
 
 const { WebClient } = require('@slack/web-api')
 const { createEventAdapter } = require('@slack/events-api')
+const { createMessageAdapter } = require('@slack/interactive-messages')
 
 const { logger } = require('./logging.js')
 const secret = require('./secret.json')
 const config = require('./config.js')
 const utils = require('./utils.js')
 
-const adapter = createEventAdapter(process.env.SLACK_SIGNING_SECRET)
+const eventsAdapter = createEventAdapter(process.env.SLACK_SIGNING_SECRET)
+const interactionsAdapter = createMessageAdapter(process.env.SLACK_SIGNING_SECRET)
 const web = new WebClient(secret.token)
 
 config.plugins.forEach(pluginPath => {
@@ -21,27 +23,25 @@ config.plugins.forEach(pluginPath => {
   delete require.cache[filename]
 
   const module = require(filename)
-  const pluginEvents = module.events
-  const listeners = {}
 
-  Object.entries(pluginEvents).forEach(([name, func]) => {
+  Object.entries(module.events).forEach(([name, func]) => {
     const listener = (payload) => func({ logger, web }, utils.patch(web, payload))
-
-    adapter.on(name, listener)
-    listeners[name] = listener
+    eventsAdapter.on(name, listener)
   })
 
-  module.listeners = listeners
+  if (module.actions) {
+    const actions = (payload, respond) => module.actions({ logger, web }, payload, respond)
+    interactionsAdapter.action({}, actions)
+  }
 
   if ('init' in module) {
     module.init({ logger, web })
   }
-
-  return module
 })
 
 const app = express()
-app.use('/slack/events', adapter.requestListener())
+app.use('/slack/events', eventsAdapter.requestListener())
+app.use('/slack/interactive', interactionsAdapter.requestListener())
 
 const server = createServer(app)
 const port = process.env.PORT || 3000

@@ -4,8 +4,10 @@ const match = require('@menadevs/objectron')
 const config = require('../config.js')
 const {
   Blocks,
-  Section,
-  Markdown
+  Button,
+  Divider,
+  Markdown,
+  Section
 } = require('../blocks.js')
 
 const help = 'get help!'
@@ -14,27 +16,55 @@ How use this plugin:
     help
 `
 
-const plugins = config.plugins.filter(p => !p.includes('help.js')).map(p => {
-  const plugin = require(path.resolve(p))
-  return [plugin.name, plugin.help, plugin.verbose]
-}).concat([['help', help, verbose]])
+const plugins = Object.fromEntries(
+  config.plugins.filter(
+    p => !p.includes('help.js')
+  ).map(p => {
+    const plugin = require(path.resolve(p))
+    return [plugin.name, plugin]
+  }).concat([['help', { name: 'help', help, verbose }]])
+)
 
-const buildBlocks = (plugin) => {
-  const helps = plugins.map(([name, helpText, verboseText]) => {
-    return `*${name}:* ${helpText}`
-  })
+const buildBlocks = () => {
+  const helps = Object.values(plugins).map((plugin) => Section(
+    Markdown(`*${plugin.name}:* ${plugin.help}`),
+    Button('Learn more', plugin.name)
+  ))
 
-  if (helps.length === 0) {
-    return Blocks(Section(Markdown(`No such plugin: *${plugin}*`)))
-  } else {
-    return Blocks(Section(Markdown(helps.join('\n'))))
-  }
+  return Blocks(...helps)
+}
+
+const buildHelpBlocks = (plugin) => {
+  const selected = plugins[plugin]
+  return Blocks(
+    Section(Markdown(`*${selected.name}:* ${selected.help}\n${selected.verbose}`)),
+    Divider()
+  )
 }
 
 module.exports = {
   name: 'help',
   help,
   verbose,
+
+  actions: (options, payload, respond) => {
+    match(payload, {
+      type: 'block_actions',
+      actions: [{
+        text: {
+          text: 'Learn more'
+        },
+        value: /(?<module>.*)/
+      }]
+    }, result => {
+      options.web.chat.postMessage({
+        channel: payload.container.channel_id,
+        blocks: buildHelpBlocks(result.groups.module),
+        as_user: true
+      })
+    })
+  },
+
   events: {
     message: (options, message) => {
       match(message, {
