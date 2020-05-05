@@ -7,21 +7,19 @@ const { WebClient } = require('@slack/web-api')
 const { createEventAdapter } = require('@slack/events-api')
 const { createMessageAdapter } = require('@slack/interactive-messages')
 
-const { logger } = require('./logging.js')
+const logger = require('./logging.js')
 const secret = require('./secret.json')
 const config = require('./config.js')
 const utils = require('./utils.js')
 
-const eventsAdapter = createEventAdapter(process.env.SLACK_SIGNING_SECRET)
-const interactionsAdapter = createMessageAdapter(process.env.SLACK_SIGNING_SECRET)
+const signingSecret = process.env.SLACK_SIGNING_SECRET
+
+const eventsAdapter = createEventAdapter(signingSecret)
+const interactionsAdapter = createMessageAdapter(signingSecret)
 const web = new WebClient(secret.token)
 
-config.plugins.forEach(pluginPath => {
+const plugins = config.plugins.map(pluginPath => {
   const filename = path.resolve(pluginPath)
-
-  // Needed, otherwise it'll load from cache
-  delete require.cache[filename]
-
   const module = require(filename)
 
   Object.entries(module.events).forEach(([name, func]) => {
@@ -29,14 +27,15 @@ config.plugins.forEach(pluginPath => {
     eventsAdapter.on(name, listener)
   })
 
-  if (module.actions) {
-    const actions = (payload, respond) => module.actions({ logger, web }, payload, respond)
-    interactionsAdapter.action({}, actions)
-  }
+  return module
+})
 
-  if ('init' in module) {
-    module.init({ logger, web })
-  }
+// Unlike events, interactions do not suppot multiple listeners
+// We have to use a single listener instead
+interactionsAdapter.action({}, (payload, respond) => {
+  plugins.filter(p => p.actions).forEach((plugin) => {
+    plugin.actions({ logger, web }, payload, respond)
+  })
 })
 
 const app = express()

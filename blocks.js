@@ -4,6 +4,7 @@ module.exports = {
   Markdown: (text) => { return { type: 'mrkdwn', text } },
   Divider: () => { return { type: 'divider' } },
   Context: (...children) => { return { type: 'context', elements: children } },
+  Actions: (...children) => { return { type: 'actions', elements: children } },
   Fields: (...children) => { return { type: 'fields', fields: children } },
   Button: (text, value) => {
     return {

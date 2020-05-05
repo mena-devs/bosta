@@ -28,7 +28,7 @@ const plugins = Object.fromEntries(
 const buildBlocks = () => {
   const helps = Object.values(plugins).map((plugin) => Section(
     Markdown(`*${plugin.name}:* ${plugin.help}`),
-    Button('Learn more', plugin.name)
+    Button('Learn more', `help ${plugin.name}`)
   ))
 
   return Blocks(...helps)
@@ -51,14 +51,11 @@ module.exports = {
     match(payload, {
       type: 'block_actions',
       actions: [{
-        text: {
-          text: 'Learn more'
-        },
-        value: /(?<module>.*)/
+        value: /help (?<module>.*)/
       }]
     }, result => {
       options.web.chat.postMessage({
-        channel: payload.container.channel_id,
+        channel: payload.user.id,
         blocks: buildHelpBlocks(result.groups.module),
         as_user: true
       })
@@ -70,19 +67,10 @@ module.exports = {
       match(message, {
         type: 'message',
         text: /^help$/
-      }, result => options.web.chat.postMessage({
-        channel: message.channel,
-        blocks: buildBlocks(),
-        as_user: true
-      }))
-
-      match(message, {
-        type: 'message',
-        text: /^help (?<plugin>.*)/
       }, result => {
         options.web.chat.postMessage({
           channel: message.channel,
-          blocks: buildBlocks(result.groups.plugin),
+          blocks: buildBlocks(),
           as_user: true
         })
       })

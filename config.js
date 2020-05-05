@@ -23,7 +23,11 @@ const config = {
 
     // Other
     path.join('plugins', 'ping.js'),
-    path.join('plugins', 'juju.js')
+    path.join('plugins', 'juju.js'),
+    path.join('plugins', 'wikipedia.js'),
+
+    // Examples
+    path.join('plugins', 'modal.js')
   ]
 
 }

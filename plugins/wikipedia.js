@@ -1,62 +1,53 @@
-const Plugin = require('../utils.js').Plugin
+const match = require('@menadevs/objectron')
+const fetch = require('node-fetch')
+const logger = require('../logging.js')
 
-const rp = require('request-promise')
-
-const winston = require('winston')
-
-const META = {
-  name: 'wikipedia',
-  short: 'pulls an extract from wikipedia',
-  examples: [
-    'wikipedia: foobar'
-  ]
-}
+const verbose = `
+How to use this plugin:
+    wikipedia: foobar
+`
 
 const API = '/w/api.php?format=json&redirects=1&action=query&prop=extracts&exintro=&explaintext=&titles='
 
-function wikipedia (title) {
-  const values = o => Object.keys(o).map(k => o[k])
+const wikipedia = (title) => {
+  const uri = `https://en.wikipedia.org${API}${encodeURIComponent(title)}`
 
-  const options = {
-    uri: `https://en.wikipedia.org${API}${encodeURIComponent(title)}`,
-    json: true
-  }
+  return new Promise(async (resolve, reject) => {
+    const response = await fetch(uri)
+    const json = await response.json()
 
-  return new Promise((resolve, reject) => {
-    rp(options)
-      .then((json) => {
-        if (json.query) {
-          const extract = values(json.query.pages)[0].extract
-          const pageId = values(json.query.pages)[0].pageid
-          const pageUrl = `https://en.wikipedia.org/?curid=${pageId}`
+    if (json.query) {
+      const extract = Object.values(json.query.pages)[0].extract
+      const pageId = Object.values(json.query.pages)[0].pageid
+      const pageUrl = `https://en.wikipedia.org/?curid=${pageId}`
 
-          if (extract) {
-            const text = extract.split('\n')[0]
-            resolve(`${text} ${pageUrl}`)
-          } else {
-            resolve(`Sorry, I could not find anything about ${title}`)
-          }
-        }
-      })
-      .catch(error => reject(error))
+      if (extract) {
+        const text = extract.split('\n')[0]
+        resolve(`${text} ${pageUrl}`)
+      } else {
+        resolve(`Sorry, I could not find anything about ${title}`)
+      }
+    }
   })
 }
 
-function handleWikipedia (options, message, text) {
-  wikipedia(text)
-    .then((extract) => {
-      message.reply(extract)
-    }).catch((error) => {
-      winston.error(`${META.name} Error: ${error}`)
-    })
-}
-
-function register (bot, rtm, web, config) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/^wikipedia: (.*)/, handleWikipedia, {})
-}
-
 module.exports = {
-  register,
-  META
+  name: 'wikipedia',
+  help: 'pulls an extract from wikipedia',
+  verbose,
+  events: {
+    message: (options, message) => {
+      match(message, {
+        type: 'message',
+        text: /^wikipedia: (?<topic>.*)/
+      }, result => {
+        wikipedia(result.groups.topic)
+          .then((extract) => {
+            message.reply(extract)
+          }).catch((error) => {
+            logger.error(`Wikipedia Error: ${error}`)
+          })
+      })
+    }
+  }
 }
