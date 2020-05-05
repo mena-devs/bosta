@@ -1,23 +1,17 @@
-const rp = require('request-promise')
-const winston = require('winston')
-const Plugin = require('../utils.js').Plugin
+const match = require('@menadevs/objectron')
+const fetch = require('node-fetch')
 
-const META = {
-  name: 'corona',
-  short: 'COVID-19 spread live statistics',
-  examples: [
-    '## Stats per country live',
-    'corona LB',
-    '## Stats per country by date',
-    'corona LB yesterday',
-    '## Worldwide stats',
-    'corona world'
-  ]
-}
+const api = { uri: 'https://api.covid19api.com/' }
 
-const api = {
-  uri: 'https://api.covid19api.com/'
-}
+const verbose = `
+How to use this plugin:
+    *Stats per country live*
+    corona LB
+    *Stats per country by date*
+    corona LB yesterday
+    *Worldwide stats*
+    corona world
+`
 
 /**
  * Fetch world summary
@@ -26,18 +20,13 @@ const api = {
  * @param {*} message
  * @param {*} query
  */
-function world (options, message, query) {
-  const request = {
-    url: `${api.uri}/world/total`,
-    json: true
-  }
+async function world (options, message, query) {
+  const url = `${api.uri}/world/total`
+  const response = await fetch(url)
+  const json = await response.json()
 
-  rp(request)
-    .then((json) => {
-      message.reply(`Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`)
-      message.reply('Source: https://covid19api.com/')
-    })
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
+  message.reply(`Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`)
+  message.reply('Source: https://covid19api.com/')
 }
 
 /**
@@ -47,24 +36,19 @@ function world (options, message, query) {
  * @param {*} message
  * @param {*} query
  */
-function yesterday (options, message, query) {
-  const request = {
-    url: `${api.uri}/total/country/${query}`,
-    json: true
-  }
+async function yesterday (options, message, query) {
+  const url = `${api.uri}/total/country/${query}`
+  const response = await fetch(url)
+  let json = await response.json()
 
-  rp(request)
-    .then((json) => {
-      json = json.slice(-2)[0]
+  json = json.slice(-2)[0]
 
-      let active = json.Active
+  let active = json.Active
 
-      if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
+  if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
 
-      message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
-      message.reply('Source: https://covid19api.com/')
-    })
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
+  message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
+  message.reply('Source: https://covid19api.com/')
 }
 
 /**
@@ -74,33 +58,40 @@ function yesterday (options, message, query) {
  * @param {*} message
  * @param {*} query
  */
-function live (options, message, query) {
-  const request = {
-    url: `${api.uri}/total/country/${query}`,
-    json: true
-  }
+async function live (options, message, query) {
+  const url = `${api.uri}/total/country/${query}`
+  const response = await fetch(url)
+  let json = await response.json()
 
-  rp(request)
-    .then((json) => {
-      json = json.slice(-1)[0]
-      let active = json.Active
+  json = json.slice(-1)[0]
+  let active = json.Active
 
-      if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
+  if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
 
-      message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
-      message.reply('Source: https://covid19api.com/')
-    })
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
-}
-
-function register (bot, rtm, web, config, secret) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/^[c|C]orona ([a-zA-Z]{2})$/, live, {})
-  plugin.route(/^[c|C]orona ([a-zA-Z]{2}) [y|Y]esterday$/, yesterday, {})
-  plugin.route(/^[c|C]orona [w|W]orld$/, world, {})
+  message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
+  message.reply('Source: https://covid19api.com/')
 }
 
 module.exports = {
-  register,
-  META
+  name: 'corona',
+  help: 'COVID-19 spread live statistics',
+  verbose,
+  events: {
+    message: (options, message) => {
+      match(message, {
+        type: 'message',
+        text: /^[c|C]orona (?<code>[a-zA-Z]{2})$/
+      }, (result) => live(options, message, result.groups.code))
+
+      match(message, {
+        type: 'message',
+        text: /^[c|C]orona (?<code>[a-zA-Z]{2}) [y|Y]esterday$/
+      }, (result) => yesterday(options, message, result.groups.code))
+
+      match(message, {
+        type: 'message',
+        text: /^[c|C]orona [w|W]orld$/
+      }, (result) => world(options, message))
+    }
+  }
 }

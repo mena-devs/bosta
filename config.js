@@ -26,6 +26,7 @@ const config = {
     path.join('plugins', 'juju.js'),
     path.join('plugins', 'wikipedia.js'),
     path.join('plugins', 'lira.js'),
+    path.join('plugins', 'corona.js'),
 
     // Examples
     path.join('plugins', 'modal.js')
