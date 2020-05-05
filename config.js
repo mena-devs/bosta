@@ -25,6 +25,7 @@ const config = {
     path.join('plugins', 'ping.js'),
     path.join('plugins', 'juju.js'),
     path.join('plugins', 'wikipedia.js'),
+    path.join('plugins', 'lira.js'),
 
     // Examples
     path.join('plugins', 'modal.js')
