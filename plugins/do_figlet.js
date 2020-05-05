@@ -1,31 +1,27 @@
+const match = require('@menadevs/objectron')
+const { pre } = require('../utils.js')
+
 const figlet = require('figlet')
 
-const pre = require('../utils.js').pre
-const Plugin = require('../utils.js').Plugin
-
-const META = {
-  name: 'figlet',
-  short: 'figlet-izes text',
-  examples: [
-    'figlet dany boy'
-  ]
-}
-
-function handleFiglet (options, message, text) {
-  figlet(text, (err, data) => {
-    if (!err) {
-      message.reply_thread(pre(data))
-    }
-  })
-}
-
-function register (bot, rtm, web, config) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/^figlet (.*)/, handleFiglet, {})
-}
+const verbose = `
+How to use this plugin:
+    figlet dany boy
+`
 
 module.exports = {
-  register,
-  META,
-  handleFiglet
+  name: 'figlet',
+  help: 'figletizes text',
+  verbose,
+  events: {
+    message: (options, message) => {
+      match(message, {
+        type: 'message',
+        text: /^figlet (?<what>.*)/
+      }, result => figlet(result.groups.what, (err, data) => {
+        if (!err) {
+          message.reply_thread(pre(data))
+        }
+      }))
+    }
+  }
 }

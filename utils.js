@@ -3,14 +3,18 @@ function pre (text) {
 }
 
 function patch (web, message) {
-  message.reply = (text) => web.chat.postMessage({ channel: message.channel, text, as_user: true })
-  message.reply_thread = (text) => {
-    web.chat.postMessage(
-      message.channel,
-      text,
-      { as_user: true, thread_ts: message.ts }
-    )
-  }
+  message.reply = (text) => web.chat.postMessage({
+    as_user: true,
+    channel: message.channel,
+    text
+  })
+
+  message.reply_thread = (text) => web.chat.postMessage({
+    as_user: true,
+    thread_ts: message.ts,
+    channel: message.channel,
+    text
+  })
 
   return message
 }

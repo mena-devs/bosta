@@ -24,6 +24,7 @@ const config = {
     // Other
     path.join('plugins', 'ping.js'),
     path.join('plugins', 'juju.js'),
+    path.join('plugins', 'do_figlet.js'),
     path.join('plugins', 'wikipedia.js'),
     path.join('plugins', 'lira.js'),
     path.join('plugins', 'corona.js'),
