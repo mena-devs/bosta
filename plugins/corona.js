@@ -1,19 +1,13 @@
 const rp = require('request-promise')
-const winston = require('winston')
-const Plugin = require('../utils.js').Plugin
+const match = require('@menadevs/objectron')
 
-const META = {
-  name: 'corona',
-  short: 'COVID-19 spread live statistics',
-  examples: [
-    '## Stats per country live',
-    'corona LB',
-    '## Stats per country by date',
-    'corona LB yesterday',
-    '## Worldwide stats',
-    'corona world'
-  ]
-}
+const verbose = `
+How to use this plugin:
+
+    corona LB
+    corona LB yesterday
+    corona world
+`
 
 const api = {
   uri: 'https://api.covid19api.com/'
@@ -26,7 +20,7 @@ const api = {
  * @param {*} message
  * @param {*} query
  */
-function world (options, message, query) {
+function world (message, options) {
   const request = {
     url: `${api.uri}/world/total`,
     json: true
@@ -37,7 +31,7 @@ function world (options, message, query) {
       message.reply(`Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`)
       message.reply('Source: https://covid19api.com/')
     })
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
+    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
 }
 
 /**
@@ -47,9 +41,9 @@ function world (options, message, query) {
  * @param {*} message
  * @param {*} query
  */
-function yesterday (options, message, query) {
+function byCountryYesterday (message, groups, options) {
   const request = {
-    url: `${api.uri}/total/country/${query}`,
+    url: `${api.uri}/total/country/${groups.country}`,
     json: true
   }
 
@@ -64,7 +58,7 @@ function yesterday (options, message, query) {
       message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
       message.reply('Source: https://covid19api.com/')
     })
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
+    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
 }
 
 /**
@@ -74,9 +68,9 @@ function yesterday (options, message, query) {
  * @param {*} message
  * @param {*} query
  */
-function live (options, message, query) {
+function byCountry (message, groups, options) {
   const request = {
-    url: `${api.uri}/total/country/${query}`,
+    url: `${api.uri}/total/country/${groups.country}`,
     json: true
   }
 
@@ -90,17 +84,37 @@ function live (options, message, query) {
       message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
       message.reply('Source: https://covid19api.com/')
     })
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
+    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
 }
 
-function register (bot, rtm, web, config, secret) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/^[c|C]orona ([a-zA-Z]{2})$/, live, {})
-  plugin.route(/^[c|C]orona ([a-zA-Z]{2}) [y|Y]esterday$/, yesterday, {})
-  plugin.route(/^[c|C]orona [w|W]orld$/, world, {})
+const events = {
+  message: (options, message) => {
+    match(message, {
+      type: 'message',
+      text: /^[c|C]orona (?<country>[a-zA-Z]{2})$/
+    }, result => {
+      return byCountry(message, result.groups, options)
+    })
+
+    match(message, {
+      type: 'message',
+      text: /^[c|C]orona (?<country>[a-zA-Z]{2}) [y|Y]esterday$/
+    }, result => {
+      return byCountryYesterday(message, result.groups, options)
+    })
+
+    match(message, {
+      type: 'message',
+      text: /^[c|C]orona [w|W]orld$/
+    }, result => {
+      return world(message, options)
+    })
+  }
 }
 
 module.exports = {
-  register,
-  META
+  name: 'corona',
+  help: 'COVID-19 spread live statistics',
+  verbose,
+  events
 }
