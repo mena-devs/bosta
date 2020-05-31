@@ -26,63 +26,63 @@ TBD
 
 - Ping
   - Simple ping/pong handler.
-  - [Docs](./Docs/ping.md)
+  - [Docs](./docs/ping.md)
 
 - Wikipedia
   - Fetches the _extract_ of a search from wikipedia and only displays the first line.
-  - [Docs](./Docs/wikipedia.md)
+  - [Docs](./docs/wikipedia.md)
 
 - Figlet
   - Generate text banners out of smaller ASCII characters.
-  - [Docs](./Docs/figlet.md)
+  - [Docs](./docs/figlet.md)
 
 - Sentiment Analysis
   - Provides sentiment analysis over a user's last N-messages.
-  - [Docs](./Docs/sentiment_analysis.md)
+  - [Docs](./docs/sentiment_analysis.md)
 
 - Spell Checker
   - Automatically check the spelling of words that are followed by `(sp?)`
-  - [Docs](./Docs/spell_checker.md)
+  - [Docs](./docs/spell_checker.md)
 
 - Tell-Me-About
   - A rudimentary, persistent, user-configured responder. It's purpose is to allow users to configure shortcuts to commonly used text.
-  - [Docs](./Docs/tell_me_about.md)
+  - [Docs](./docs/tell_me_about.md)
 
 - Snippets
   - The snippets plugin is capable of executing user submitted code and report back the results.
-  - [Docs](./Docs/snippets.md)
+  - [Docs](./docs/snippets.md)
 
 - User Requests
   - Takes a invite request from any MENA Devs member and pushes it to assigned admins for approval / rejection.
-  - [Docs](./Docs/user_requests.md)
+  - [Docs](./docs/user_requests.md)
 
 - Hacker News
   - Fetches up to (N) top stories from YCombinator's Hacker News.
-  - [Docs](./Docs/hacker_news.md)
+  - [Docs](./docs/hacker_news.md)
 
 - New User MOTD
   - Send a greeting to new members and push the MENA Dev's Code of Conduct to them in a private message.
-  - [Docs](./Docs/new_user_motd.md)
+  - [Docs](./docs/new_user_motd.md)
 
 - Lira
   - Fetches the latest LBP/USD rate
-  - [Docs](./Docs/lira.md)
+  - [Docs](./docs/lira.md)
 
 - Corona
   - Fetches the latest statistics around the spread of COVID-19.
-  - [Docs](./Docs/corona.md)
+  - [Docs](./docs/corona.md)
 
 - Wolfram|Alpha
   - Integrates with the computational knowledge engine Wolfram Alpha. Used to answer a variety of calculable questions.
-  - [Docs](./Docs/wolfram_alpha.md)
+  - [Docs](./docs/wolfram_alpha.md)
 
 - Karma
   - Manages virtual points that can be given to a user as symbolic appreciation for a contribution in the community.
-  - [Docs](./Docs/karma.md)
+  - [Docs](./docs/karma.md)
 
 - System Commands
   - System and telemetry commands to monitor and manage the bot remotely.
-  - [Docs](./Docs/system_commands.md)
+  - [Docs](./docs/system_commands.md)
 
 ## Contributing
 
