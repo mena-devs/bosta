@@ -12,8 +12,6 @@ function patch (rtm, web, message) {
     )
   }
   message.reply_blocks = (text, blocks) => {
-    console.dir(blocks, { depth: null })
-    // console.log(text, blocks)
     web.chat.postMessage({
       channel: message.channel,
       text: 'HNews',
