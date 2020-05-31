@@ -1,201 +1,95 @@
 # Bostantine Androidaou
+> [MENA-Devs](https://menadevs.com/)' Slack Greek Emperor
 
 [![Build Status](https://menadevs.semaphoreci.com/badges/bosta.svg?style=shields)](https://menadevs.semaphoreci.com/projects/bosta)
 
-## Synopsis
+Pluggable Slack bot that's running the show at MENA Devs' slack workspace. It's designed for ease of use with a simple architecture, and hot reloading of pluggins.
 
-[MENA-Devs](https://menadevs.com/)'s Slack Greek Emperor
+## Installation
 
-## Installation & Configuration
+```sh
+# 1. Install dependencies
+npm install
 
-Bosta has been tested with the following node version:
+# 2. Rename `secret.json.template` to `secret.json`
+mv secret.json.template secret.json
 
-```
-NodeJS v12.16.x LTS
-```
-
-Install the dependencies using:
-
-```
-$ npm install
+# 3. Start the bot with
+npm start
 ```
 
-Retrieve your bot token and add a custom incoming webhook (if winston is enabled in your configuration file) from slack and create a `secret.json` file as follows:
+## Slack Configuration Guide
 
-```
-{
-    "winston_webhook": "webhook-url-here",
-    "token": "your-bot-token-here",
-    "menadevs_api_token": "this is a token specific to MENA Devs purposes",
-    "wolframalpha_app_id": "APP_ID"
-}
-```
-
-then start the bot using
-
-```
-$ npm start
-```
-
-Plugins may have their own installation requirements that are covered as part
-of the plugin's own documentation.
-
-Alternatively, you can build and run bosta through docker. Simply make sure your `secret.json` is available and run the following commands:
-
-```
-$ docker build -t bosta:latest .
-$ docker run --rm -ti bosta:latest
-```
+TBD
 
 ## Available Plugins
 
-### Ping
+- Ping
+  - Simple ping/pong handler.
+  - [Docs](./Docs/ping.md)
 
-Simple ping/pong handler; you can change the text in the configuration file.
+- Wikipedia
+  - Fetches the _extract_ of a search from wikipedia and only displays the first line.
+  - [Docs](./Docs/wikipedia.md)
 
-### Wikipedia
+- Figlet
+  - Generate text banners out of smaller ASCII characters.
+  - [Docs](./Docs/figlet.md)
 
-Fetches the _extract_ of a search from wikipedia and only displays the first
-line. You can configure the amount of text displayed in the configuration file.
+- Sentiment Analysis
+  - Provides sentiment analysis over a user's last N-messages.
+  - [Docs](./Docs/sentiment_analysis.md)
 
-### Figlet
+- Spell Checker
+  - Automatically check the spelling of words that are followed by `(sp?)`
+  - [Docs](./Docs/spell_checker.md)
 
-Displays funky text.
+- Tell-Me-About
+  - A rudimentary, persistent, user-configured responder. It's purpose is to allow users to configure shortcuts to commonly used text.
+  - [Docs](./Docs/tell_me_about.md)
 
-### Sentiment Analysis
+- Snippets
+  - The snippets plugin is capable of executing user submitted code and report back the results.
+  - [Docs](./Docs/snippets.md)
 
-Provides sentiment analysis over a user's last N-messages. The plugin uses
-[DatumBox's Sentiment Analysis API](http://www.datumbox.com/api-sandbox/#!/Document-Classification/SentimentAnalysis_post_0)
- and you must provide the API key in your `secret.json`:
+- User Requests
+  - Takes a invite request from any MENA Devs member and pushes it to assigned admins for approval / rejection.
+  - [Docs](./Docs/user_requests.md)
 
-```json
-{
-    ...
-    "datumbox": "api-token-here"
-}
-```
+- Hacker News
+  - Fetches up to (N) top stories from YCombinator's Hacker News.
+  - [Docs](./Docs/hacker_news.md)
 
-### Spell Checker
+- New User MOTD
+  - Send a greeting to new members and push the MENA Dev's Code of Conduct to them in a private message.
+  - [Docs](./Docs/new_user_motd.md)
 
-This plugin will automatically check the spelling of words that are followed
-by `(sp?)`. Example:
+- Lira
+  - Fetches the latest LBP/USD rate
+  - [Docs](./Docs/lira.md)
 
-```
-John: This may end up being idiocyncracy(sp?). What did you see?
-Bosta: possible spelling for idiosyncracy: idiosyncrasy, idiosyncratic, ...
-```
+- Corona
+  - Fetches the latest statistics around the spread of COVID-19.
+  - [Docs](./Docs/corona.md)
 
-### Tell-Me-About
+- Wolfram|Alpha
+  - Integrates with the computational knowledge engine Wolfram Alpha. Used to answer a variety of calculable questions.
+  - [Docs](./Docs/wolfram_alpha.md)
 
-A rudimentary, persistent, user-configured responder. It's purpose is to allow
-users to configure shortcuts to commonly used text. Example:
+- Karma
+  - Manages virtual points that can be given to a user as symbolic appreciation for a contribution in the community.
+  - [Docs](./Docs/karma.md)
 
-```
-John: @bosta save sscce as: Short, Self Contained, Correct, Example. Read more
-about it here http://sscce.org/
-bosta: sscce saved.
-John: about sscce
-bosta: sscce: Short, Self Contained, Correct, Example. Read more
-about it here http://sscce.org/
-```
-
-### Snippets
-
-The snippets plugin is capable of executing user submitted snippets and report
-back the results:
-
-#### How to use?
-
-- When a user _shares_ a snippet and sets the language, if the bot supports
-that language, it will execute it and report back the result as a comment on
-the snippet itself.
-- The bot would also execute subsequent shares of the same snippet (changed or
-otherwise).
-- The user is capable of using the `:repeat:` emoji as a reaction to force a
-re-evaluation of the snippet.
-- You can check the language support using `snippets support`
-- You can check the language configuration using `snippets config <lang>`
-
-#### What are the concerns?
-
-- Is it safe? Yes, it's very safe; the bot uses containers to execute the
-snippets and as such your system is protected (hopefully, for the most part).
-- What about memory? The plugin allows you to control how much memory is
-allocated for every container/language.
-- What about infinite/long running operations? The plugin allows you to control
-the timeout for every container/language
-
-#### Dependencies
-
-System the snippet executor is heavily dependant on Docker, you will need to
-ensure that you have a working docker configuration. The bot was tested against
-the following versions:
-
-```
-Docker version 1.11.2
-docker-machine version 0.7.0
-```
-
-#### Configuration
-
-In order to allow the bot to execute commands, you need to make sure that you
-have the corresponding docker images specified in `config.json`:
-
-```
-"python": {
-    "command": "python",
-    "image": "python:latest",
-    "memory": 8,
-    "timeout": 4
-}
-```
-
-Simply install the proper image (in the example above `docker pull python:latest`)
-
-### User Requests
-
-This plugin takes a invite request from any MENA Devs member and pushes it to assigned admins for action.
-
-#### Supported Requests
-
-- Invitation request
-
-### Hacker News
-
-Retrieves up to (N) top stories from YCombinator's Hacker News
-
-### New User
-
-Manually triggered command to send a greeting to any member and push the MENA Dev's Code of Conduct to them in a private message sent by the Bot.
-
-### Lira
-
-TBD @aymanfarhat
-
-### WolframAlpha
-
-Integration with the computational knowledge engine. Used to answer a variety of calculable questions.
-
-#### Configuration
-
-The `secrets.json` file should contain a WolframAlpha app id as follows:
-
-```
-    "wolframalpha_app_id": "APP_ID"
-```
-
-### Karma
-
-Manages virtual points that can be given to a user as symbolic appreciation for a contribution in the community.
-
-### Corona
-
-Fetches the latest statistics around the spread of COVID-19. Source: https://covid19api.com/
-
----
+- System Commands
+  - System and telemetry commands to monitor and manage the bot remotely.
+  - [Docs](./Docs/system_commands.md)
 
 ## Contributing
 
 We would very much appreciate any and all contributions for this project. Nevertheless, in order for us to manage this repository efficiently, please review and abide by the contribution guidelines detailed in this document: [CONTRIBUTING.md](./CONTRIBUTING.md) before pushing your changes.
 
 This project does not require a Contributor License Agreement.
+
+## Meta
+
+Distributed under the Apache 2.0 license. See [LICENSE](./LICENSE) for more information.
