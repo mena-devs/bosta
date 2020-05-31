@@ -25,7 +25,8 @@ const config = {
     path.join('plugins', 'ping.js'),
     path.join('plugins', 'juju.js'),
     path.join('plugins', 'chmod.js'),
-    path.join('plugins', 'corona.js')
+    path.join('plugins', 'corona.js'),
+    path.join('plugins', 'hackernews.js')
   ]
 
 }

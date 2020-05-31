@@ -1,62 +1,42 @@
-const https = require('https')
-const winston = require('winston')
-const Plugin = require('../utils.js').Plugin
+const rp = require('request-promise')
+const match = require('@menadevs/objectron')
+const {
+  Blocks,
+  Section,
+  Fields,
+  Divider,
+  Markdown
+} = require('../blocks.js')
 
-const META = {
-  name: 'hackernews',
-  short: 'Retrieves top N stories from YC Hacker News',
-  examples: [
-    'hnews 10'
-  ]
-}
+const verbose = `
+How to use this plugin:
 
-const hnAPIURL = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty'
-const hnStoryURL = 'https://hacker-news.firebaseio.com/v0/item/<STORY_ID>.json?print=pretty'
+    hnews 10
+`
 
-function retrieveStories (nStories) {
+const hnAPI = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty'
+const hnStoryAPI = 'https://hacker-news.firebaseio.com/v0/item/'
+
+function retrieveStoryText (storyId, fields) {
   return new Promise((resolve, reject) => {
-    https.get(hnAPIURL, (res) => {
-      // Combine the chunks that are retrieved
-      const responseParts = []
-      res.setEncoding('utf8')
-      res.on('data', (d) => {
-        responseParts.push(d)
-      })
-      // Combine the chunks and resolve
-      res.on('end', () => {
-        const storyIDs = JSON.parse(responseParts.join(''))
-        resolve(storyIDs.slice(0, nStories))
-      })
-    }).on('error', (e) => {
-      reject(e)
-    })
-  })
-}
+    const request = {
+      url: `${hnStoryAPI}${storyId}.json?print=pretty`,
+      json: true
+    }
 
-function retrieveStoryText (storyID, fields) {
-  return new Promise((resolve, reject) => {
-    const customURL = hnStoryURL.replace(/<STORY_ID>/, storyID)
-    https.get(customURL, (res) => {
-      // Combine the chunks that are retrieved
-      const responseParts = []
-      res.setEncoding('utf8')
-      res.on('data', (d) => {
-        responseParts.push(d)
-      })
-      // Combine the chunks and resolve
-      res.on('end', () => {
-        const parsed = JSON.parse(responseParts.join(''))
-        const storyField = {
-          title: `${parsed.score} - ${parsed.title}`,
-          value: parsed.url,
-          short: false
-        }
+    rp(request)
+      .then((json) => {
+        const storyField = Section(
+          Fields(
+            Markdown(`*${json.score} - ${json.title}*`),
+            Markdown(`${json.url}`)
+          )
+        )
+        // Add to the list of stories fetched
         fields.push(storyField)
         resolve()
       })
-    }).on('error', (e) => {
-      reject(e)
-    })
+      .catch((error) => console.log(error))
   })
 }
 
@@ -65,6 +45,9 @@ function retrieveStoryDetails (storyIDs) {
     const fields = []
     const requests = []
 
+    // Loop over the stories and push retrieveStoryText() into
+    // an array so that we can fetch the data for all the stories
+    // and return only when all the jobs are done
     storyIDs.forEach((item) => {
       requests.push(retrieveStoryText(item, fields))
     })
@@ -73,44 +56,45 @@ function retrieveStoryDetails (storyIDs) {
   })
 }
 
-function hnews (options, message, nStories) {
-  if (nStories) {
-    retrieveStories(nStories)
-      .then(response => retrieveStoryDetails(response))
-      .then((response) => {
-        const attachment = {
-          as_user: true,
-          thread_ts: message.ts,
-          attachments: [
-            {
-              color: '#36a64f',
-              author_name: 'Bosta',
-              title: `Top ${nStories} Hacker News Stories`,
-              fields: response,
-              footer: 'Automation',
-              footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png'
-            }
-          ]
-        }
+function hnews (message, groups, options) {
+  if (isNaN(groups.count)) {
+    options.logger.error(`${module.exports.name}: You need to provide a number`)
+    return
+  }
 
-        // Post the message
-        options.web.chat.postMessage(message.channel, '', attachment, (err) => {
-          if (err) {
-            winston.error('HN Plugin Error:', err)
-          } else {
-            winston.info('Hackernews articles retrieved and pushed to relevant channel.')
-          }
-        })
-      })
+  const request = {
+    url: hnAPI,
+    json: true
+  }
+
+  rp(request)
+    .then((json) => retrieveStoryDetails(json.slice(0, groups.count)))
+    .then((stories) => {
+      // const storiesBlock = stories.join(',')
+      // Post the stories
+      message.reply_blocks('ABC', Blocks(
+        Section(
+          Markdown(':ycombinator: *Hacker News* :success:')
+        ),
+        Divider(),
+        ...stories
+      ))
+    })
+    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
+}
+
+const events = {
+  message: (options, message) => {
+    match(message, {
+      type: 'message',
+      text: /^hnews (?<count>[0-9]{1,2})?/
+    }, result => hnews(message, result.groups, options))
   }
 }
 
-function register (bot, rtm, web, config) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/^hnews ([0-9]+):?/, hnews, {})
-}
-
 module.exports = {
-  register,
-  META
+  name: 'hackernews',
+  help: 'Retrieves top N stories from YC Hacker News',
+  verbose,
+  events
 }

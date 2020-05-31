@@ -92,23 +92,17 @@ const events = {
     match(message, {
       type: 'message',
       text: /^[c|C]orona (?<country>[a-zA-Z]{2})$/
-    }, result => {
-      return byCountry(message, result.groups, options)
-    })
+    }, result => byCountry(message, result.groups, options))
 
     match(message, {
       type: 'message',
       text: /^[c|C]orona (?<country>[a-zA-Z]{2}) [y|Y]esterday$/
-    }, result => {
-      return byCountryYesterday(message, result.groups, options)
-    })
+    }, result => byCountryYesterday(message, result.groups, options))
 
     match(message, {
       type: 'message',
       text: /^[c|C]orona [w|W]orld$/
-    }, result => {
-      return world(message, options)
-    })
+    }, result => world(message, options))
   }
 }
 
