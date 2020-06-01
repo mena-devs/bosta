@@ -18,9 +18,100 @@ mv secret.json.template secret.json
 npm start
 ```
 
-## Slack Configuration Guide
+We recommend the usage of a process manager if you're planning to deploy Bosta. We are using [pm2](https://pm2.keymetrics.io/) for our setup.
 
-TBD
+## Slack Configuration
+
+This is where things get a little bit complex, we recommend that you go through [https://api.slack.com/start/building/bolt](https://api.slack.com/start/building/bolt) before you attempt the below so that you get enough context for each of the steps below:
+
+1. Create a slack app: [https://api.slack.com/apps?new_app=1&ref=bolt_start_hub](https://api.slack.com/apps?new_app=1&ref=bolt_start_hub)
+
+2. Give the app the scopes (permissions) below: [https://api.slack.com/apps/A012Y6E2WPQ/oauth?from=docs](https://api.slack.com/apps/A012Y6E2WPQ/oauth?from=docs)
+
+```
+app_mentions:read
+View messages that directly mention @bostalocalbd in conversations that the app is in
+
+channels:history
+View messages and other content in public channels that Bosta.Local.BD has been added to
+
+channels:join
+Join public channels in the workspace
+
+channels:read
+View basic information about public channels in the workspace
+
+chat:write
+Send messages as @bostalocalbd
+
+chat:write.customize
+Send messages as @bostalocalbd with a customized username and avatar
+
+chat:write.public
+Send messages to channels @bostalocalbd isn't a member of
+
+emoji:read
+View custom emoji in the workspace
+
+groups:history
+View messages and other content in private channels that Bosta.Local.BD has been added to
+
+im:history
+View messages and other content in direct messages that Bosta.Local.BD has been added to
+
+im:read
+View basic information about direct messages that Bosta.Local.BD has been added to
+
+im:write
+Start direct messages with people
+
+incoming-webhook
+Post messages to specific channels in Slack
+```
+
+3. Install the app: [https://api.slack.com/start/building/bolt#install](https://api.slack.com/start/building/bolt#install)
+
+4. (Optional) Enable app home: [https://api.slack.com/start/building/bolt#home](https://api.slack.com/start/building/bolt#home)
+
+5. Create an incoming webhook to be used with winston to push logs to a channel: [https://api.slack.com/messaging/webhooks](https://api.slack.com/messaging/webhooks)
+
+6. Enable events subscription by following this guide: [https://api.slack.com/events-api](https://api.slack.com/events-api) and make sure to subscribe to the following events:
+
+```
+message.channels
+A message was posted to a channel
+
+message.im
+A message was posted in a direct message channel
+```
+
+7. Configure the display information for your bot
+
+8. Update your `secret.json` file with the webhook you created in **step #5** and the OAuth token you got in **step #3**
+
+```
+{
+  ...
+  "winston_webhook": "https://hooks.slack.com/services/<...>",
+  "token": "xoxb-<...>",
+  ...
+}
+```
+
+## Local Development
+
+Obviously when you start with Bosta you will be doing local development. In addition to all the above and for the event subscription to work you will need a URL that is available through the internet. You will not get that just by running bosta locally.
+
+You have 2 options:
+
+1. Use [https://ngrok.com/](https://ngrok.com/)
+2. Setup a reverse proxy with ssh tunneling through your own publicly available server
+
+- **Option #1**: is easy and fast but if you're using the free version of ngrok, everytime you terminate the process a new URL is generated and you need to update the slack configuration and verify the new URL again.
+
+- **Option #2**: is more complicated to setup but offers a long term solution where your URL does not expire.
+
+- **Option #3**: is of course to purchase a license for ngrok which will solve the temporary URL problem.
 
 ## Available Plugins
 
