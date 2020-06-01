@@ -1,6 +1,7 @@
 eval/
 secret.json
 data/
+_storage/
 
 ### macOS ###
 *.DS_Store

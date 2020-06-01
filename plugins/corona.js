@@ -4,9 +4,9 @@ const match = require('@menadevs/objectron')
 const verbose = `
 How to use this plugin:
 
-    corona LB
-    corona LB yesterday
-    corona world
+  corona LB
+  corona LB yesterday
+  corona world
 `
 
 const api = {

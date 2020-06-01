@@ -13,7 +13,9 @@ const config = {
       username: 'Bosta',
       level: 'info',
       handleExceptions: true
-    }
+    },
+
+    karma_log: `${__dirname}/_storage/karma/`
   },
 
   plugins: [
@@ -26,7 +28,8 @@ const config = {
     path.join('plugins', 'juju.js'),
     path.join('plugins', 'chmod.js'),
     path.join('plugins', 'corona.js'),
-    path.join('plugins', 'hackernews.js')
+    path.join('plugins', 'hackernews.js'),
+    path.join('plugins', 'karma.js')
   ]
 
 }
