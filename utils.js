@@ -14,7 +14,7 @@ function patch (rtm, web, message) {
   message.reply_blocks = (text, blocks) => {
     web.chat.postMessage({
       channel: message.channel,
-      text: 'HNews',
+      text: text,
       blocks: blocks,
       as_user: true,
       thread_ts: message.ts
