@@ -29,7 +29,8 @@ const config = {
     path.join('plugins', 'chmod.js'),
     path.join('plugins', 'corona.js'),
     path.join('plugins', 'hackernews.js'),
-    path.join('plugins', 'karma.js')
+    path.join('plugins', 'karma.js'),
+    path.join('plugins', 'do_figlet.js')
   ]
 
 }
