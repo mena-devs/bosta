@@ -87,7 +87,7 @@ const events = {
 
     match(message, {
       type: 'message',
-      text: /^\-(?<points>[1-5]) <@(?<user>[^>]+)>:?/
+      text: /^-(?<points>[1-5]) <@(?<user>[^>]+)>:?/
     }, result => updateKarma(message, result.groups, options, 'decrement'))
 
     match(message, {
