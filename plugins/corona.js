@@ -30,8 +30,7 @@ function world (message, options) {
     .then((json) => {
       message.reply(`Confirmed: ${json.TotalConfirmed}, Deaths: ${json.TotalDeaths}, Recovered: ${json.TotalRecovered}`)
       message.reply('Source: https://covid19api.com/')
-    })
-    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
+    }).catch(error => options.logger.error(`${module.exports.name}: ${error}`))
 }
 
 /**
@@ -57,8 +56,7 @@ function byCountryYesterday (message, groups, options) {
 
       message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
       message.reply('Source: https://covid19api.com/')
-    })
-    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
+    }).catch(error => options.logger.error(`${module.exports.name}: ${error}`))
 }
 
 /**
@@ -83,8 +81,7 @@ function byCountry (message, groups, options) {
 
       message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
       message.reply('Source: https://covid19api.com/')
-    })
-    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
+    }).catch(error => options.logger.error(`${module.exports.name}: ${error}`))
 }
 
 const events = {
