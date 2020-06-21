@@ -7,9 +7,9 @@ const match = require('@menadevs/objectron')
 const verbose = `
 How to use this plugin:
 
-  .respawn
-  .uptime
-  .recents
+    .respawn
+    .uptime
+    .recents
 `
 
 /**
