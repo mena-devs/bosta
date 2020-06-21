@@ -18,7 +18,7 @@ function updateKarma (message, groups, options, proceedure) {
     return
   }
 
-  storage.init({ dir: config.main.karma_log })
+  storage.init({ dir: config.karma.karma_log })
     .then(() => storage.getItem(groups.user))
     .then((currentKarma) => {
       // Update the Karma for the receiver
@@ -68,7 +68,7 @@ function updateKarma (message, groups, options, proceedure) {
 }
 
 function getKarma (message, groups, options) {
-  return storage.init({ dir: config.main.karma_log })
+  return storage.init({ dir: config.karma.karma_log })
     .then(() => storage.getItem(groups.user))
     .then((currentKarma) => {
       if (!currentKarma) {
