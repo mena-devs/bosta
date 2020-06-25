@@ -5,11 +5,12 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "standard"
+    "test": "mocha"
   },
   "author": "",
   "license": "Apache 2.0",
   "dependencies": {
+    "@dguttman/wolfram-alpha-api": "^1.0.0-rc.1",
     "@menadevs/objectron": "^0.1.14",
     "@slack/rtm-api": "^5.0.3",
     "@slack/web-api": "^5.8.0",
@@ -21,6 +22,8 @@
     "winston-slack-webhook-transport": "^1.2.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
     "standard": "^14.3.3"
   }
 }
