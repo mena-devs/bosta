@@ -40,7 +40,8 @@ const config = {
     path.join('plugins', 'karma.js'),
     path.join('plugins', 'do_figlet.js'),
     path.join('plugins', 'newuser.js'),
-    path.join('plugins', 'system.js')
+    path.join('plugins', 'system.js'),
+    path.join('plugins', 'wolframalpha.js')
   ]
 
 }

@@ -1,88 +1,103 @@
-const https = require('https')
-const winston = require('winston')
-const Plugin = require('../utils.js').Plugin
+const WolframAlphaAPI = require('@dguttman/wolfram-alpha-api')
+const match = require('@menadevs/objectron')
+const secret = require('../secret.json')
+const {
+  Blocks,
+  Section,
+  Image,
+  Divider,
+  Markdown
+} = require('../blocks.js')
 
-var wolfram = require('wolfram-alpha')
+const verbose = `
+How to use this plugin:
 
-const META = {
-  name: 'wolframalpha',
-  short: 'Execute a computation using WolframAlpha\'s API',
-  examples: [
-    '## Shortened Output (Default)',
-    'wa integrate 2x',
-    'wa pi to 100 digits',
-    'wa length of the Eiffel tower',
-    '## Verbose Output',
-    'wav integrate 2x'
-  ]
-}
+    wa integrate 2x
+    wa pi to 100 digits
+    wa height of the Eiffel tower
+`
 
-function buildAttachement (results, verboseOutput) {
-  return new Promise((resolve, reject) => {
-    let fields = []
-    const outputText = results.length == 0 ? "Couldn't compute your request" : ''
-    const timestamp = Math.floor(new Date() / 1000)
+const wolfram = WolframAlphaAPI(secret.wolframalpha_app_id)
 
-    if (!results.length == 0) {
-      if (verboseOutput) {
-        fields = results.map(function (obj) {
-          var rObj = {}
-          rObj.title = obj.title
-          rObj.value = obj.subpods[0].text
-          rObj.image = obj.subpods[0].image
-          rObj.short = false
-          return rObj
-        })
-      } else {
-        fields = [{
-          title: results[0].title,
-          value: results[0].subpods[0].text
-        },
-        {
-          title: results[1].title,
-          value: results[1].subpods[0].text,
-          image: results[1].subpods[0].image
-        }]
+/**
+ * Builds a blocks response in accordance with Slack's API
+ * for a cleaner UI: https://api.slack.com/block-kit
+ *
+ * @param {*} response
+ */
+function buildBlocks (response) {
+  if (!response.success) {
+    return Blocks(
+      Section(
+        Markdown('Could not compute your query.')
+      )
+    )
+  }
+
+  const blocks = Blocks(
+    Section(
+      Markdown(':wolframalpha: *Wolfram|Alpha Output:* :success:')
+    ),
+    Divider()
+  )
+  response.pods.forEach((pod) => {
+    blocks.push(
+      Section(
+        Markdown(`*${pod.title}*`)
+      )
+    )
+    pod.subpods.forEach((subpod) => {
+      // Display the image only if there's no plain text alternative
+      if (subpod.img && !subpod.img.title) {
+        blocks.push(
+          Image(subpod.img.src, subpod.img.alt)
+        )
+      } else if (subpod.img.title) {
+        blocks.push(
+          Section(
+            Markdown(`\`\`\`${subpod.img.title}\`\`\``)
+          )
+        )
       }
-    }
-
-    const outputImage = results.length == 0 ? '' : fields[1].image
-
-    resolve({
-      as_user: true,
-      attachments: [{
-        text: outputText,
-        color: '#36a64f',
-        author_name: 'Bosta',
-        fields: fields,
-        image_url: outputImage,
-        footer: 'Wolfram|Alpha',
-        footer_icon: 'https://platform.slack-edge.com/img/default_application_icon.png',
-        ts: timestamp
-      }]
     })
   })
+  return JSON.stringify(blocks)
 }
 
-function waQuery (options, message, query, routeOptions) {
-  if (!query) {
-    message.reply('I got nothing to compute')
-    return
+/**
+ * Dispatches query to Wolfram|Alpha using their REST API
+ * and returns a custom message to the user in a thread
+ *
+ * @param {*} message
+ * @param {*} groups
+ * @param {*} options
+ */
+function wa (message, groups, options) {
+  return wolfram.getFull({
+    input: groups.query,
+    output: 'json'
+  })
+    .then((response) => {
+      return buildBlocks(response)
+    })
+    .then((blocks) => {
+      message.reply_blocks('ABC', blocks)
+    })
+    .catch(error => options.logger.error(`${module.exports.name}: ${error}`))
+}
+
+const events = {
+  message: (options, message) => {
+    match(message, {
+      type: 'message',
+      text: /^wa (?<query>.+[^)])?/
+    }, result => wa(message, result.groups, options))
   }
-  wolfram.query(query)
-    .then(results => buildAttachement(results, routeOptions.verboseOutput))
-    .then(attachment => options.web.chat.postMessage(message.channel, '', attachment))
-    .catch(error => winston.error(`${META.name} Error: ${error}`))
-}
-
-function register (bot, rtm, web, config, secret) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  wolfram = wolfram.createClient(secret.wolframalpha_app_id)
-  plugin.route(/^wa (.+[^)])$/, waQuery, { verboseOutput: false })
-  plugin.route(/^wav (.+[^)])$/, waQuery, { verboseOutput: true })
 }
 
 module.exports = {
-  register,
-  META
+  name: 'wolframalpha',
+  help: 'Run a computation using WolframAlpha\'s API',
+  verbose,
+  events
 }

@@ -15,7 +15,7 @@ function main () {
   const web = new WebClient(secret.token)
 
   const logger = winston.createLogger({
-    level: 'info',
+    level: 'trace',
     transports: [
       new SlackHook({
         webhookUrl: secret.winston_webhook,
