@@ -2,6 +2,7 @@ module.exports = {
   Blocks: (...children) => { return children },
   PlainText: (text, emoji) => { return { type: 'plain_text', text, emoji } },
   Markdown: (text) => { return { type: 'mrkdwn', text } },
+  Image: (source, altText) => { return { type: 'image', image_url: source, alt_text: altText } },
   Divider: () => { return { type: 'divider' } },
   Context: (...children) => { return { type: 'context', elements: children } },
   Fields: (...children) => { return { type: 'fields', fields: children } },
