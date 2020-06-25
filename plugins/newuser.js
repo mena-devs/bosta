@@ -45,7 +45,7 @@ from the admins: \n\n ${message}`
  * @param {*} options
  * @param {*} userId
  */
-function addUserToRecentsList(options, userId) {
+function addUserToRecentsList (options, userId) {
   return storage.init({ dir: config.newuser.recent_users_store })
     .then(() => storage.getItem('list'))
     .then((recentUsersList) => {
@@ -58,7 +58,7 @@ function addUserToRecentsList(options, userId) {
       if (!recentUsersList.includes(userId)) {
         recentUsersList.push(userId)
         // Store only up to N number of users defined in max_recent_users variable
-        // slice(-N) will guarantee that only the latest N users are returned 
+        // slice(-N) will guarantee that only the latest N users are returned
         // from the array for storage
         storage.setItem('list', recentUsersList.slice(-config.newuser.max_recent_users))
       }
@@ -74,7 +74,7 @@ function addUserToRecentsList(options, userId) {
  * @param {*} groups
  * @param {*} options
  */
-function greetUser(message, groups, options) {
+function greetUser (message, groups, options) {
   // Only trigger if the user joins #general
   if (groups.channelId === mainChannel) {
     // Add a wave emoji as a general greeting

@@ -19,7 +19,7 @@ How to use this plugin:
  * @param {*} message
  * @param {*} options
  */
-function executeRespawn(message, options) {
+function executeRespawn (message, options) {
   message.reply(`<@${message.user}> ordered a respawn! :thinking_face:`)
 
   // Execute the reboot order with 'forever'
@@ -33,7 +33,7 @@ function executeRespawn(message, options) {
 }
 
 /**
- * Fetch the uptime of Bosta process on the server. We use forver to manage the 
+ * Fetch the uptime of Bosta process on the server. We use forver to manage the
  * process so we can fetch uptime from it.
  *
  * This will throw an error if you're running bosta locally without using
@@ -42,7 +42,7 @@ function executeRespawn(message, options) {
  * @param {*} message
  * @param {*} options
  */
-function getUptime(message, options) {
+function getUptime (message, options) {
   cp.exec('forever list --plain', (error, stdout) => {
     if (error) {
       options.logger.error(`${module.exports.name}: uptime could not be fetched. ${pre(error)}`)
@@ -59,7 +59,7 @@ function getUptime(message, options) {
  * @param {*} message
  * @param {*} options
  */
-function getRecentsList(message, options) {
+function getRecentsList (message, options) {
   return storage.init({ dir: config.newuser.recent_users_store })
     .then(() => storage.getItem('list'))
     .then((recentUsersList) => {
