@@ -12,7 +12,7 @@ const secret = require('./secret.json')
 const config = require('./config.js')
 const utils = require('./utils.js')
 
-const signingSecret = process.env.SLACK_SIGNING_SECRET
+const signingSecret = process.env.SLACK_SIGNING_SECRET || secret.slack_signing_secret
 
 const eventsAdapter = createEventAdapter(signingSecret)
 const interactionsAdapter = createMessageAdapter(signingSecret)
