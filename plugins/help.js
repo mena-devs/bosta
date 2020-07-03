@@ -4,64 +4,73 @@ const match = require('@menadevs/objectron')
 const config = require('../config.js')
 const {
   Blocks,
-  Section,
-  Markdown
+  Button,
+  Divider,
+  Markdown,
+  Section
 } = require('../blocks.js')
 
-const help = 'help plugin allows you, get help!'
+const help = 'get help!'
 const verbose = `
 How use this plugin:
     help
-    help ping
-    help wikipedia
 `
 
-const plugins = config.plugins.filter(p => !p.includes('help.js')).map(p => {
-  const plugin = require(path.resolve(p))
-  return [plugin.name, plugin.help, plugin.verbose]
-}).concat([['help', help, verbose]])
+const plugins = Object.fromEntries(
+  config.plugins.filter(
+    p => !p.includes('help.js')
+  ).map(p => {
+    const plugin = require(path.resolve(p))
+    return [plugin.name, plugin]
+  }).concat([['help', { name: 'help', help, verbose }]])
+)
 
-var buildBlocks = (plugin) => {
-  const helps = plugins.filter(p => {
-    // Fugly! => if a plugin was passed, filter, otherwise return all.
-    return plugin ? plugin === p[0] : true
-  }).map(([name, helpText, verboseText]) => {
-    if (plugin) {
-      return `*${name}:* ${helpText}\n${verboseText}`
-    } else {
-      return `*${name}:* ${helpText}`
-    }
-  })
+const buildBlocks = () => {
+  const helps = Object.values(plugins).map((plugin) => Section(
+    Markdown(`*${plugin.name}:* ${plugin.help}`),
+    Button('Learn more', `help ${plugin.name}`)
+  ))
 
-  if (helps.length === 0) {
-    return Blocks(Section(Markdown(`No such plugin: *${plugin}*`)))
-  } else {
-    return Blocks(Section(Markdown(helps.join('\n'))))
-  }
+  return Blocks(...helps)
+}
+
+const buildHelpBlocks = (plugin) => {
+  const selected = plugins[plugin]
+  return Blocks(
+    Section(Markdown(`*${selected.name}:* ${selected.help}\n${selected.verbose}`)),
+    Divider()
+  )
 }
 
 module.exports = {
   name: 'help',
   help,
   verbose,
+
+  actions: (options, payload, respond) => {
+    match(payload, {
+      type: 'block_actions',
+      actions: [{
+        value: /help (?<module>.*)/
+      }]
+    }, result => {
+      options.web.chat.postMessage({
+        channel: payload.user.id,
+        blocks: buildHelpBlocks(result.groups.module),
+        as_user: true
+      })
+    })
+  },
+
   events: {
     message: (options, message) => {
       match(message, {
         type: 'message',
         text: /^help$/
-      }, result => options.web.chat.postMessage({
-        channel: message.channel,
-        blocks: buildBlocks(),
-        as_user: true
-      }))
-
-      match(message, {
-        type: 'message',
-        text: /^help (?<plugin>.*)/
       }, result => {
         options.web.chat.postMessage({
           channel: message.channel,
-          blocks: buildBlocks(result.groups.plugin),
+          blocks: buildBlocks(),
           as_user: true
         })
       })

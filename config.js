@@ -28,7 +28,7 @@ const config = {
 
   plugins: [
     // Core
-    path.join('plugins', 'auth.js'),
+    path.join('plugins', 'info.js'),
     path.join('plugins', 'help.js'),
 
     // Other
@@ -41,7 +41,9 @@ const config = {
     path.join('plugins', 'do_figlet.js'),
     path.join('plugins', 'newuser.js'),
     path.join('plugins', 'system.js'),
-    path.join('plugins', 'wolframalpha.js')
+    path.join('plugins', 'wolframalpha.js'),
+    path.join('plugins', 'wikipedia.js'),
+    path.join('plugins', 'lira.js')
   ]
 
 }

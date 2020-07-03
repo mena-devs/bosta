@@ -5,7 +5,19 @@ module.exports = {
   Image: (source, altText) => { return { type: 'image', image_url: source, alt_text: altText } },
   Divider: () => { return { type: 'divider' } },
   Context: (...children) => { return { type: 'context', elements: children } },
+  Actions: (...children) => { return { type: 'actions', elements: children } },
   Fields: (...children) => { return { type: 'fields', fields: children } },
+  Button: (text, value) => {
+    return {
+      type: 'button',
+      text: {
+        type: 'plain_text',
+        text: text,
+        emoji: true
+      },
+      value
+    }
+  },
 
   Section: (...children) => {
     return {
