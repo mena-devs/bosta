@@ -181,6 +181,19 @@ We would very much appreciate any and all contributions for this project. Nevert
 
 This project does not require a Contributor License Agreement.
 
+## Frequent Problems
+
+### RequestError: Error: unable to get local issuer certificate
+
+This error pops up because the API provider has a misconfigured SSL certificate. At the moment there are no plans to change providers. The following is a workaround until the issue is permanently resolved:
+
+```
+# Run bosta with the flag: NODE_TLS_REJECT_UNAUTHORIZED
+env NODE_TLS_REJECT_UNAUTHORIZED=0 \
+    DEBUG=true \
+    npm start
+```
+
 ## Meta
 
 Distributed under the Apache 2.0 license. See [LICENSE](./LICENSE) for more information.
