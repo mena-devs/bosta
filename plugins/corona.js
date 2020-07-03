@@ -9,15 +9,9 @@ How to use this plugin:
     corona world
 `
 
-const verbose = `
-How to use this plugin:
-    *Stats per country live*
-    corona LB
-    *Stats per country by date*
-    corona LB yesterday
-    *Worldwide stats*
-    corona world
-`
+const api = {
+  uri: 'https://api.covid19api.com/'
+}
 
 /**
  * Fetch world summary
@@ -52,11 +46,13 @@ function byCountryYesterday (message, groups, options) {
     json: true
   }
 
-  json = json.slice(-2)[0]
+  rp(request)
+    .then((json) => {
+      json = json.slice(-2)[0]
 
-  let active = json.Active
+      let active = json.Active
 
-  if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
+      if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
 
       message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
       message.reply('Source: https://covid19api.com/')
@@ -76,10 +72,12 @@ function byCountry (message, groups, options) {
     json: true
   }
 
-  json = json.slice(-1)[0]
-  let active = json.Active
+  rp(request)
+    .then((json) => {
+      json = json.slice(-1)[0]
+      let active = json.Active
 
-  if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
+      if (active === 0) { active = json.Confirmed - (json.Deaths + json.Recovered) }
 
       message.reply(`Confirmed: ${json.Confirmed}, Deaths: ${json.Deaths}, Recovered: ${json.Recovered}, Active: ${active}, Date: ${json.Date}`)
       message.reply('Source: https://covid19api.com/')
