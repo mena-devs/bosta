@@ -25,7 +25,11 @@ const config = {
     max_recent_users: 10,
     recent_users_store: `${__dirname}/_storage/newusers/`
   },
-
+  userrequests: {
+    invitation_request_channel: 'G1H574PK7',
+    tilde_api_uri: 'https://menadevs.com/api/v1/invitations'
+  },
+  // Loaded plugins
   plugins: [
     // Core
     path.join('plugins', 'info.js'),
@@ -47,6 +51,6 @@ const config = {
     path.join('plugins', 'wikipedia.js'),
     path.join('plugins', 'lira.js')
   ]
-};
+}
 
-module.exports = config;
+module.exports = config
