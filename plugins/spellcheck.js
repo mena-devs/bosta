@@ -1,16 +1,14 @@
 const checker = require('spellchecker')
+const match = require('@menadevs/objectron')
 
-const Plugin = require('../utils.js').Plugin
+const verbose = `
+How to use this plugin:
 
-const META = {
-  name: 'spellchecker',
-  short: 'spell checks any word in a sentence',
-  examples: [
-    'it is constittutionolly(sp?) illegal'
-  ]
-}
+  It is constittutionolly(sp?) illegal
+  Only got an hour of dayligth(sp?) left. Better get started
+  `
 
-function spell (options, message, word) {
+function spell (message, word) {
   const wrong = checker.isMisspelled(word)
   const result = checker.getCorrectionsForMisspelling(word)
 
@@ -23,12 +21,19 @@ function spell (options, message, word) {
   }
 }
 
-function register (bot, rtm, web, config) {
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/(\w+)\(sp\?\)/, spell, {})
+const events = {
+  message: (options, message) => {
+    match(message, {
+      type: 'message',
+      text: /(?<word>\w+)\(sp\?\)/
+    }, result => spell(message, result.groups.word))
+  }
 }
 
 module.exports = {
-  register,
-  META
+  name: 'spellcheck',
+  help: 'see if the bot is alive, or ask it to ping others',
+  verbose,
+  events,
+  spell
 }

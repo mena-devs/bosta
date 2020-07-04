@@ -7,7 +7,7 @@ const {
   Image,
   Divider,
   Markdown
-} = require('../blocks.js')
+} = require('../blocks')
 
 const verbose = `
 How to use this plugin:

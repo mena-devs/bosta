@@ -1,4 +1,5 @@
 # Bostantine Androidaou
+
 > [MENA-Devs](https://menadevs.com/)' Slack Greek Emperor
 
 [![Build Status](https://menadevs.semaphoreci.com/badges/bosta.svg?style=shields)](https://menadevs.semaphoreci.com/projects/bosta)
@@ -75,25 +76,30 @@ Post messages to specific channels in Slack
 
 5. Create an incoming webhook to be used with winston to push logs to a channel: [https://api.slack.com/messaging/webhooks](https://api.slack.com/messaging/webhooks)
 
-6. Enable events subscription by following this guide: [https://api.slack.com/events-api](https://api.slack.com/events-api) and make sure to subscribe to the following events:
+6. Enable events subscription by following this guide: [https://api.slack.com/events-api](https://api.slack.com/events-api).
 
-```
-message.channels
-A message was posted to a channel
+   a. it is required to enter a "Request URL" that is available through the internet in this page. Slack uses this url to send HTTP POST requests when events occur - Details on how to generate this url can be found in the "Local Development" section (e.g. `http://1g0flm41cd32.ngrok.io/slack/events`)
 
-message.im
-A message was posted in a direct message channel
-```
+   b. make sure to subscribe to the following events:
+
+   ```
+   message.channels
+   A message was posted to a channel
+
+   message.im
+   A message was posted in a direct message channel
+   ```
 
 7. Configure the display information for your bot
 
-8. Update your `secret.json` file with the webhook you created in **step #5** and the OAuth token you got in **step #3**
+8. Update your `secret.json` file with the webhook you created in **step #5**, the OAuth token you got in **step #3**, and the Singing Secret, which can be retrieved from your slack app settings, under "App Credentials" in the Basic information page
 
 ```
 {
   ...
   "winston_webhook": "https://hooks.slack.com/services/<...>",
   "token": "xoxb-<...>",
+  "slack_signing_secret": "..."
   ...
 }
 ```
@@ -116,58 +122,72 @@ You have 2 options:
 ## Available Plugins
 
 - Ping
+
   - Simple ping/pong handler.
   - [Docs](./docs/ping.md)
 
 - Wikipedia
+
   - Fetches the _extract_ of a search from wikipedia and only displays the first line.
   - [Docs](./docs/wikipedia.md)
 
 - Figlet
+
   - Generate text banners out of smaller ASCII characters.
   - [Docs](./docs/figlet.md)
 
 - Sentiment Analysis
+
   - Provides sentiment analysis over a user's last N-messages.
   - [Docs](./docs/sentiment_analysis.md)
 
 - Spell Checker
+
   - Automatically check the spelling of words that are followed by `(sp?)`
   - [Docs](./docs/spell_checker.md)
 
 - Tell-Me-About
+
   - A rudimentary, persistent, user-configured responder. It's purpose is to allow users to configure shortcuts to commonly used text.
   - [Docs](./docs/tell_me_about.md)
 
 - Snippets
+
   - The snippets plugin is capable of executing user submitted code and report back the results.
   - [Docs](./docs/snippets.md)
 
 - User Requests
+
   - Takes a invite request from any MENA Devs member and pushes it to assigned admins for approval / rejection.
   - [Docs](./docs/user_requests.md)
 
 - Hacker News
+
   - Fetches up to (N) top stories from YCombinator's Hacker News.
   - [Docs](./docs/hacker_news.md)
 
 - New User MOTD
+
   - Send a greeting to new members and push the MENA Dev's Code of Conduct to them in a private message.
   - [Docs](./docs/new_user_motd.md)
 
 - Lira
+
   - Fetches the latest LBP/USD rate
   - [Docs](./docs/lira.md)
 
 - Corona
+
   - Fetches the latest statistics around the spread of COVID-19.
   - [Docs](./docs/corona.md)
 
 - Wolfram|Alpha
+
   - Integrates with the computational knowledge engine Wolfram Alpha. Used to answer a variety of calculable questions.
   - [Docs](./docs/wolfram_alpha.md)
 
 - Karma
+
   - Manages virtual points that can be given to a user as symbolic appreciation for a contribution in the community.
   - [Docs](./docs/karma.md)
 

@@ -42,6 +42,7 @@ const config = {
     path.join('plugins', 'newuser.js'),
     path.join('plugins', 'system.js'),
     path.join('plugins', 'wolframalpha.js'),
+    path.join('plugins', 'spellcheck.js'),
     path.join('plugins', 'wikipedia.js'),
     path.join('plugins', 'lira.js')
   ]
