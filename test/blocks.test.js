@@ -1,7 +1,5 @@
 const match = require('@menadevs/objectron')
-const assert = require('chai').assert
-const suite = require('mocha').suite
-const test = require('mocha').test
+
 const {
   Blocks,
   Section,
@@ -10,8 +8,8 @@ const {
   Markdown
 } = require('../blocks.js')
 
-suite('Bosta Core Tests', () => {
-  test('Successful Section, Markdown, Divider blocks generation', () => {
+describe('Bosta Core Tests', () => {
+  it('Successful Section, Markdown, Divider blocks generation', () => {
     /**
      * This exepected to be transformed to valid a JSON object as expected
      * by the Slack's API
@@ -63,11 +61,11 @@ suite('Bosta Core Tests', () => {
       groups: {}
     }
 
-    assert.isTrue(result.match)
-    assert.deepEqual(result, expected)
+    expect(result.match).toBeTruthy()
+    expect(result).toEqual(expected)
   })
 
-  test('Successful Section, Markdown, Divider, Image blocks generation', () => {
+  it('Successful Section, Markdown, Divider, Image blocks generation', () => {
     /**
      * This exepected to be transformed to valid a JSON object as expected
      * by the Slack's API
@@ -125,8 +123,7 @@ suite('Bosta Core Tests', () => {
       },
       groups: {}
     }
-
-    assert.isTrue(result.match)
-    assert.deepEqual(result, expected)
+    expect(result.match).toBeTruthy()
+    expect(result).toEqual(expected)
   })
 })

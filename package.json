@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "mocha"
+    "test": "jest"
   },
   "author": "",
   "license": "Apache 2.0",
@@ -16,19 +16,19 @@
     "@slack/interactive-messages": "^1.6.0",
     "@slack/rtm-api": "^5.0.3",
     "@slack/web-api": "^5.8.0",
-    "node-persist": "^3.0.5",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.5",
     "express": "^4.17.1",
     "figlet": "^1.4.0",
     "node-fetch": "^2.6.0",
+    "node-persist": "^3.0.5",
     "pm2": "^4.4.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
+    "spellchecker": "^3.7.0",
     "winston": "^3.2.1",
     "winston-slack-webhook-transport": "^1.2.1"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^8.0.1",
+    "jest": "^26.1.0",
     "standard": "^14.3.3"
   }
 }
