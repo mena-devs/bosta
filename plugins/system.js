@@ -1,6 +1,6 @@
 const cp = require('child_process')
 const config = require('../config')
-const pre = require('../utils.js').pre
+const { pre } = require('../utils.js')
 const storage = require('node-persist')
 const match = require('@menadevs/objectron')
 
