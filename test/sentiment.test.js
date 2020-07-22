@@ -1,4 +1,3 @@
-// const { findUser, getTargetChannel, getUserMessagesInChannel, analyseSentiment, analyse } = require('../plugins/sentiment')
 const sentiment = require('../plugins/sentiment')
 
 jest.mock('node-fetch')
@@ -185,16 +184,197 @@ describe('analyseSentiment function', () => {
 describe('analyse function', () => {
   const reply_thread = jest.fn()
   const message = {
-    reply_thread
+    reply_thread,
+    channel: '1234'
   }
-  it('should call find user and return a message that the name passed does not belong to a user', async () => {
-    jest.spyOn(sentiment, 'findUser').mockImplementation(
-      () => {
-        console.log('kousa')
+
+  it('should reply that the name passed does not belong to a user', async () => {
+    const list = jest.fn().mockReturnValue({
+        members: []
+      })
+    
+      const options = {
+          web : {
+            users: { list }
+          }
       }
-    )
-    const analyseResult = await sentiment.analyse({}, message, 'John')
-    expect(sentiment.findUser).toHaveBeenCalled()
-    expect(json).toHaveBeenCalled()
+
+    const analyseResult = await sentiment.analyse(options, message, 'John')
+    expect(reply_thread).toHaveBeenCalledWith(`I don't know of a John. Please validate you entered the correct person's name.`)
+  })
+
+  it('should reply that the channel or group is invalid', async () => {
+    const listUsers = jest.fn().mockReturnValue({
+        members: [
+            {
+              profile: {
+                display_name: 'bosta'
+              }
+            },
+            {
+              profile: {
+                display_name: 'John'
+              }
+            }
+          ]
+      })
+
+      const listChannels = jest.fn().mockReturnValue({
+        channels: []
+      })
+    
+      
+      const options = {
+          web : {
+              users: { list: listUsers },
+              conversations: { list: listChannels }
+          }
+      }
+
+    const analyseResult = await sentiment.analyse(options, message, 'John')
+    expect(reply_thread).toHaveBeenCalledWith(`Are you in a channel or group? sentiment doesn\'t work in a direct message.`)
+  })
+
+  it('should reply that the person has not spoken recently', async () => {
+    const listUsers = jest.fn().mockReturnValue({
+        members: [
+            {
+              profile: {
+                display_name: 'bosta'
+              }
+            },
+            {
+              profile: {
+                display_name: 'John'
+              }
+            }
+          ]
+      })
+
+      const listChannels = jest.fn().mockReturnValue({
+        channels: [
+            {
+              id: '1234',
+              is_archived: false
+            },
+            {
+              id: '5677',
+              is_archived: false
+            },
+            {
+              id: '9999',
+              is_archived: true
+            }
+          ]
+      })
+
+      const history = jest.fn().mockReturnValue({
+        messages: []
+      })   
+      
+      const options = {
+          web : {
+              users: { list: listUsers },
+              conversations: { list: listChannels, history }
+          }
+      }
+
+    const analyseResult = await sentiment.analyse(options, message, 'John')
+    expect(reply_thread).toHaveBeenCalledWith(`User John has not spoken recently.`)
+  })
+
+  it('should call the sentiments api and return a proper sentiment result', async () => {
+    const listUsers = jest.fn().mockReturnValue({
+        members: [
+            {
+              profile: {
+                display_name: 'bosta'
+              }
+            },
+            {
+                id: 'user1',
+              profile: {
+                display_name: 'John',
+              }
+            }
+          ]
+      })
+
+      const listChannels = jest.fn().mockReturnValue({
+        channels: [
+            {
+              id: '1234',
+              is_archived: false
+            },
+            {
+              id: '5677',
+              is_archived: false
+            },
+            {
+              id: '9999',
+              is_archived: true
+            }
+          ]
+      })
+
+      const history = jest.fn().mockReturnValue({
+        messages: [
+            {
+                user: '1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              },
+              {
+                user: 'user1'
+              }
+        ]
+      })   
+      
+      const options = {
+          web : {
+              users: { list: listUsers },
+              conversations: { list: listChannels, history }
+          }
+      }
+
+      const json = jest.fn().mockReturnValue({output: {result: 'positive'}})
+      const fetch = require('node-fetch').mockImplementation(
+        () => {
+          return {
+            json
+          }
+        }
+      )
+
+    const analyseResult = await sentiment.analyse(options, message, 'John')
+    expect(reply_thread).toHaveBeenCalledWith(`John has recently been positive.`)
   })
 })

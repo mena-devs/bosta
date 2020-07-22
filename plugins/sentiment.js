@@ -61,6 +61,12 @@ async function analyseSentiment (messages) {
   return jsonResult
 }
 
+/**
+ * analyse the user messages in a channel or group
+ * @param {*} options 
+ * @param {*} message 
+ * @param {*} target 
+ */
 async function analyse (options, message, target) {
   try {
     const user = await findUser(options.web.users, target)
@@ -71,19 +77,18 @@ async function analyse (options, message, target) {
 
     const targetChannel = await getTargetChannel(options.web.conversations, message.channel)
     if (!targetChannel) {
-      message.reply_thread('Are you in a channel or group? sentiment doesn\'t work in a direct message')
+      message.reply_thread('Are you in a channel or group? sentiment doesn\'t work in a direct message.')
       return
     }
 
     const messages = await getUserMessagesInChannel(options.web.conversations, targetChannel, user)
     if (messages.length !== 0) {
       const response = await analyseSentiment(messages.map(m => m.text).join('\n'))
-      message.reply_thread(`${target} has recently been ${response.output.result}`)
+      message.reply_thread(`${target} has recently been ${response.output.result}.`)
     } else {
-      message.reply_thread(`'User ${target} has not spoken recently'`)
+      message.reply_thread(`User ${target} has not spoken recently.`)
     }
   } catch (error) {
-    console.error(error)
     message.reply_thread(`Something went wrong! this has nothing to do with the sentiments of ${target}. Please check the logs.`)
     options.logger.error(`${module.exports.name} - something went wrong. Here's the error: ${pre(error)}`)
   }
