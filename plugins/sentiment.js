@@ -42,13 +42,14 @@ async function getTargetChannel (conversations, channel) {
  */
 async function getUserMessagesInChannel (conversations, channel, user) {
   const { messages } = await conversations.history({ channel: channel.id, limit: 1000 })
+  // fetching first 10 messages from the list of messages
   const lastTenMessagesByUser = messages.filter(message => message.user === user.id).slice(0, 10)
 
   return lastTenMessagesByUser
 }
 
 /**
- * Send the messages to the api and return response
+ * send the messages to the api and return response
  * @param {*} secret
  * @param {*} messages
  */
@@ -114,3 +115,4 @@ module.exports = {
   analyseSentiment,
   analyse
 }
+
