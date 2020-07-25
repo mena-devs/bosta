@@ -32,7 +32,7 @@ const events = {
 
 module.exports = {
   name: 'spellcheck',
-  help: 'see if the bot is alive, or ask it to ping others',
+  help: 'spell checks any word in a sentence',
   verbose,
   events,
   spell

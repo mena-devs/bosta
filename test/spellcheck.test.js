@@ -1,13 +1,13 @@
-const {spell} = require('../plugins/spellcheck')
+const { spell } = require('../plugins/spellcheck')
 const { isMisspelled } = require('spellchecker')
 
 jest.mock('spellchecker')
 
-afterEach(() => { 
-    jest.clearAllMocks();
+afterEach(() => {
+  jest.clearAllMocks()
 })
 describe('spellcheck spell function', () => {
-    const replyThreadMock = jest.fn();
+  const replyThreadMock = jest.fn()
   it('should call isMisspelled, getCorrectionsForMisspelling with the passed word, and return that the value is spelled correctly', () => {
     const isMisspelledMock = jest.fn().mockReturnValue(false)
     const getCorrectionsForMisspellingMock = jest.fn()
@@ -17,7 +17,7 @@ describe('spellcheck spell function', () => {
     const message = {
       type: 'message',
       text: 'daylight(sp?) savings',
-      reply_thread: replyThreadMock,
+      reply_thread: replyThreadMock
     }
     const word = 'daylight'
     spell(message, word)
@@ -35,11 +35,11 @@ describe('spellcheck spell function', () => {
     const message = {
       type: 'message',
       text: 'daylight(sp?) savings',
-      reply_thread: replyThreadMock,
+      reply_thread: replyThreadMock
     }
     const word = 'daylightblabla'
     spell(message, word)
-   expect(replyThreadMock).toHaveBeenCalledWith(`I don't know how to fix daylightblabla`)
+    expect(replyThreadMock).toHaveBeenCalledWith('I don\'t know how to fix daylightblabla')
   })
 
   it('should return possible spelling for word', () => {
@@ -51,10 +51,10 @@ describe('spellcheck spell function', () => {
     const message = {
       type: 'message',
       text: 'daylight(sp?) savings',
-      reply_thread: replyThreadMock,
+      reply_thread: replyThreadMock
     }
     const word = 'daylightblabla'
     spell(message, word)
-   expect(replyThreadMock).toHaveBeenCalledWith(`possible spelling for daylightblabla: daylight, day-light`)
+    expect(replyThreadMock).toHaveBeenCalledWith('possible spelling for daylightblabla: daylight, day-light')
   })
 })

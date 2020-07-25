@@ -68,6 +68,9 @@ Start direct messages with people
 
 incoming-webhook
 Post messages to specific channels in Slack
+
+users: read
+View people in the workspace
 ```
 
 3. Install the app: [https://api.slack.com/start/building/bolt#install](https://api.slack.com/start/building/bolt#install)
