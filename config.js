@@ -1,7 +1,6 @@
-const path = require('path')
+const path = require('path');
 
 const config = {
-
   main: {
     prefix: 'Remote',
     general_channel_id: 'C03B400RU',
@@ -20,7 +19,8 @@ const config = {
     karma_log: `${__dirname}/_storage/karma/`
   },
   newuser: {
-    coc_url: 'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md',
+    coc_url:
+      'https://raw.githubusercontent.com/mena-devs/code-of-conduct/master/GREETING.md',
     // Maximum number of recent joiners to store
     max_recent_users: 10,
     recent_users_store: `${__dirname}/_storage/newusers/`
@@ -47,7 +47,6 @@ const config = {
     path.join('plugins', 'wikipedia.js'),
     path.join('plugins', 'lira.js')
   ]
+};
 
-}
-
-module.exports = config
+module.exports = config;
