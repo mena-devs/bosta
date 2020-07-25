@@ -1,8 +1,8 @@
-const SlackHook = require('winston-slack-webhook-transport')
-const winston = require('winston')
+const SlackHook = require('winston-slack-webhook-transport');
+const winston = require('winston');
 
-const secret = require('./secret.json')
-const config = require('./config.js')
+const secret = require('./secret.json');
+const config = require('./config.js');
 
 module.exports = winston.createLogger({
   level: 'info',
@@ -15,4 +15,4 @@ module.exports = winston.createLogger({
       handleExceptions: config.main.logging.handleExceptions
     })
   ]
-})
+});

@@ -1,12 +1,6 @@
-const match = require('@menadevs/objectron')
+const match = require('@menadevs/objectron');
 
-const {
-  Blocks,
-  Section,
-  Image,
-  Divider,
-  Markdown
-} = require('../blocks.js')
+const { Blocks, Section, Image, Divider, Markdown } = require('../blocks.js');
 
 describe('Bosta Core Tests', () => {
   it('Successful Section, Markdown, Divider blocks generation', () => {
@@ -15,14 +9,10 @@ describe('Bosta Core Tests', () => {
      * by the Slack's API
      */
     const payload = Blocks(
-      Section(
-        Markdown(':wolframalpha: *Wolfram|Alpha Output:* :success:')
-      ),
+      Section(Markdown(':wolframalpha: *Wolfram|Alpha Output:* :success:')),
       Divider(),
-      Section(
-        Markdown('*Output:*')
-      )
-    )
+      Section(Markdown('*Output:*'))
+    );
 
     const result = match(payload, [
       {
@@ -42,7 +32,7 @@ describe('Bosta Core Tests', () => {
           text: '*Output:*'
         }
       }
-    ])
+    ]);
 
     const expected = {
       match: true,
@@ -59,11 +49,11 @@ describe('Bosta Core Tests', () => {
         2: { type: 'section', text: { type: 'mrkdwn', text: '*Output:*' } }
       },
       groups: {}
-    }
+    };
 
-    expect(result.match).toBeTruthy()
-    expect(result).toEqual(expected)
-  })
+    expect(result.match).toBeTruthy();
+    expect(result).toEqual(expected);
+  });
 
   it('Successful Section, Markdown, Divider, Image blocks generation', () => {
     /**
@@ -71,15 +61,11 @@ describe('Bosta Core Tests', () => {
      * by the Slack's API
      */
     const payload = Blocks(
-      Section(
-        Markdown(':wolframalpha: *Wolfram|Alpha Output:* :success:')
-      ),
+      Section(Markdown(':wolframalpha: *Wolfram|Alpha Output:* :success:')),
       Divider(),
-      Section(
-        Markdown('*Output:*')
-      ),
+      Section(Markdown('*Output:*')),
       Image('https://example.com/img/image1.png', 'test alternative text')
-    )
+    );
 
     const result = match(payload, [
       {
@@ -104,7 +90,7 @@ describe('Bosta Core Tests', () => {
         image_url: 'https://example.com/img/image1.png',
         alt_text: 'test alternative text'
       }
-    ])
+    ]);
 
     const expected = {
       match: true,
@@ -119,11 +105,15 @@ describe('Bosta Core Tests', () => {
         },
         1: { type: 'divider' },
         2: { type: 'section', text: { type: 'mrkdwn', text: '*Output:*' } },
-        3: { type: 'image', image_url: 'https://example.com/img/image1.png', alt_text: 'test alternative text' }
+        3: {
+          type: 'image',
+          image_url: 'https://example.com/img/image1.png',
+          alt_text: 'test alternative text'
+        }
       },
       groups: {}
-    }
-    expect(result.match).toBeTruthy()
-    expect(result).toEqual(expected)
-  })
-})
+    };
+    expect(result.match).toBeTruthy();
+    expect(result).toEqual(expected);
+  });
+});

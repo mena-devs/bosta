@@ -1,11 +1,11 @@
-const match = require('@menadevs/objectron')
+const match = require('@menadevs/objectron');
 
 const verbose = `
 How to use this plugin:
 
     ping
     ping john
-`
+`;
 
 module.exports = {
   name: 'ping',
@@ -13,15 +13,23 @@ module.exports = {
   verbose,
   events: {
     message: (options, message) => {
-      match(message, {
-        type: 'message',
-        text: /^ping$/
-      }, result => message.reply('pong'))
+      match(
+        message,
+        {
+          type: 'message',
+          text: /^ping$/
+        },
+        (result) => message.reply('pong')
+      );
 
-      match(message, {
-        type: 'message',
-        text: /^ping (?<who>.*)/
-      }, result => message.reply(`${result.groups.who} wake up!`))
+      match(
+        message,
+        {
+          type: 'message',
+          text: /^ping (?<who>.*)/
+        },
+        (result) => message.reply(`${result.groups.who} wake up!`)
+      );
     }
   }
-}
+};

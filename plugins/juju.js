@@ -1,11 +1,11 @@
-const match = require('@menadevs/objectron')
+const match = require('@menadevs/objectron');
 
 const verbose = `
 How to use this plugin:
 
     is using linux bad juju?
     is hugging toni bad juju?
-`
+`;
 
 module.exports = {
   name: 'juju',
@@ -13,12 +13,17 @@ module.exports = {
   verbose,
   events: {
     message: (options, message) => {
-      match(message, {
-        type: 'message',
-        text: /^is (?<verb>\S+) (?<what>\S+) bad juju?/
-      }, result => message.reply(
-          `${result.groups.what} is bad juju, people have died ${result.groups.verb} ${result.groups.what}`
-      ))
+      match(
+        message,
+        {
+          type: 'message',
+          text: /^is (?<verb>\S+) (?<what>\S+) bad juju?/
+        },
+        (result) =>
+          message.reply(
+            `${result.groups.what} is bad juju, people have died ${result.groups.verb} ${result.groups.what}`
+          )
+      );
     }
   }
-}
+};

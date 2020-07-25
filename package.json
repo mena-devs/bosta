@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
+    "lint": "eslint --fix plugins/**/*.js test/**/*.js *.js",
     "test": "jest"
   },
   "author": "",
@@ -28,7 +29,10 @@
     "winston-slack-webhook-transport": "^1.2.1"
   },
   "devDependencies": {
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.1.0",
-    "standard": "^14.3.3"
+    "prettier": "^2.0.5"
   }
 }

@@ -1,7 +1,7 @@
-const Plugin = require('../utils.js').Plugin
+const Plugin = require('../utils.js').Plugin;
 
-const rp = require('request-promise')
-const storage = require('node-persist')
+const rp = require('request-promise');
+const storage = require('node-persist');
 
 const META = {
   name: 'tellmeabout',
@@ -13,90 +13,90 @@ const META = {
     'about: stop-writing-classes',
     'forget: key-to-delete'
   ]
+};
+
+function cleanup(text) {
+  const pattern = /<a.*>(.*)<\/a>\s*(.*)/;
+  const [, key, value] = text.match(pattern) || [];
+
+  return `${key}: ${value}`;
 }
 
-function cleanup (text) {
-  const pattern = /<a.*>(.*)<\/a>\s*(.*)/
-  const [, key, value] = text.match(pattern) || []
-
-  return `${key}: ${value}`
-}
-
-function search (term) {
+function search(term) {
   const options = {
     uri: `https://duckduckgo.com/?format=json&q=${encodeURIComponent(term)}`,
     json: true
-  }
+  };
 
   return new Promise((resolve, reject) => {
     rp(options)
       .then((json) => {
         if (json) {
-          const topics = json.RelatedTopics
-            .filter(topic => topic.Result !== undefined)
-            .map(topic => cleanup(topic.Result))
-            .join('\n')
+          const topics = json.RelatedTopics.filter(
+            (topic) => topic.Result !== undefined
+          )
+            .map((topic) => cleanup(topic.Result))
+            .join('\n');
 
           if (topics) {
-            resolve(topics)
+            resolve(topics);
           } else {
-            resolve(`I don't know anything about ${term}`)
+            resolve(`I don't know anything about ${term}`);
           }
         } else {
-          resolve('invalid response, sorry!')
+          resolve('invalid response, sorry!');
         }
       })
-      .catch(error => reject(error))
-  })
+      .catch((error) => reject(error));
+  });
 }
 
-function save (options, message, key, value) {
-  if (key.length > options.config.plugins.tellmeabout.max_key_length ||
-        value.length > options.config.plugins.tellmeabout.max_value_length) {
-    message.reply('input too large, please reduce.')
+function save(options, message, key, value) {
+  if (
+    key.length > options.config.plugins.tellmeabout.max_key_length ||
+    value.length > options.config.plugins.tellmeabout.max_value_length
+  ) {
+    message.reply('input too large, please reduce.');
   } else {
-    storage
-      .setItem(key, value)
-      .then(_ => message.reply(`${key} saved.`))
+    storage.setItem(key, value).then((_) => message.reply(`${key} saved.`));
   }
 }
 
-function about (options, message, key) {
+function about(options, message, key) {
   storage
     .getItem(key)
     .then((value) => {
       if (value) {
-        return `${key}: ${value}`
+        return `${key}: ${value}`;
       }
 
-      return search(key)
-    }).then(value => message.reply(value))
-}
-
-function forget (options, message, key) {
-  storage
-    .removeItem(key)
-    .then((value) => {
-      if (value) {
-        message.reply(`${key} removed.`)
-      } else {
-        message.reply(`I do not know anything about ${key}`)
-      }
+      return search(key);
     })
+    .then((value) => message.reply(value));
 }
 
-function register (bot, rtm, web, config) {
+function forget(options, message, key) {
+  storage.removeItem(key).then((value) => {
+    if (value) {
+      message.reply(`${key} removed.`);
+    } else {
+      message.reply(`I do not know anything about ${key}`);
+    }
+  });
+}
+
+function register(bot, rtm, web, config) {
   storage.init({
     dir: config.plugins.tellmeabout.path
-  })
+  });
 
-  const plugin = new Plugin({ bot, rtm, web, config })
-  plugin.route(/^save: (.+?) as: (.+)/, save, {})
-  plugin.route(/^forget: (.+)/, forget, {})
-  plugin.route(/^about: (.+)/, about, {})
+  const plugin = new Plugin({ bot, rtm, web, config });
+  plugin.route(/^save: (.+?) as: (.+)/, save, {});
+  plugin.route(/^forget: (.+)/, forget, {});
+  plugin.route(/^about: (.+)/, about, {});
 }
 
 module.exports = {
   register,
   META
-}
+};
